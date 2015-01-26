@@ -73,7 +73,7 @@ class Cache implements iCache
     }
 
     // add default prefix
-    $this->setPrefix($_SERVER['SERVER_NAME'] . '_' . (isset($_SESSION['language']) ? $_SESSION['language'] : '') . '_' . (isset($_SESSION['language_extra']) ? $_SESSION['language_extra'] : ''));
+    $this->setPrefix((isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '') . '_' . (isset($_SESSION['language']) ? $_SESSION['language'] : '') . '_' . (isset($_SESSION['language_extra']) ? $_SESSION['language_extra'] : ''));
 
     if ($adapter === null || !is_object($adapter)) {
 
