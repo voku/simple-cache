@@ -62,7 +62,7 @@ class Cache implements iCache
         // cache isn't active
           $this->active !== true ||
           // $_SERVER == client
-          $_SERVER['$_SERVER_ADDR'] == $this->get_client_ip() ||
+          $_SERVER['SERVER_ADDR'] == $this->get_client_ip() ||
           // user is loggedIn
           $_SESSION['userID'] ||
           // user is a dev
@@ -73,7 +73,7 @@ class Cache implements iCache
     }
 
     // add default prefix
-    $this->setPrefix($_SERVER['$_SERVER_NAME'] . '_' . (isset($_SESSION['language']) ? $_SESSION['language'] : '') . '_' . (isset($_SESSION['language_extra']) ? $_SESSION['language_extra'] : ''));
+    $this->setPrefix($_SERVER['SERVER_NAME'] . '_' . (isset($_SESSION['language']) ? $_SESSION['language'] : '') . '_' . (isset($_SESSION['language_extra']) ? $_SESSION['language_extra'] : ''));
 
     if ($adapter === null || !is_object($adapter)) {
 
