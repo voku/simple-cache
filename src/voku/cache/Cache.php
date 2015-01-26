@@ -70,7 +70,7 @@ class Cache implements iCache
           (
               isset($_SERVER['SERVER_ADDR'])
               &&
-              $_SERVER['SERVER_ADDR'] == $this->get_client_ip()
+              $_SERVER['SERVER_ADDR'] == $this->getClientIp()
           )
           ||
           // user is loggedIn
@@ -238,9 +238,9 @@ class Cache implements iCache
    *
    * @return  string
    */
-  private function get_client_ip($trust_proxy_headers = false)
+  private function getClientIp($trust_proxy_headers = false)
   {
-    $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : false;
+    $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'NO_REMOTE_ADDR';
 
     if ($trust_proxy_headers) {
       return $remoteAddr;
