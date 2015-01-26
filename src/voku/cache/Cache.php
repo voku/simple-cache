@@ -363,9 +363,14 @@ class Cache implements iCache
   public function setItem($key, $value, $ttl = 0)
   {
     $storeKey = $this->calculateStoreKey($key);
-    $serialized = $this->serializer->serialize($value);
 
-    if ($this->adapter instanceof iAdapter) {
+    if (
+        $this->adapter instanceof iAdapter
+        &&
+        $this->serializer instanceof iSerializer
+    ) {
+      $serialized = $this->serializer->serialize($value);
+
       if ($ttl) {
         return $this->adapter->setExpired($storeKey, $serialized, $ttl);
       } else {
@@ -427,7 +432,7 @@ class Cache implements iCache
 
       // for testing with dev-address
       $noDev = isset($_GET['noDev']) ? (int)$_GET['noDev'] : 0;
-      $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : false;
+      $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'NO_REMOTE_ADDR';
 
       if
       (
