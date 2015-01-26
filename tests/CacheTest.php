@@ -174,7 +174,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
     $this->adapter = $this->getMock('voku\cache\AdapterApc');
     $this->serializer = $this->getMock('voku\cache\SerializerDefault');
 
-    $this->cache = new Cache($this->adapter, $this->serializer, false, false);
+    $this->cache = new Cache($this->adapter, $this->serializer, false, true);
 
     // reset default prefix
     $this->cache->setPrefix('');
