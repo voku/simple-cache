@@ -47,7 +47,7 @@ class Cache implements iCache
    *
    * @param iAdapter    $adapter
    * @param iSerializer $serializer
-   * @param boolean     $checkForUser check for dev-ip or if cms user is logged-in ...
+   * @param boolean     $checkForUser check for dev-ip or if cms-user is logged-in
    * @param bool        $cacheEnabled false will disable the cache (use it e.g. for global settings)
    */
   public function __construct($adapter = null, $serializer = null, $checkForUser = true, $cacheEnabled = true)
@@ -61,7 +61,7 @@ class Cache implements iCache
     }
 
     // test the cache also for dev
-    $testCache = isset($_GET['testCache']) ? (int) $_GET['testCache'] : 0;
+    $testCache = isset($_GET['testCache']) ? (int)$_GET['testCache'] : 0;
 
     // check for user-session / dev / ip && no testCache is set
     if ($checkForUser === true && $testCache != 1) {
@@ -204,8 +204,7 @@ class Cache implements iCache
           $adapter instanceof AdapterMemcache
       ) {
         $serializer = new SerializerNo();
-      }
-      // set serializer as default
+      } // set serializer as default
       else {
         $serializer = new SerializerIgbinary();
       }
@@ -452,7 +451,7 @@ class Cache implements iCache
    */
   public function setActive($active)
   {
-    $this->active = boolval($active);
+    $this->active = (boolean)$active;
   }
 
 }
