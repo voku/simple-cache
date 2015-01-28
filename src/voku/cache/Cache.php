@@ -66,7 +66,7 @@ class Cache implements iCache
     // check for user-session / dev / ip && no testCache is set
     if ($checkForUser === true && $testCache != 1) {
       if (
-          // $_SERVER == client
+        // $_SERVER == client
           (
               isset($_SERVER['SERVER_ADDR'])
               &&
@@ -96,78 +96,78 @@ class Cache implements iCache
         $adapter = $adapterCache;
       } else {
 
-
-        $redis = null;
-        $isRedisAvailable = false;
-        if (extension_loaded('redis')) {
-          if (class_exists('\Predis\Client')) {
-            $redis = new \Predis\Client(
-                array(
-                    'scheme'  => 'tcp',
-                    'host'    => '127.0.0.1',
-                    'port'    => 6379,
-                    'timeout' => '2.0'
-                )
-            );
-            try {
-              $redis->connect();
-              $isRedisAvailable = $redis->getConnection()->isConnected();
-            }
-            catch (\Exception $e) {
-              // nothing
-            }
-          }
+        $memcached = null;
+        $isMemcachedAvailable = false;
+        if (extension_loaded('memcached')) {
+          $memcached = new \Memcached();
+          $isMemcachedAvailable = $memcached->addServer('127.0.0.1', '11211');
         }
 
-        if ($isRedisAvailable === false) {
-          $redis = null;
+        if ($isMemcachedAvailable === false) {
+          $memcache = null;
         }
 
-        $adapterRedis = new AdapterPredis($redis);
-        if ($adapterRedis->installed() === true) {
+        $adapterMemcached = new AdapterMemcached($memcached);
+        if ($adapterMemcached->installed() === true) {
 
-          // fallback to Redis
-          $adapter = $adapterRedis;
+          // fallback to Memcached
+          $adapter = $adapterMemcached;
 
         } else {
 
-          $memcached = null;
-          $isMemcachedAvailable = false;
-          if (extension_loaded('memcached')) {
-            $memcached = new \Memcached();
-            $isMemcachedAvailable = $memcached->addServer('127.0.0.1', '11211');
+          $memcache = null;
+          $isMemcacheAvailable = false;
+          if (class_exists('\Memcache')) {
+            $memcache = new \Memcache;
+            $isMemcacheAvailable = @$memcache->connect('localhost', 11211);
           }
 
-          if ($isMemcachedAvailable === false) {
+          if ($isMemcacheAvailable === false) {
             $memcache = null;
           }
 
-          $adapterMemcached = new AdapterMemcached($memcached);
-          if ($adapterMemcached->installed() === true) {
+          $adapterMemcache = new AdapterMemcache($memcache);
+          if ($adapterMemcache->installed() === true) {
 
-            // fallback to Memcached
-            $adapter = $adapterMemcached;
+            // fallback to Memcache
+            $adapter = $adapterMemcache;
 
           } else {
 
-            $memcache = null;
-            $isMemcacheAvailable = false;
-            if (class_exists('\Memcache')) {
-              $memcache = new \Memcache;
-              $isMemcacheAvailable = @$memcache->connect('localhost', 11211);
+            $redis = null;
+            $isRedisAvailable = false;
+            if (extension_loaded('redis')) {
+              if (class_exists('\Predis\Client')) {
+                $redis = new \Predis\Client(
+                    array(
+                        'scheme'  => 'tcp',
+                        'host'    => '127.0.0.1',
+                        'port'    => 6379,
+                        'timeout' => '2.0'
+                    )
+                );
+                try {
+                  $redis->connect();
+                  $isRedisAvailable = $redis->getConnection()->isConnected();
+                }
+                catch (\Exception $e) {
+                  // nothing
+                }
+              }
             }
 
-            if ($isMemcacheAvailable === false) {
-              $memcache = null;
+            if ($isRedisAvailable === false) {
+              $redis = null;
             }
 
-            $adapterMemcache = new AdapterMemcache($memcache);
-            if ($adapterMemcache->installed() === true) {
+            $adapterRedis = new AdapterPredis($redis);
+            if ($adapterRedis->installed() === true) {
 
-              // fallback to Memcache
-              $adapter = $adapterMemcache;
+              // fallback to Redis
+              $adapter = $adapterRedis;
 
             } else {
+
               $adapterXcache = new AdapterXcache();
               if ($adapterXcache->installed() === true) {
 

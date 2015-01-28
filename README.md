@@ -7,8 +7,8 @@ Simple Cache Class
 
 
 This is a simple Cache Abstraction Layer for PHP >= 5.3 that provides a simple interaction with your cache-server. It will auto-detect you server-cache in this order:
-- Redis
 - Memcached / Memcache
+- Redis
 - Xcache
 - APC / APCu
 
