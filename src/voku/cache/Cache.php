@@ -66,7 +66,7 @@ class Cache implements iCache
     // check for user-session / dev / ip && no testCache is set
     if ($checkForUser === true && $testCache != 1) {
       if (
-        // $_SERVER == client
+          // $_SERVER == client
           (
               isset($_SERVER['SERVER_ADDR'])
               &&
@@ -183,8 +183,8 @@ class Cache implements iCache
                   $adapter = $adapterApc;
 
                 } else {
-                  // no cache-adapter available
-                  return false;
+                  // no cache-adapter available -> use a array
+                  $adapter = new AdapterArray();
                 }
               }
             }

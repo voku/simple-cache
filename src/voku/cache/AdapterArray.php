@@ -10,8 +10,15 @@ namespace voku\cache;
 class AdapterArray implements iAdapter
 {
 
-  private $values = array();
-  private $expired = array();
+  /**
+   * @var array
+   */
+  private static $values = array();
+
+  /**
+   * @var array
+   */
+  private static $expired = array();
 
   /**
    * get cached-item by key
@@ -22,9 +29,7 @@ class AdapterArray implements iAdapter
    */
   public function get($key)
   {
-    $this->removeExpired($key);
-
-    return $this->exists($key) ? $this->values[$key] : null;
+    return $this->exists($key) ? self::$values[$key] : null;
   }
 
   /**
@@ -36,18 +41,22 @@ class AdapterArray implements iAdapter
    */
   private function removeExpired($key)
   {
-    if (!isset($this->expired[$key]) || !isset($this->values[$key])) {
+    if (
+        !isset(self::$expired[$key])
+        ||
+        !isset(self::$values[$key])
+    ) {
       return false;
     }
 
-    list($time, $ttl) = $this->expired[$key];
+    list($time, $ttl) = self::$expired[$key];
 
     if (time() > ($time + $ttl)) {
-      unset($this->values[$key]);
+      unset(self::$values[$key]);
     }
 
-    if (!isset($this->values[$key])) {
-      unset($this->expired[$key]);
+    if (!isset(self::$values[$key])) {
+      unset(self::$expired[$key]);
     }
 
     return true;
@@ -64,7 +73,7 @@ class AdapterArray implements iAdapter
   {
     $this->removeExpired($key);
 
-    return isset($this->values[$key]);
+    return isset(self::$values[$key]);
   }
 
   /**
@@ -77,7 +86,7 @@ class AdapterArray implements iAdapter
    */
   public function set($key, $value)
   {
-    $this->values[$key] = $value;
+    self::$values[$key] = $value;
   }
 
   /**
@@ -91,8 +100,8 @@ class AdapterArray implements iAdapter
    */
   public function setExpired($key, $value, $ttl)
   {
-    $this->values[$key] = $value;
-    $this->expired[$key] = array(
+    self::$values[$key] = $value;
+    self::$expired[$key] = array(
         time(),
         $ttl
     );
@@ -109,7 +118,7 @@ class AdapterArray implements iAdapter
   {
     $this->removeExpired($key);
 
-    unset($this->values[$key]);
+    unset(self::$values[$key]);
   }
 
   /**

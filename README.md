@@ -8,17 +8,13 @@
 Simple Cache Class
 ===================
 
-
-This is a simple Cache Abstraction Layer for PHP >= 5.3 that provides a simple interaction with your cache-server. It will auto-detect you server-cache in this order:
-- Memcached / Memcache
-- Redis
-- Xcache
-- APC / APCu
-
-_This project is under construction, any feedback would be appreciated_
-
-Author: [Lars Moelleken](http://github.com/voku)
-
+This is a simple Cache Abstraction Layer for PHP >= 5.3 that provides a simple interaction 
+with your cache-server. You can define the Adapter / Serializer in the "constructor" or the class will auto-detect you server-cache in this order:
+1. Memcached / Memcache
+2. Redis
+3. Xcache
+4. APC / APCu
+5. static array
 
 ##Get "Simple Cache"
 You can download it from here, or require it using [composer](https://packagist.org/packages/voku/simple-cache).
