@@ -119,7 +119,7 @@ class Cache implements iCache
           $isMemcacheAvailable = false;
           if (class_exists('\Memcache')) {
             $memcache = new \Memcache;
-            $isMemcacheAvailable = @$memcache->connect('localhost', 11211);
+            $isMemcacheAvailable = @$memcache->connect('127.0.0.1', 11211);
           }
 
           if ($isMemcacheAvailable === false) {
