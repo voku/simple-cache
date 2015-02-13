@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/voku/simple-cache.svg?branch=master)](https://travis-ci.org/voku/simple-cache)
 [![Coverage Status](https://coveralls.io/repos/voku/simple-cache/badge.svg)](https://coveralls.io/r/voku/simple-cache)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/4926981d-ecb1-482b-a15c-447954b9bd66/mini.png)](https://insight.sensiolabs.com/projects/4926981d-ecb1-482b-a15c-447954b9bd66)
+[![Dependency Status](https://www.versioneye.com/php/voku:simple-cache/dev-master/badge.svg)](https://www.versioneye.com/php/voku:simple-cache/dev-master)
 [![Total Downloads](https://poser.pugx.org/voku/simple-cache/downloads.svg)](https://packagist.org/packages/voku/simple-cache)
 [![License](https://poser.pugx.org/voku/simple-cache/license.svg)](https://packagist.org/packages/voku/simple-cache)
 
