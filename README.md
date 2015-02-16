@@ -4,12 +4,11 @@
 [![Dependency Status](https://www.versioneye.com/php/voku:simple-cache/dev-master/badge.svg)](https://www.versioneye.com/php/voku:simple-cache/dev-master)
 [![Total Downloads](https://poser.pugx.org/voku/simple-cache/downloads.svg)](https://packagist.org/packages/voku/simple-cache)
 [![License](https://poser.pugx.org/voku/simple-cache/license.svg)](https://packagist.org/packages/voku/simple-cache)
+[![Join the chat at https://gitter.im/voku/simple-cache](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/voku/simple-cache?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 Simple Cache Class
 ===================
-
-[![Join the chat at https://gitter.im/voku/simple-cache](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/voku/simple-cache?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This is a simple Cache Abstraction Layer for PHP >= 5.3 that provides a simple interaction 
 with your cache-server. You can define the Adapter / Serializer in the "constructor" or the class will auto-detect you server-cache in this order:
