@@ -45,10 +45,10 @@ class Cache implements iCache
   /**
    * __construct
    *
-   * @param iAdapter    $adapter
-   * @param iSerializer $serializer
-   * @param boolean     $checkForUser check for dev-ip or if cms-user is logged-in
-   * @param bool        $cacheEnabled false will disable the cache (use it e.g. for global settings)
+   * @param null|iAdapter    $adapter
+   * @param null|iSerializer $serializer
+   * @param boolean          $checkForUser check for dev-ip or if cms-user is logged-in
+   * @param bool             $cacheEnabled false will disable the cache (use it e.g. for global settings)
    */
   public function __construct($adapter = null, $serializer = null, $checkForUser = true, $cacheEnabled = true)
   {
@@ -228,6 +228,16 @@ class Cache implements iCache
   }
 
   /**
+   * enable / disable the cache
+   *
+   * @param boolean $active
+   */
+  public function setActive($active)
+  {
+    $this->active = (boolean)$active;
+  }
+
+  /**
    * returns the IP address of the client
    *
    * @param   bool $trust_proxy_headers   Whether or not to trust the
@@ -255,6 +265,42 @@ class Cache implements iCache
     }
 
     return $ip;
+  }
+
+  /**
+   * check for developer
+   *
+   * @return bool
+   */
+  private function checkForDev()
+  {
+    $return = false;
+
+    if (function_exists('checkForDev')) {
+      $return = checkForDev();
+    } else {
+
+      // for testing with dev-address
+      $noDev = isset($_GET['noDev']) ? (int)$_GET['noDev'] : 0;
+      $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'NO_REMOTE_ADDR';
+
+      if
+      (
+          $noDev != 1
+          &&
+          (
+              $remoteAddr == '127.0.0.1'
+              ||
+              $remoteAddr == '::1'
+              ||
+              PHP_SAPI == 'cli'
+          )
+      ) {
+        $return = true;
+      }
+    }
+
+    return $return;
   }
 
   /**
@@ -415,50 +461,6 @@ class Cache implements iCache
     } else {
       return false;
     }
-  }
-
-  /**
-   * check for developer
-   *
-   * @return bool
-   */
-  private function checkForDev()
-  {
-    $return = false;
-
-    if (function_exists('checkForDev')) {
-      $return = checkForDev();
-    } else {
-
-      // for testing with dev-address
-      $noDev = isset($_GET['noDev']) ? (int)$_GET['noDev'] : 0;
-      $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'NO_REMOTE_ADDR';
-
-      if
-      (
-          $noDev != 1
-          &&
-          (
-              $remoteAddr == '127.0.0.1'
-              || $remoteAddr == '::1'
-              || PHP_SAPI == 'cli'
-          )
-      ) {
-        $return = true;
-      }
-    }
-
-    return $return;
-  }
-
-  /**
-   * enable / disable the cache
-   *
-   * @param boolean $active
-   */
-  public function setActive($active)
-  {
-    $this->active = (boolean)$active;
   }
 
 }
