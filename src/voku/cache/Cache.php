@@ -204,7 +204,8 @@ class Cache implements iCache
           $adapter instanceof AdapterMemcache
       ) {
         $serializer = new SerializerNo();
-      } // set serializer as default
+      }
+      // set serializer as default
       else {
         $serializer = new SerializerIgbinary();
       }
