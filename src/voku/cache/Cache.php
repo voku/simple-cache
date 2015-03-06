@@ -104,7 +104,7 @@ class Cache implements iCache
         }
 
         if ($isMemcachedAvailable === false) {
-          $memcache = null;
+          $memcached = null;
         }
 
         $adapterMemcached = new AdapterMemcached($memcached);
