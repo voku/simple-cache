@@ -57,11 +57,4 @@ interface iAdapter
    * @return mixed
    */
   public function exists($key);
-
-  /**
-   * check if cache is installed
-   *
-   * @return mixed
-   */
-  public function installed();
 }

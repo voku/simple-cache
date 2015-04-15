@@ -2,6 +2,8 @@
 
 namespace voku\cache;
 
+use Predis\Client;
+
 /**
  * AdapterPredis: Memcached-adapter
  *
@@ -10,27 +12,16 @@ namespace voku\cache;
 class AdapterPredis implements iAdapter
 {
   /**
-   * @var bool
-   */
-  public $installed = false;
-
-  /**
-   * @var \Predis\Client
+   * @var Client
    */
   private $client;
 
   /**
-   * @param \Predis\Client $client
+   * @param Client $client
    */
-  public function __construct($client)
+  public function __construct(Client $client)
   {
-    if ($client instanceof \Predis\Client) {
-      $this->installed = true;
       $this->client = $client;
-      return true;
-    } else {
-      return false;
-    }
   }
 
   /**
@@ -83,17 +74,6 @@ class AdapterPredis implements iAdapter
   {
     return $this->client->del($key);
   }
-
-  /**
-   * check if cache is installed
-   *
-   * @return boolean
-   */
-  public function installed()
-  {
-    return $this->installed;
-  }
-
 
   /**
    * @param $key
