@@ -2,6 +2,8 @@
 
 namespace voku\cache;
 
+use Predis\Client;
+
 /**
  * AdapterPredis: Memcached-adapter
  *
@@ -10,14 +12,14 @@ namespace voku\cache;
 class AdapterPredis implements iAdapter
 {
   /**
-   * @var \Predis\Client
+   * @var Client
    */
   private $client;
 
   /**
-   * @param \Predis\Client $client
+   * @param Client $client
    */
-  public function __construct($client)
+  public function __construct(Client $client)
   {
       $this->client = $client;
   }
