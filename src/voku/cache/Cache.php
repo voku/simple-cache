@@ -43,7 +43,7 @@ class Cache implements iCache
   private $active = true;
 
   /**
-   * @var boolean
+   * @var mixed no cache if admin-session
    */
   private $adminSession = false;
 
@@ -74,16 +74,16 @@ class Cache implements iCache
     // check for user-session / dev / ip && no testCache is set
     if ($checkForUser === true && $testCache != 1) {
       if (
-        // server == client
+          // server == client
           (
               isset($_SERVER['SERVER_ADDR'])
               &&
               $_SERVER['SERVER_ADDR'] == $this->getClientIp()
           )
           ||
-          // user is loggedIn
+          // admin is logged-in
           (
-              $this->adminSession === true
+              $this->adminSession
           )
           ||
           // user is a dev
