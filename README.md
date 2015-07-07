@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/voku/simple-cache.svg?branch=master)](https://travis-ci.org/voku/simple-cache)
-[![Coverage Status](https://coveralls.io/repos/voku/simple-cache/badge.svg)](https://coveralls.io/r/voku/simple-cache)
+[![Coverage Status](https://coveralls.io/repos/github/voku/simple-cache/badge.svg?branch=master)](https://coveralls.io/github/voku/simple-cache?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/voku/simple-cache/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/voku/simple-cache/?branch=master)
 [![Codacy Badge](https://www.codacy.com/project/badge/5846d2a46599486486b3956c0ce11a18)](https://www.codacy.com/app/voku/simple-cache)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/4926981d-ecb1-482b-a15c-447954b9bd66/mini.png)](https://insight.sensiolabs.com/projects/4926981d-ecb1-482b-a15c-447954b9bd66)
