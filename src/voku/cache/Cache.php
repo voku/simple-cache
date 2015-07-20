@@ -401,7 +401,7 @@ class Cache implements iCache
 
     $storeKey = $this->calculateStoreKey($key);
 
-    $this->setItem($storeKey, $value, $ttl);
+    return $this->setItem($storeKey, $value, $ttl);
   }
 
   /**

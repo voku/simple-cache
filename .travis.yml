@@ -11,6 +11,15 @@ php:
   - hhvm-nightly
 
 before_script:
+  - php --version
+  - mkdir -p $(dirname ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini)
+  - touch ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "php-config -> orig"
+  - cat ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "extension=apcu.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "apc.enable_cli=0" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "php-config -> new"
+  - cat ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - wget https://scrutinizer-ci.com/ocular.phar
   - travis_retry composer self-update
   - travis_retry composer install --no-interaction --prefer-source
