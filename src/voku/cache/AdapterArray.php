@@ -87,6 +87,8 @@ class AdapterArray implements iAdapter
   public function set($key, $value)
   {
     self::$values[$key] = $value;
+
+    return true;
   }
 
   /**
@@ -105,6 +107,8 @@ class AdapterArray implements iAdapter
         time(),
         $ttl
     );
+
+    return true;
   }
 
   /**
