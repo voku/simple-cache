@@ -94,6 +94,12 @@ class ApcCacheTest extends PHPUnit_Framework_TestCase
     $this->adapter = new AdapterApc();
     $this->serializer = new SerializerDefault();
 
+    if ($this->adapter->installed() === false) {
+      self::markTestSkipped(
+          'The APC extension is not available.'
+      );
+    }
+
     $this->cache = new Cache($this->adapter, $this->serializer, false, true);
 
     // reset default prefix

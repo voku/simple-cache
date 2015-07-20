@@ -12,7 +12,14 @@ namespace voku\cache;
 class AdapterApc implements iAdapter
 {
 
+  /**
+   * @var bool
+   */
   public $installed = false;
+
+  /**
+   * @var bool
+   */
   public $debug = false;
 
   /**
