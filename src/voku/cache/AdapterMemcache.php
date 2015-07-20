@@ -51,7 +51,7 @@ class AdapterMemcache implements iAdapter
    */
   public function set($key, $value)
   {
-    $this->memcache->set($key, $value, $this->getCompressedFlag());
+    return $this->memcache->set($key, $value, $this->getCompressedFlag());
   }
 
   /**
@@ -99,7 +99,7 @@ class AdapterMemcache implements iAdapter
       $ttl = 2592000;
     }
 
-    $this->memcache->set($key, $value, $this->getCompressedFlag(), $ttl);
+    return $this->memcache->set($key, $value, $this->getCompressedFlag(), $ttl);
   }
 
   /**
@@ -111,7 +111,7 @@ class AdapterMemcache implements iAdapter
    */
   public function remove($key)
   {
-    $this->memcache->delete($key);
+    return $this->memcache->delete($key);
   }
 
   /**
