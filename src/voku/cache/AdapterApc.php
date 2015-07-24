@@ -25,14 +25,10 @@ class AdapterApc implements iAdapter
   /**
    * __construct()
    */
-  function __construct()
+  public function __construct()
   {
-    if (function_exists('apc_store') === false) {
-      return false;
-    } else {
+    if (function_exists('apc_store') === true) {
       $this->installed = true;
-
-      return true;
     }
   }
 

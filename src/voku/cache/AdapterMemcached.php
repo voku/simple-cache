@@ -31,10 +31,6 @@ class AdapterMemcached implements iAdapter
       $this->installed = true;
 
       $this->setSettings();
-
-      return true;
-    } else {
-      return false;
     }
   }
 

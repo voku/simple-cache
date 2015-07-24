@@ -27,9 +27,6 @@ class AdapterPredis implements iAdapter
     if ($client instanceof \Predis\Client) {
       $this->installed = true;
       $this->client = $client;
-      return true;
-    } else {
-      return false;
     }
   }
 

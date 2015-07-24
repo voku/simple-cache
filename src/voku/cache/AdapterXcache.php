@@ -16,12 +16,8 @@ class AdapterXcache implements iAdapter
    */
   public function __construct()
   {
-    if (!extension_loaded('xcache')) {
-      return false;
-    } else {
+    if (extension_loaded('xcache') === true) {
       $this->installed = true;
-
-      return true;
     }
   }
 

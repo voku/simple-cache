@@ -34,10 +34,6 @@ class AdapterMemcache implements iAdapter
     if ($memcache instanceof \Memcache) {
       $this->memcache = $memcache;
       $this->installed = true;
-
-      return true;
-    } else {
-      return false;
     }
   }
 

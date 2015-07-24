@@ -33,19 +33,19 @@ class Cache implements iCache
   private $prefix = '';
 
   /**
-   * @var Boolean
+   * @var bool
    */
-  private $cacheIsReady = false;
+  private $isReady = false;
 
   /**
    * @var bool
    */
-  private $active = true;
+  private $isActive = true;
 
   /**
-   * @var mixed no cache if admin-session
+   * @var mixed no cache, if admin-session is set
    */
-  private $adminSession = false;
+  private $isAdminSession = false;
 
   /**
    * __construct
@@ -58,21 +58,191 @@ class Cache implements iCache
    */
   public function __construct($adapter = null, $serializer = null, $checkForUser = true, $cacheEnabled = true, $adminSession = false)
   {
-    static $adapterCache;
+    $this->isAdminSession = $adminSession;
 
     // check for active-cache
     $this->setActive($cacheEnabled);
-    if ($this->active !== true) {
-      return false;
+    if ($this->isActive === true && $checkForUser === true) {
+      $this->setActive($this->isCacheActiveForTheCurrentUser());
     }
 
-    $this->adminSession = $adminSession;
+    if ($this->isActive === true) {
 
-    // test the cache also for dev
+      $this->setPrefix($this->getTheDefaultPrefix());
+
+      if (
+          $adapter === null
+          ||
+          !is_object($adapter)
+          ||
+          !$adapter instanceof iAdapter
+      ) {
+        $adapter = $this->autoConnectToAvailableCacheSystem();
+      }
+
+      // Memcache(d) has his own "serializer", so don't use it twice
+      if (!is_object($serializer) && $serializer === null) {
+        if (
+            $adapter instanceof AdapterMemcached
+            ||
+            $adapter instanceof AdapterMemcache
+        ) {
+          $serializer = new SerializerNo();
+        } else {
+          // set serializer as default
+          $serializer = new SerializerIgbinary();
+        }
+      }
+    }
+
+    // check if we will use the cache
+    if (
+        $serializer instanceof iSerializer
+        &&
+        $adapter instanceof iAdapter
+    ) {
+      $this->setCacheIsReady(true);
+
+      $this->adapter = $adapter;
+      $this->serializer = $serializer;
+    }
+  }
+
+  /**
+   * auto-connect to the available cache-system on the server
+   *
+   * @return iAdapter
+   */
+  protected function autoConnectToAvailableCacheSystem() {
+    static $adapterCache;
+
+    if (is_object($adapterCache) && $adapterCache instanceof iAdapter) {
+      return $adapterCache;
+    } else {
+
+      $memcached = null;
+      $isMemcachedAvailable = false;
+      if (extension_loaded('memcached')) {
+        $memcached = new \Memcached();
+        $isMemcachedAvailable = $memcached->addServer('127.0.0.1', '11211');
+      }
+
+      if ($isMemcachedAvailable === false) {
+        $memcached = null;
+      }
+
+      $adapterMemcached = new AdapterMemcached($memcached);
+      if ($adapterMemcached->installed() === true) {
+
+        // fallback to Memcached
+        $adapter = $adapterMemcached;
+
+      } else {
+
+        $memcache = null;
+        $isMemcacheAvailable = false;
+        if (class_exists('\Memcache')) {
+          $memcache = new \Memcache;
+          /** @noinspection PhpUsageOfSilenceOperatorInspection */
+          $isMemcacheAvailable = @$memcache->connect('127.0.0.1', 11211);
+        }
+
+        if ($isMemcacheAvailable === false) {
+          $memcache = null;
+        }
+
+        $adapterMemcache = new AdapterMemcache($memcache);
+        if ($adapterMemcache->installed() === true) {
+
+          // fallback to Memcache
+          $adapter = $adapterMemcache;
+
+        } else {
+
+          $redis = null;
+          $isRedisAvailable = false;
+          if (extension_loaded('redis')) {
+            if (class_exists('\Predis\Client')) {
+              $redis = new \Predis\Client(
+                  array(
+                      'scheme'  => 'tcp',
+                      'host'    => '127.0.0.1',
+                      'port'    => 6379,
+                      'timeout' => '2.0',
+                  )
+              );
+              try {
+                $redis->connect();
+                $isRedisAvailable = $redis->getConnection()->isConnected();
+              } catch (\Exception $e) {
+                // nothing
+              }
+            }
+          }
+
+          if ($isRedisAvailable === false) {
+            $redis = null;
+          }
+
+          $adapterRedis = new AdapterPredis($redis);
+          if ($adapterRedis->installed() === true) {
+
+            // fallback to Redis
+            $adapter = $adapterRedis;
+
+          } else {
+
+            $adapterXcache = new AdapterXcache();
+            if ($adapterXcache->installed() === true) {
+
+              // fallback to Xcache
+              $adapter = $adapterXcache;
+
+            } else {
+
+              $adapterApc = new AdapterApc();
+              if ($adapterApc->installed() === true) {
+
+                // fallback to APC || APCu
+                $adapter = $adapterApc;
+
+              } else {
+                // no cache-adapter available -> use a array
+                $adapter = new AdapterArray();
+              }
+            }
+          }
+        }
+      }
+
+      // save to static cache
+      $adapterCache = $adapter;
+    }
+
+    return $adapter;
+  }
+
+  /**
+   * set the default-prefix via "SERVER_NAME" + "SESSION"-language
+   */
+  protected function getTheDefaultPrefix()
+  {
+    return (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '') . '_' . (isset($_SESSION['language']) ? $_SESSION['language'] : '') . '_' . (isset($_SESSION['language_extra']) ? $_SESSION['language_extra'] : '');
+  }
+
+  /**
+   * check if the current use is a admin || dev || server == client
+   *
+   * @return bool
+   */
+  public function isCacheActiveForTheCurrentUser()
+  {
+    $active = true;
+
+    // test the cache, with this GET-parameter
     $testCache = isset($_GET['testCache']) ? (int)$_GET['testCache'] : 0;
 
-    // check for user-session / dev / ip && no testCache is set
-    if ($checkForUser === true && $testCache != 1) {
+    if ($testCache != 1) {
       if (
           // server == client
           (
@@ -82,157 +252,16 @@ class Cache implements iCache
           )
           ||
           // admin is logged-in
-          (
-              $this->adminSession
-          )
+          $this->isAdminSession
           ||
           // user is a dev
           $this->checkForDev() === true
       ) {
-        return false;
+        $active = false;
       }
     }
 
-    // add default prefix
-    $this->setPrefix((isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '') . '_' . (isset($_SESSION['language']) ? $_SESSION['language'] : '') . '_' . (isset($_SESSION['language_extra']) ? $_SESSION['language_extra'] : ''));
-
-    if ($adapter === null || !is_object($adapter)) {
-
-      if (is_object($adapterCache)) {
-        $adapter = $adapterCache;
-      } else {
-
-        $memcached = null;
-        $isMemcachedAvailable = false;
-        if (extension_loaded('memcached')) {
-          $memcached = new \Memcached();
-          $isMemcachedAvailable = $memcached->addServer('127.0.0.1', '11211');
-        }
-
-        if ($isMemcachedAvailable === false) {
-          $memcached = null;
-        }
-
-        $adapterMemcached = new AdapterMemcached($memcached);
-        if ($adapterMemcached->installed() === true) {
-
-          // fallback to Memcached
-          $adapter = $adapterMemcached;
-
-        } else {
-
-          $memcache = null;
-          $isMemcacheAvailable = false;
-          if (class_exists('\Memcache')) {
-            $memcache = new \Memcache;
-            /** @noinspection PhpUsageOfSilenceOperatorInspection */
-            $isMemcacheAvailable = @$memcache->connect('127.0.0.1', 11211);
-          }
-
-          if ($isMemcacheAvailable === false) {
-            $memcache = null;
-          }
-
-          $adapterMemcache = new AdapterMemcache($memcache);
-          if ($adapterMemcache->installed() === true) {
-
-            // fallback to Memcache
-            $adapter = $adapterMemcache;
-
-          } else {
-
-            $redis = null;
-            $isRedisAvailable = false;
-            if (extension_loaded('redis')) {
-              if (class_exists('\Predis\Client')) {
-                $redis = new \Predis\Client(
-                    array(
-                        'scheme'  => 'tcp',
-                        'host'    => '127.0.0.1',
-                        'port'    => 6379,
-                        'timeout' => '2.0'
-                    )
-                );
-                try {
-                  $redis->connect();
-                  $isRedisAvailable = $redis->getConnection()->isConnected();
-                }
-                catch (\Exception $e) {
-                  // nothing
-                }
-              }
-            }
-
-            if ($isRedisAvailable === false) {
-              $redis = null;
-            }
-
-            $adapterRedis = new AdapterPredis($redis);
-            if ($adapterRedis->installed() === true) {
-
-              // fallback to Redis
-              $adapter = $adapterRedis;
-
-            } else {
-
-              $adapterXcache = new AdapterXcache();
-              if ($adapterXcache->installed() === true) {
-
-                // fallback to Xcache
-                $adapter = $adapterXcache;
-
-              } else {
-
-                $adapterApc = new AdapterApc();
-                if ($adapterApc->installed() === true) {
-
-                  // fallback to APC || APCu
-                  $adapter = $adapterApc;
-
-                } else {
-                  // no cache-adapter available -> use a array
-                  $adapter = new AdapterArray();
-                }
-              }
-            }
-          }
-        }
-
-        $adapterCache = $adapter;
-      }
-
-    }
-
-    // set serializer for memcached
-    if (!is_object($serializer) && $serializer === null) {
-      if (
-          $adapter instanceof AdapterMemcached
-          ||
-          $adapter instanceof AdapterMemcache
-      ) {
-        $serializer = new SerializerNo();
-      }
-      // set serializer as default
-      else {
-        $serializer = new SerializerIgbinary();
-      }
-    }
-
-    // check if we will use the cache
-    if (
-        !$serializer instanceof iSerializer
-        ||
-        !$adapter instanceof iAdapter
-    ) {
-      return false;
-    }
-
-    $this->setCacheIsReady(true);
-
-    $this->adapter = $adapter;
-    $this->serializer = $serializer;
-
-    return true;
+    return $active;
   }
 
   /**
@@ -240,9 +269,9 @@ class Cache implements iCache
    *
    * @param boolean $active
    */
-  public function setActive($active)
+  public function setActive($isActive)
   {
-    $this->active = (boolean)$active;
+    $this->isActive = (boolean)$isActive;
   }
 
   /**
@@ -315,9 +344,9 @@ class Cache implements iCache
    *
    * @param Boolean $cacheIsReady
    */
-  private function setCacheIsReady($cacheIsReady)
+  private function setCacheIsReady($isReady)
   {
-    $this->cacheIsReady = (boolean)$cacheIsReady;
+    $this->isReady = (boolean)$isReady;
   }
 
   /**
@@ -327,7 +356,7 @@ class Cache implements iCache
    */
   public function getCacheIsReady()
   {
-    return $this->cacheIsReady;
+    return $this->isReady;
   }
 
   /**
