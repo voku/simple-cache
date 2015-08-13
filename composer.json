@@ -27,7 +27,7 @@
   },
   "autoload": {
     "psr-4": {
-      "voku\\cache\\": "src"
+      "voku\\cache\\": "src/voku/cache/"
     }
   },
   "extra": {
