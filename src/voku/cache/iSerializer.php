@@ -27,4 +27,4 @@ interface iSerializer
    * @return mixed
    */
   public function unserialize($value);
-} 
+}

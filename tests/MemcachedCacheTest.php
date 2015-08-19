@@ -1,6 +1,5 @@
 <?php
 
-use voku\cache\AdapterArray;
 use voku\cache\AdapterMemcached;
 use voku\cache\Cache;
 use voku\cache\iAdapter;
