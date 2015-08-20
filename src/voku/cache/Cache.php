@@ -54,11 +54,11 @@ class Cache implements iCache
    * @param null|iSerializer $serializer
    * @param boolean          $checkForUser check for dev-ip or if cms-user is logged-in
    * @param boolean          $cacheEnabled false will disable the cache (use it e.g. for global settings)
-   * @param string|boolean   $adminSession set a user-id, if the user is a admin (so we can disable cache for this user)
+   * @param string|boolean   $isAdminSession set a user-id, if the user is a admin (so we can disable cache for this user)
    */
-  public function __construct($adapter = null, $serializer = null, $checkForUser = true, $cacheEnabled = true, $adminSession = false)
+  public function __construct($adapter = null, $serializer = null, $checkForUser = true, $cacheEnabled = true, $isAdminSession = false)
   {
-    $this->isAdminSession = $adminSession;
+    $this->isAdminSession = $isAdminSession;
 
     // check for active-cache
     $this->setActive($cacheEnabled);

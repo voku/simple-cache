@@ -70,4 +70,9 @@ function test() {
 }
 ```
 
+##No-Cache for the admin or a specific ip-address
+
+If you use the parameter "$checkForUser" (true) from the constructor, then the cache isn't used for the admin-session.
+You can also overwrite the check for the user, if you add a global function named "checkForDev()".
+
 
