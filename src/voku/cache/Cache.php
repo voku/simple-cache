@@ -109,11 +109,129 @@ class Cache implements iCache
   }
 
   /**
+   * enable / disable the cache
+   *
+   * @param boolean $isActive
+   */
+  public function setActive($isActive)
+  {
+    $this->isActive = (boolean)$isActive;
+  }
+
+  /**
+   * check if the current use is a admin || dev || server == client
+   *
+   * @return bool
+   */
+  public function isCacheActiveForTheCurrentUser()
+  {
+    $active = true;
+
+    // test the cache, with this GET-parameter
+    $testCache = isset($_GET['testCache']) ? (int)$_GET['testCache'] : 0;
+
+    if ($testCache != 1) {
+      if (
+        // server == client
+          (
+              isset($_SERVER['SERVER_ADDR'])
+              &&
+              $_SERVER['SERVER_ADDR'] == $this->getClientIp()
+          )
+          ||
+          // admin is logged-in
+          $this->isAdminSession
+          ||
+          // user is a dev
+          $this->checkForDev() === true
+      ) {
+        $active = false;
+      }
+    }
+
+    return $active;
+  }
+
+  /**
+   * returns the IP address of the client
+   *
+   * @param   bool $trust_proxy_headers   Whether or not to trust the
+   *                                      proxy headers HTTP_CLIENT_IP
+   *                                      and HTTP_X_FORWARDED_FOR. ONLY
+   *                                      use if your $_SERVER is behind a
+   *                                      proxy that sets these values
+   *
+   * @return  string
+   */
+  private function getClientIp($trust_proxy_headers = false)
+  {
+    $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'NO_REMOTE_ADDR';
+
+    if ($trust_proxy_headers) {
+      return $remoteAddr;
+    }
+
+    if (isset($_SERVER['HTTP_CLIENT_IP']) && $_SERVER['HTTP_CLIENT_IP']) {
+      $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR']) {
+      $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+      $ip = $remoteAddr;
+    }
+
+    return $ip;
+  }
+
+  /**
+   * check for developer
+   *
+   * @return bool
+   */
+  private function checkForDev()
+  {
+    $return = false;
+
+    if (function_exists('checkForDev')) {
+      $return = checkForDev();
+    } else {
+
+      // for testing with dev-address
+      $noDev = isset($_GET['noDev']) ? (int)$_GET['noDev'] : 0;
+      $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'NO_REMOTE_ADDR';
+
+      if (
+          $noDev != 1
+          &&
+          (
+              $remoteAddr == '127.0.0.1'
+              ||
+              $remoteAddr == '::1'
+              ||
+              PHP_SAPI == 'cli'
+          )
+      ) {
+        $return = true;
+      }
+    }
+
+    return $return;
+  }
+
+  /**
+   * set the default-prefix via "SERVER_NAME" + "SESSION"-language
+   */
+  protected function getTheDefaultPrefix()
+  {
+    return (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '') . '_' . (isset($_SESSION['language']) ? $_SESSION['language'] : '') . '_' . (isset($_SESSION['language_extra']) ? $_SESSION['language_extra'] : '');
+  }
+
+  /**
    * auto-connect to the available cache-system on the server
    *
    * @return iAdapter
    */
-  protected function autoConnectToAvailableCacheSystem() {
+  protected function autoConnectToAvailableCacheSystem()
+  {
     static $adapterCache;
 
     if (is_object($adapterCache) && $adapterCache instanceof iAdapter) {
@@ -223,126 +341,9 @@ class Cache implements iCache
   }
 
   /**
-   * set the default-prefix via "SERVER_NAME" + "SESSION"-language
-   */
-  protected function getTheDefaultPrefix()
-  {
-    return (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '') . '_' . (isset($_SESSION['language']) ? $_SESSION['language'] : '') . '_' . (isset($_SESSION['language_extra']) ? $_SESSION['language_extra'] : '');
-  }
-
-  /**
-   * check if the current use is a admin || dev || server == client
-   *
-   * @return bool
-   */
-  public function isCacheActiveForTheCurrentUser()
-  {
-    $active = true;
-
-    // test the cache, with this GET-parameter
-    $testCache = isset($_GET['testCache']) ? (int)$_GET['testCache'] : 0;
-
-    if ($testCache != 1) {
-      if (
-          // server == client
-          (
-              isset($_SERVER['SERVER_ADDR'])
-              &&
-              $_SERVER['SERVER_ADDR'] == $this->getClientIp()
-          )
-          ||
-          // admin is logged-in
-          $this->isAdminSession
-          ||
-          // user is a dev
-          $this->checkForDev() === true
-      ) {
-        $active = false;
-      }
-    }
-
-    return $active;
-  }
-
-  /**
-   * enable / disable the cache
-   *
-   * @param boolean $active
-   */
-  public function setActive($isActive)
-  {
-    $this->isActive = (boolean)$isActive;
-  }
-
-  /**
-   * returns the IP address of the client
-   *
-   * @param   bool $trust_proxy_headers   Whether or not to trust the
-   *                                      proxy headers HTTP_CLIENT_IP
-   *                                      and HTTP_X_FORWARDED_FOR. ONLY
-   *                                      use if your $_SERVER is behind a
-   *                                      proxy that sets these values
-   *
-   * @return  string
-   */
-  private function getClientIp($trust_proxy_headers = false)
-  {
-    $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'NO_REMOTE_ADDR';
-
-    if ($trust_proxy_headers) {
-      return $remoteAddr;
-    }
-
-    if (isset($_SERVER['HTTP_CLIENT_IP']) && $_SERVER['HTTP_CLIENT_IP']) {
-      $ip = $_SERVER['HTTP_CLIENT_IP'];
-    } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR']) {
-      $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } else {
-      $ip = $remoteAddr;
-    }
-
-    return $ip;
-  }
-
-  /**
-   * check for developer
-   *
-   * @return bool
-   */
-  private function checkForDev()
-  {
-    $return = false;
-
-    if (function_exists('checkForDev')) {
-      $return = checkForDev();
-    } else {
-
-      // for testing with dev-address
-      $noDev = isset($_GET['noDev']) ? (int)$_GET['noDev'] : 0;
-      $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'NO_REMOTE_ADDR';
-
-      if (
-          $noDev != 1
-          &&
-          (
-              $remoteAddr == '127.0.0.1'
-              ||
-              $remoteAddr == '::1'
-              ||
-              PHP_SAPI == 'cli'
-          )
-      ) {
-        $return = true;
-      }
-    }
-
-    return $return;
-  }
-
-  /**
    * set cacheIsReady state
    *
-   * @param Boolean $cacheIsReady
+   * @param Boolean $isReady
    */
   private function setCacheIsReady($isReady)
   {
