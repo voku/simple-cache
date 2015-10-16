@@ -26,7 +26,7 @@ You can download it from here, or require it using [composer](https://packagist.
 {
     "require": {
 		"voku/simple-cache": "2.*",
-		"predis/predis": "1.*"
+		"predis/predis": "1.*" // if you will use redis as cache, then add predis
 	}
 }
 ```
@@ -34,6 +34,7 @@ You can download it from here, or require it using [composer](https://packagist.
 ##Install via "composer require"
 ```shell
 composer require voku/simple-cache
+composer require predis/predis # if you will use redis as cache, then add predis
 ```
 
 
