@@ -96,17 +96,14 @@ class AdapterArray implements iAdapter
    *
    * @param string $key
    * @param mixed  $value
-   * @param        $ttl
+   * @param int    $ttl
    *
    * @return mixed|void
    */
   public function setExpired($key, $value, $ttl)
   {
     self::$values[$key] = $value;
-    self::$expired[$key] = array(
-        time(),
-        $ttl
-    );
+    self::$expired[$key] = array(time(), $ttl);
 
     return true;
   }

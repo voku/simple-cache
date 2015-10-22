@@ -343,7 +343,7 @@ class Cache implements iCache
   /**
    * set cacheIsReady state
    *
-   * @param Boolean $isReady
+   * @param boolean $isReady
    */
   private function setCacheIsReady($isReady)
   {
@@ -353,7 +353,7 @@ class Cache implements iCache
   /**
    * get the cacheIsReady state
    *
-   * @return Boolean
+   * @return boolean
    */
   public function getCacheIsReady()
   {
@@ -363,7 +363,7 @@ class Cache implements iCache
   /**
    * get cached-item by key
    *
-   * @param String $key
+   * @param string $key
    *
    * @return mixed
    */
@@ -386,7 +386,7 @@ class Cache implements iCache
    *
    * @param String $rawKey
    *
-   * @return String
+   * @return string
    */
   private function calculateStoreKey($rawKey)
   {
@@ -414,8 +414,8 @@ class Cache implements iCache
   /**
    * set cache-item by key => value + date
    *
-   * @param           $key
-   * @param           $value
+   * @param string    $key
+   * @param mixed     $value
    * @param \DateTime $date
    *
    * @return mixed|void
@@ -467,7 +467,7 @@ class Cache implements iCache
   /**
    * remove cached-item
    *
-   * @param String $key
+   * @param string $key
    *
    * @return bool
    */
@@ -485,7 +485,7 @@ class Cache implements iCache
   /**
    * check if cached-item exists
    *
-   * @param String $key
+   * @param string $key
    *
    * @return boolean
    */
