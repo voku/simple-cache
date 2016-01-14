@@ -5,7 +5,9 @@
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/4926981d-ecb1-482b-a15c-447954b9bd66/mini.png)](https://insight.sensiolabs.com/projects/4926981d-ecb1-482b-a15c-447954b9bd66)
 [![Reference Status](https://www.versioneye.com/php/voku:simple-cache/reference_badge.svg?style=flat)](https://www.versioneye.com/php/voku:simple-cache/references)
 [![Dependency Status](https://www.versioneye.com/php/voku:simple-cache/dev-master/badge.svg)](https://www.versioneye.com/php/voku:simple-cache/dev-master)
-[![Latest Stable Version](https://poser.pugx.org/voku/simple-cache/v/stable)](https://packagist.org/packages/voku/simple-cache) [![Total Downloads](https://poser.pugx.org/voku/simple-cache/downloads)](https://packagist.org/packages/voku/simple-cache) [![Latest Unstable Version](https://poser.pugx.org/voku/simple-cache/v/unstable)](https://packagist.org/packages/voku/simple-cache)
+[![Latest Stable Version](https://poser.pugx.org/voku/simple-cache/v/stable)](https://packagist.org/packages/voku/simple-cache) 
+[![Total Downloads](https://poser.pugx.org/voku/simple-cache/downloads)](https://packagist.org/packages/voku/simple-cache) 
+[![Latest Unstable Version](https://poser.pugx.org/voku/simple-cache/v/unstable)](https://packagist.org/packages/voku/simple-cache)
 [![PHP 7 ready](http://php7ready.timesplinter.ch/voku/simple-cache/badge.svg)](https://travis-ci.org/voku/simple-cache)
 [![License](https://poser.pugx.org/voku/simple-cache/license)](https://packagist.org/packages/voku/simple-cache)
 
@@ -26,9 +28,9 @@ You can download it from here, or require it using [composer](https://packagist.
 ```json
 {
     "require": {
-		"voku/simple-cache": "2.*",
-		"predis/predis": "1.*" // if you will use redis as cache, then add predis
-	}
+    "voku/simple-cache": "2.*",
+    "predis/predis": "1.*" // if you will use redis as cache, then add predis
+  }
 }
 ```
 
