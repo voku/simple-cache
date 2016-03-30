@@ -136,7 +136,7 @@ class AdapterMemcache implements iAdapter
     if (isset($memcachedCache[$key])) {
       return $memcachedCache[$key];
     } else {
-      $return = $this->memcache->get($key, $this->getCompressedFlag());
+      $return = $this->memcache->get($key);
       $memcachedCache[$key] = $return;
       return $return;
     }
