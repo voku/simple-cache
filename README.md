@@ -58,19 +58,14 @@ composer require predis/predis # if you will use redis as cache, then add predis
 ##Usage 
 
 ```php
-function test() {
-  $cache = \voku\cache\Cache();
+$cache = \voku\cache\Cache();
   
-  if (
-    $cache->getCacheIsReady() === true
-    &&
-    $cache->existsItem('foo')
-  ) {
-    return $cache->getItem('foo');
-  } else {
-    $bar = someSpecialFunctionsWithAReturnValue();
-    $cache->setItem('foo', $bar);
-    return $bar;
+if ($cache->getCacheIsReady() === true && $cache->existsItem('foo')) {
+  return $cache->getItem('foo');
+} else {
+  $bar = someSpecialFunctionsWithAReturnValue();
+  $cache->setItem('foo', $bar);
+  return $bar;
 }
 ```
 
