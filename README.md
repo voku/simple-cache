@@ -44,21 +44,22 @@ composer require predis/predis # if you will use redis as cache, then add predis
 ##Quick Start
 
 ```php
-    require_once 'composer/autoload.php';
+use voku\cache\Cache;
 
-    $cache = new \voku\cache\Cache();
-    
-    // example
-    // $cache = \voku\cache\Cache();
-    // $cache->setItem('foo', 'bar');
-    // $bar = $cache->getItem('foo');
+require_once 'composer/autoload.php';
 
+$cache = new Cache();
+$ttl = 3600; // 60s * 60 = 1h
+$cache->setItem('foo', 'bar', $ttl);
+$bar = $cache->getItem('foo');
 ```
 
 ##Usage 
 
 ```php
-$cache = \voku\cache\Cache();
+use voku\cache\Cache;
+
+$cache = new Cache();
   
 if ($cache->getCacheIsReady() === true && $cache->existsItem('foo')) {
   return $cache->getItem('foo');
