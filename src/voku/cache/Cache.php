@@ -325,8 +325,17 @@ class Cache implements iCache
                 $adapter = $adapterApc;
 
               } else {
-                // no cache-adapter available -> use a array
-                $adapter = new AdapterArray();
+
+                $adapterFile = new AdapterFile();
+                if ($adapterFile->installed() === true) {
+
+                  // fallback to File-Cache
+                  $adapter = $adapterFile;
+
+                } else {
+                  // no cache-adapter available -> use a array
+                  $adapter = new AdapterArray();
+                }
               }
             }
           }
