@@ -28,6 +28,11 @@ class AdapterFile implements iAdapter
   protected $serializer;
 
   /**
+   * @var string
+   */
+  protected $fileMode = '0755';
+
+  /**
    * @param string $cacheDir
    */
   public function __construct($cacheDir = null)
@@ -151,17 +156,57 @@ class AdapterFile implements iAdapter
     return true;
   }
 
+  /**
+   * recursively creates & chmod directories
+   *
+   * @param string $path
+   *
+   * @return bool
+   */
   protected function createCacheDirectory($path)
   {
-    if (!@mkdir($path, 0777, true) || !is_dir($path)) {
+    if (
+        !$path
+        ||
+        $path === '/'
+        ||
+        $path === '.'
+        ||
+        $path === '\\'
+    ) {
       return false;
     }
 
-    if (!is_writable($path)) {
-      return false;
+    // if the directory already exists, just return true
+    if (is_dir($path) && is_writable($path)) {
+      return true;
     }
 
-    return true;
+    // if more than one level, try parent first
+    if (dirname($path) !== '.') {
+      $return = $this->createCacheDirectory(dirname($path));
+      // if creating parent fails, we can abort immediately
+      if (!$return) {
+        return false;
+      }
+    }
+
+    $mode_dec = intval($this->fileMode, 8);
+    $oldumask = umask(0);
+
+    if (!@mkdir($path, $mode_dec) && !is_dir($path)) {
+      $return = false;
+    } else {
+      $return = true;
+    }
+
+    if (is_dir($path) && !is_writable($path)) {
+      $return = chmod($path, $mode_dec);
+    }
+
+    umask($oldumask);
+
+    return $return;
   }
 
   /**
@@ -200,6 +245,16 @@ class AdapterFile implements iAdapter
     }
 
     return (time() > $ttl);
+  }
+
+  /**
+   * e.g. '0777', or '0755' ...
+   *
+   * @param $fileMode
+   */
+  public function setFileMode($fileMode)
+  {
+    $this->fileMode = $fileMode;
   }
 
   /**
