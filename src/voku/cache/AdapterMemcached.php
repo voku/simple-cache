@@ -42,12 +42,16 @@ class AdapterMemcached implements iAdapter
     // Use faster compression if available
     if (\Memcached::HAVE_IGBINARY) {
       $this->memcached->setOption(\Memcached::OPT_SERIALIZER, \Memcached::SERIALIZER_IGBINARY);
+    } else {
+      $this->memcached->setOption(\Memcached::OPT_SERIALIZER, \Memcached::SERIALIZER_JSON);
     }
+
+    $this->memcached->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
     $this->memcached->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
     $this->memcached->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
     $this->memcached->setOption(\Memcached::OPT_NO_BLOCK, true);
     $this->memcached->setOption(\Memcached::OPT_TCP_NODELAY, true);
-    $this->memcached->setOption(\Memcached::OPT_COMPRESSION, false);
+    $this->memcached->setOption(\Memcached::OPT_COMPRESSION, true);
     $this->memcached->setOption(\Memcached::OPT_CONNECT_TIMEOUT, 2);
   }
 
