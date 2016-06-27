@@ -36,6 +36,17 @@ class ArrayCacheTest extends PHPUnit_Framework_TestCase
     $return = $this->cache->setItem('foo', array(1, 2, 3, 4));
 
     self::assertEquals(true, $return);
+
+    // -----
+
+    $ao = new ArrayObject();
+
+    $ao->prop = 'prop data';
+    $ao['arr'] = 'array data';
+
+    $return = $this->cache->setItem('ao', $ao);
+
+    self::assertEquals(true, $return);
   }
 
   public function testGetItem()
@@ -43,6 +54,17 @@ class ArrayCacheTest extends PHPUnit_Framework_TestCase
     $return = $this->cache->getItem('foo');
 
     self::assertEquals(array(1, 2, 3, 4), $return);
+
+    // -----
+
+    $return = $this->cache->getItem('ao');
+
+    $ao = new ArrayObject();
+
+    $ao->prop = 'prop data';
+    $ao['arr'] = 'array data';
+
+    self::assertEquals(true, $ao == $return);
   }
 
   public function testExistsItem()
