@@ -45,7 +45,11 @@ class AdapterMemcached implements iAdapter
     }
 
     // Fix for "PHP: hhvm"
-    if (defined(\Memcached::OPT_COMPRESSION_TYPE) === true) {
+    if (
+        defined(\Memcached::OPT_COMPRESSION_TYPE) === true
+        &&
+        defined(\Memcached::COMPRESSION_FASTLZ) === true
+    ) {
       $this->memcached->setOption(\Memcached::OPT_COMPRESSION_TYPE, \Memcached::COMPRESSION_FASTLZ);
     }
 
