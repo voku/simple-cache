@@ -33,21 +33,21 @@ class FileCacheTest extends PHPUnit_Framework_TestCase
 
   public function testSetItem()
   {
-    $return = $this->cache->setItem('foo', array(1, 2, 3, 4));
+    $return = $this->cache->setItem('2571_519ä#-`9de.foo::bar', array(1, 2, 3, 4));
 
     self::assertEquals(true, $return);
   }
 
   public function testGetItem()
   {
-    $return = $this->cache->getItem('foo');
+    $return = $this->cache->getItem('2571_519ä#-`9de.foo::bar');
 
     self::assertEquals(array(1, 2, 3, 4), $return);
   }
 
   public function testExistsItem()
   {
-    $return = $this->cache->existsItem('foo');
+    $return = $this->cache->existsItem('2571_519ä#-`9de.foo::bar');
 
     self::assertEquals(true, $return);
   }

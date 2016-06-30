@@ -34,9 +34,9 @@ class CacheTest extends PHPUnit_Framework_TestCase
     $prefix = 'prefix:';
 
     $this->cache->setPrefix($prefix);
-    $this->adapter->expects($this->once())
+    $this->adapter->expects(self::once())
         ->method('get')
-        ->with($this->equalTo('prefix:lall'));
+        ->with(self::equalTo('prefix:lall'));
 
     $this->cache->getItem('lall');
   }
@@ -45,49 +45,49 @@ class CacheTest extends PHPUnit_Framework_TestCase
   {
     $key = 'some:test:key';
 
-    $this->adapter->expects($this->once())
+    $this->adapter->expects(self::once())
         ->method('get')
-        ->with($this->equalTo($key))
-        ->will($this->returnValue(null));
+        ->with(self::equalTo('some:test:key'))
+        ->will(self::returnValue(null));
 
     $actual = $this->cache->getItem($key);
 
-    $this->assertNull($actual);
+    self::assertNull($actual);
   }
 
   public function testGet()
   {
     $key = 'some:test:key';
-    $expected = uniqid(time());
+    $expected = uniqid(time(), true);
 
-    $this->adapter->expects($this->once())
+    $this->adapter->expects(self::once())
         ->method('get')
-        ->with($this->equalTo($key))
-        ->will($this->returnValue($expected));
+        ->with(self::equalTo($key))
+        ->will(self::returnValue($expected));
 
-    $this->serializer->expects($this->once())
+    $this->serializer->expects(self::once())
         ->method('unserialize')
-        ->with($this->equalTo($expected))
-        ->will($this->returnValue($expected));
+        ->with(self::equalTo($expected))
+        ->will(self::returnValue($expected));
 
     $actual = $this->cache->getItem($key);
 
-    $this->assertEquals($expected, $actual);
+    self::assertEquals($expected, $actual);
   }
 
   public function testSet()
   {
     $key = 'some:test:key';
-    $value = uniqid(time());
+    $value = uniqid(time(), true);
 
-    $this->serializer->expects($this->once())
+    $this->serializer->expects(self::once())
         ->method('serialize')
-        ->with($this->equalTo($value))
-        ->will($this->returnValue($value));
+        ->with(self::equalTo($value))
+        ->will(self::returnValue($value));
 
-    $this->adapter->expects($this->once())
+    $this->adapter->expects(self::once())
         ->method('setExpired')
-        ->with($this->equalTo($key), $this->equalTo($value));
+        ->with(self::equalTo($key), self::equalTo($value));
 
     $this->cache->setItem($key, $value, 10);
   }
@@ -95,17 +95,17 @@ class CacheTest extends PHPUnit_Framework_TestCase
   public function testSetWithTtl()
   {
     $key = 'some:test:key';
-    $value = uniqid(time());
-    $ttl = rand(20, 5000);
+    $value = uniqid(time(), true);
+    $ttl = mt_rand(20, 5000);
 
-    $this->serializer->expects($this->once())
+    $this->serializer->expects(self::once())
         ->method('serialize')
-        ->with($this->equalTo($value))
-        ->will($this->returnValue($value));
+        ->with(self::equalTo($value))
+        ->will(self::returnValue($value));
 
-    $this->adapter->expects($this->once())
+    $this->adapter->expects(self::once())
         ->method('setExpired')
-        ->with($this->equalTo($key), $this->equalTo($value), $this->equalTo($ttl));
+        ->with(self::equalTo($key), self::equalTo($value), self::equalTo($ttl));
 
     $this->cache->setItem($key, $value, $ttl);
   }
@@ -113,19 +113,19 @@ class CacheTest extends PHPUnit_Framework_TestCase
   public function testSetToDate()
   {
     $key = 'some:test:key';
-    $value = uniqid(time());
+    $value = uniqid(time(), true);
     $date = new DateTime();
     $time = $date->getTimestamp();
     $date->add(new DateInterval('PT1H'));
 
-    $this->serializer->expects($this->once())
+    $this->serializer->expects(self::once())
         ->method('serialize')
-        ->with($this->equalTo($value))
-        ->will($this->returnValue($value));
+        ->with(self::equalTo($value))
+        ->will(self::returnValue($value));
 
-    $this->adapter->expects($this->once())
+    $this->adapter->expects(self::once())
         ->method('setExpired')
-        ->with($this->equalTo($key), $this->equalTo($value), $this->equalTo($date->getTimestamp() - $time));
+        ->with(self::equalTo($key), self::equalTo($value), self::equalTo($date->getTimestamp() - $time));
 
     $this->cache->setItemToDate($key, $value, $date);
   }
@@ -136,7 +136,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
   public function testSetWrongDate()
   {
     $key = 'some:test:key';
-    $value = uniqid(time());
+    $value = uniqid(time(), true);
     $date = new DateTime();
     $date->sub(new DateInterval('PT1H'));
 
@@ -147,9 +147,9 @@ class CacheTest extends PHPUnit_Framework_TestCase
   {
     $key = 'some:test:key';
 
-    $this->adapter->expects($this->once())
+    $this->adapter->expects(self::once())
         ->method('remove')
-        ->with($this->equalTo($key));
+        ->with(self::equalTo($key));
 
     $this->cache->removeItem($key);
   }
@@ -158,9 +158,9 @@ class CacheTest extends PHPUnit_Framework_TestCase
   {
     $key = 'some:test:key';
 
-    $this->adapter->expects($this->once())
+    $this->adapter->expects(self::once())
         ->method('exists')
-        ->with($this->equalTo($key));
+        ->with(self::equalTo($key));
 
     $this->cache->existsItem($key);
   }

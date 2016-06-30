@@ -52,9 +52,10 @@ class Cache implements iCache
    *
    * @param null|iAdapter    $adapter
    * @param null|iSerializer $serializer
-   * @param boolean          $checkForUser check for dev-ip or if cms-user is logged-in
-   * @param boolean          $cacheEnabled false will disable the cache (use it e.g. for global settings)
-   * @param string|boolean   $isAdminSession set a user-id, if the user is a admin (so we can disable cache for this user)
+   * @param boolean          $checkForUser   check for dev-ip or if cms-user is logged-in
+   * @param boolean          $cacheEnabled   false will disable the cache (use it e.g. for global settings)
+   * @param string|boolean   $isAdminSession set a user-id, if the user is a admin (so we can disable cache for this
+   *                                         user)
    */
   public function __construct($adapter = null, $serializer = null, $checkForUser = true, $cacheEnabled = true, $isAdminSession = false)
   {
@@ -194,11 +195,11 @@ class Cache implements iCache
           $noDev != 1
           &&
           (
-              $remoteAddr == '127.0.0.1'
+              $remoteAddr === '127.0.0.1'
               ||
-              $remoteAddr == '::1'
+              $remoteAddr === '::1'
               ||
-              PHP_SAPI == 'cli'
+              PHP_SAPI === 'cli'
           )
       ) {
         $return = true;
@@ -209,11 +210,15 @@ class Cache implements iCache
   }
 
   /**
-   * set the default-prefix via "SERVER_NAME" + "SESSION"-language
+   * set the default-prefix via "SERVER"-var + "SESSION"-language
    */
   protected function getTheDefaultPrefix()
   {
-    return (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '') . '_' . (isset($_SESSION['language']) ? $_SESSION['language'] : '') . '_' . (isset($_SESSION['language_extra']) ? $_SESSION['language_extra'] : '');
+    return (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '') . '_' .
+           (isset($_SERVER['THEME']) ? $_SERVER['THEME'] : '') . '_' .
+           (isset($_SERVER['STAGE']) ? $_SERVER['STAGE'] : '') . '_' .
+           (isset($_SESSION['language']) ? $_SESSION['language'] : '') . '_' .
+           (isset($_SESSION['language_extra']) ? $_SESSION['language_extra'] : '');
   }
 
   /**
@@ -272,6 +277,7 @@ class Cache implements iCache
           $isRedisAvailable = false;
           if (extension_loaded('redis')) {
             if (class_exists('\Predis\Client')) {
+              /** @noinspection PhpUndefinedNamespaceInspection */
               $redis = new \Predis\Client(
                   array(
                       'scheme'  => 'tcp',
@@ -369,9 +375,8 @@ class Cache implements iCache
    */
   public function getItem($key)
   {
-    $storeKey = $this->calculateStoreKey($key);
-
     if ($this->adapter instanceof iAdapter) {
+      $storeKey = $this->calculateStoreKey($key);
       $serialized = $this->adapter->get($storeKey);
       $value = $serialized ? $this->serializer->unserialize($serialized) : null;
     } else {
@@ -390,7 +395,45 @@ class Cache implements iCache
    */
   private function calculateStoreKey($rawKey)
   {
-    return $this->getPrefix() . $rawKey;
+    $str = $this->getPrefix() . $rawKey;
+
+    if ($this->adapter instanceof AdapterFile) {
+      $str = $this->cleanStoreKey($str);
+    }
+
+    return $str;
+  }
+
+  /**
+   * @param $str
+   *
+   * @return string
+   */
+  private function cleanStoreKey($str)
+  {
+    $str = preg_replace("/[\r\n\t ]+/", ' ', $str);
+    $str = str_replace(
+        array('"', '*', ':', '<', '>', '?', "'", '|'),
+        array(
+            '-+-',
+            '-+-+-',
+            '-+-+-+-',
+            '-+-+-+-+-',
+            '-+-+-+-+-+-',
+            '-+-+-+-+-+-+-',
+            '-+-+-+-+-+-+-+-',
+            '-+-+-+-+-+-+-+-+-',
+        ),
+        $str
+    );
+    $str = html_entity_decode($str, ENT_QUOTES, 'UTF-8');
+    $str = htmlentities($str, ENT_QUOTES, 'UTF-8');
+    $str = preg_replace("/(&)([a-z])([a-z]+;)/i", '$2', $str);
+    $str = str_replace(' ', '-', $str);
+    $str = rawurlencode($str);
+    $str = str_replace('%', '-', $str);
+
+    return $str;
   }
 
   /**
@@ -445,13 +488,12 @@ class Cache implements iCache
    */
   public function setItem($key, $value, $ttl = 0)
   {
-    $storeKey = $this->calculateStoreKey($key);
-
     if (
         $this->adapter instanceof iAdapter
         &&
         $this->serializer instanceof iSerializer
     ) {
+      $storeKey = $this->calculateStoreKey($key);
       $serialized = $this->serializer->serialize($value);
 
       if ($ttl) {
