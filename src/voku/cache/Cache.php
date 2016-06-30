@@ -405,7 +405,7 @@ class Cache implements iCache
   }
 
   /**
-   * @param $str
+   * @param string $str
    *
    * @return string
    */
@@ -437,7 +437,7 @@ class Cache implements iCache
   }
 
   /**
-   * @return mixed
+   * @return string
    */
   public function getPrefix()
   {
@@ -461,7 +461,7 @@ class Cache implements iCache
    * @param mixed     $value
    * @param \DateTime $date
    *
-   * @return mixed|void
+   * @return boolean
    * @throws \Exception
    */
   public function setItemToDate($key, $value, \DateTime $date)
