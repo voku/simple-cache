@@ -428,7 +428,7 @@ class Cache implements iCache
     );
     $str = html_entity_decode($str, ENT_QUOTES, 'UTF-8');
     $str = htmlentities($str, ENT_QUOTES, 'UTF-8');
-    $str = preg_replace("/(&)([a-z])([a-z]+;)/i", '$2', $str);
+    $str = preg_replace('/(&)([a-z])([a-z]+;)/i', '$2', $str);
     $str = str_replace(' ', '-', $str);
     $str = rawurlencode($str);
     $str = str_replace('%', '-', $str);
