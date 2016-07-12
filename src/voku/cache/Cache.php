@@ -81,9 +81,18 @@ class Cache implements iCache
         $adapter = $this->autoConnectToAvailableCacheSystem();
       }
 
-      // Memcache(d) has his own "serializer", but it seems to be working different as the php-implementation.
+      // Memcache(d) has his own "serializer", so don't use it twice
       if (!is_object($serializer) && $serializer === null) {
-        $serializer = new SerializerIgbinary();
+        if (
+            $adapter instanceof AdapterMemcached
+            ||
+            $adapter instanceof AdapterMemcache
+        ) {
+          $serializer = new SerializerNo();
+        } else {
+          // set serializer as default
+          $serializer = new SerializerIgbinary();
+        }
       }
     }
 

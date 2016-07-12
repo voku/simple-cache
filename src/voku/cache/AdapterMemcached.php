@@ -43,22 +43,11 @@ class AdapterMemcached implements iAdapter
     if (\Memcached::HAVE_IGBINARY) {
       $this->memcached->setOption(\Memcached::OPT_SERIALIZER, \Memcached::SERIALIZER_IGBINARY);
     }
-
-    // Fix for "PHP: hhvm"
-    if (
-        defined('HHVM_VERSION') === false
-        &&
-        defined(\Memcached::COMPRESSION_FASTLZ) === true
-    ) {
-      $this->memcached->setOption(\Memcached::OPT_COMPRESSION_TYPE, \Memcached::COMPRESSION_FASTLZ);
-    }
-
-    $this->memcached->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
     $this->memcached->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
     $this->memcached->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
     $this->memcached->setOption(\Memcached::OPT_NO_BLOCK, true);
     $this->memcached->setOption(\Memcached::OPT_TCP_NODELAY, true);
-    $this->memcached->setOption(\Memcached::OPT_COMPRESSION, true);
+    $this->memcached->setOption(\Memcached::OPT_COMPRESSION, false);
     $this->memcached->setOption(\Memcached::OPT_CONNECT_TIMEOUT, 2);
   }
 

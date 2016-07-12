@@ -12,6 +12,19 @@ class SerializerIgbinary implements iSerializer
 {
 
   /**
+   * @var bool
+   */
+  public static $_exists_igbinary;
+
+  /**
+   * SerializerIgbinary constructor.
+   */
+  public function __construct()
+  {
+    self::$_exists_igbinary = (function_exists('igbinary_serialize') && function_exists('igbinary_unserialize'));
+  }
+
+  /**
    * serialize
    *
    * @param mixed $value
@@ -20,7 +33,8 @@ class SerializerIgbinary implements iSerializer
    */
   public function serialize($value)
   {
-    if (function_exists('igbinary_serialize')) {
+    if (self::$_exists_igbinary === true) {
+      /** @noinspection PhpUndefinedFunctionInspection */
       return igbinary_serialize($value);
     } else {
       // fallback
@@ -37,7 +51,8 @@ class SerializerIgbinary implements iSerializer
    */
   public function unserialize($value)
   {
-    if (function_exists('igbinary_unserialize')) {
+    if (self::$_exists_igbinary === true) {
+      /** @noinspection PhpUndefinedFunctionInspection */
       return igbinary_unserialize($value);
     } else {
       // fallback
