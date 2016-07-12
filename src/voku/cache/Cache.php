@@ -414,7 +414,7 @@ class Cache implements iCache
   }
 
   /**
-   * @param $str
+   * @param string $str
    *
    * @return string
    */
@@ -437,7 +437,7 @@ class Cache implements iCache
     );
     $str = html_entity_decode($str, ENT_QUOTES, 'UTF-8');
     $str = htmlentities($str, ENT_QUOTES, 'UTF-8');
-    $str = preg_replace("/(&)([a-z])([a-z]+;)/i", '$2', $str);
+    $str = preg_replace('/(&)([a-z])([a-z]+;)/i', '$2', $str);
     $str = str_replace(' ', '-', $str);
     $str = rawurlencode($str);
     $str = str_replace('%', '-', $str);
@@ -446,7 +446,7 @@ class Cache implements iCache
   }
 
   /**
-   * @return mixed
+   * @return string
    */
   public function getPrefix()
   {
@@ -470,7 +470,7 @@ class Cache implements iCache
    * @param mixed     $value
    * @param \DateTime $date
    *
-   * @return mixed|void
+   * @return boolean
    * @throws \Exception
    */
   public function setItemToDate($key, $value, \DateTime $date)
