@@ -72,7 +72,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
     $actual = $this->cache->getItem($key);
 
-    self::assertEquals($expected, $actual);
+    self::assertSame($expected, $actual);
   }
 
   public function testSet()

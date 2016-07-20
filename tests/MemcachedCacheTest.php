@@ -35,41 +35,41 @@ class MemcachedCacheTest extends PHPUnit_Framework_TestCase
   {
     $return = $this->cache->setItem('foo', array(1, 2, 3, 4));
 
-    self::assertEquals(true, $return);
+    self::assertSame(true, $return);
   }
 
   public function testGetItem()
   {
     $return = $this->cache->getItem('foo');
 
-    self::assertEquals(array(1, 2, 3, 4), $return);
+    self::assertSame(array(1, 2, 3, 4), $return);
   }
 
   public function testExistsItem()
   {
     $return = $this->cache->existsItem('foo');
 
-    self::assertEquals(true, $return);
+    self::assertSame(true, $return);
   }
 
   public function testGetCacheIsReady()
   {
     $return = $this->cache->getCacheIsReady();
 
-    self::assertEquals(true, $return);
+    self::assertSame(true, $return);
   }
 
   public function testSetGetItemWithPrefix()
   {
     $this->cache->setPrefix('bar');
     $prefix = $this->cache->getPrefix();
-    self::assertEquals('bar', $prefix);
+    self::assertSame('bar', $prefix);
 
     $return = $this->cache->setItem('foo', array(3, 2, 1));
-    self::assertEquals(true, $return);
+    self::assertSame(true, $return);
 
     $return = $this->cache->getItem('foo');
-    self::assertEquals(array(3, 2, 1), $return);
+    self::assertSame(array(3, 2, 1), $return);
   }
 
   public function testSetGetCacheWithEndDateTime()
@@ -79,10 +79,10 @@ class MemcachedCacheTest extends PHPUnit_Framework_TestCase
     $expireDate->add($interval);
 
     $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', array(3, 2, 1), $expireDate);
-    self::assertEquals(true, $return);
+    self::assertSame(true, $return);
 
     $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
-    self::assertEquals(array(3, 2, 1), $return);
+    self::assertSame(array(3, 2, 1), $return);
   }
 
   /**
