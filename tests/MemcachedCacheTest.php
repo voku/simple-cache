@@ -52,6 +52,27 @@ class MemcachedCacheTest extends PHPUnit_Framework_TestCase
     self::assertSame(true, $return);
   }
 
+  public function testSetEmptyItem()
+  {
+    $return = $this->cache->setItem('foo_empty', '');
+
+    self::assertSame(true, $return);
+  }
+
+  public function testGetEmptyItem()
+  {
+    $return = $this->cache->getItem('foo_empty');
+
+    self::assertSame('', $return);
+  }
+
+  public function testExistsEmptyItem()
+  {
+    $return = $this->cache->existsItem('foo_empty');
+
+    self::assertSame(true, $return);
+  }
+
   public function testGetCacheIsReady()
   {
     $return = $this->cache->getCacheIsReady();
