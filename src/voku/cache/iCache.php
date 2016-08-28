@@ -51,6 +51,13 @@ interface iCache
   public function removeItem($key);
 
   /**
+   * remove all items
+   *
+   * @return mixed
+   */
+  public function removeAll();
+
+  /**
    * check if item exists
    *
    * @param $key

@@ -61,7 +61,7 @@ class AdapterXcache implements iAdapter
   }
 
   /**
-   * remove
+   * remove one cache-item
    *
    * @param $key
    *
@@ -70,6 +70,25 @@ class AdapterXcache implements iAdapter
   public function remove($key)
   {
     return xcache_unset($key);
+  }
+
+  /**
+   * remove all cache-items
+   *
+   * @return bool
+   */
+  public function removeAll()
+  {
+    if (defined('XC_TYPE_VAR')) {
+      $xCacheCount = xcache_count(XC_TYPE_VAR);
+      for ($i = 0; $i < $xCacheCount; $i++) {
+        xcache_clear_cache(XC_TYPE_VAR, $i);
+      }
+
+      return true;
+    }
+
+    return false;
   }
 
   /**

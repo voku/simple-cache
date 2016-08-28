@@ -140,6 +140,16 @@ class AdapterApc implements iAdapter
   }
 
   /**
+   * Removes the cache
+   *
+   * @return boolean - Returns TRUE on success or FALSE on failure.
+   */
+  public function removeAll()
+  {
+    return apc_clear_cache('system') && apc_clear_cache('user');
+  }
+
+  /**
    * Clears the APC cache
    *
    * @param string $type - If $type is "user", the user cache will be cleared; otherwise, the system cache (cached

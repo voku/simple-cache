@@ -41,13 +41,20 @@ interface iAdapter
   public function setExpired($key, $value, $ttl);
 
   /**
-   * remove cache
+   * remove cache-key
    *
    * @param $key
    *
    * @return mixed
    */
   public function remove($key);
+
+  /**
+   * remove cache
+   *
+   * @return mixed
+   */
+  public function removeAll();
 
   /**
    * check if cache exists

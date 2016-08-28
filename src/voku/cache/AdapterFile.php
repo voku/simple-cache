@@ -40,7 +40,7 @@ class AdapterFile implements iAdapter
     $this->serializer = new SerializerIgbinary();
 
     if (!$cacheDir) {
-      $cacheDir = realpath(sys_get_temp_dir()) . '/cache';
+      $cacheDir = realpath(sys_get_temp_dir()) . '/simple_php_cache';
     }
 
     $this->cacheDir = (string)$cacheDir;
@@ -51,9 +51,9 @@ class AdapterFile implements iAdapter
   }
 
   /**
-   * @param string $key
+   * remove on cache-file
    *
-   * @param        $key
+   * @param string $key
    *
    * @return bool
    */
@@ -62,6 +62,27 @@ class AdapterFile implements iAdapter
     $cacheFile = $this->getFileName($key);
 
     return $this->deleteFile($cacheFile);
+  }
+
+  /**
+   * remove all cache-files
+   *
+   * @return bool
+   */
+  public function removeAll()
+  {
+    if (!$this->cacheDir) {
+      return false;
+    }
+
+    $return = array();
+    foreach (new \DirectoryIterator($this->cacheDir) as $fileInfo) {
+      if(!$fileInfo->isDot()) {
+        $return[] = unlink($fileInfo->getPathname());
+      }
+    }
+
+    return !in_array(false, $return);
   }
 
   /**
@@ -194,6 +215,7 @@ class AdapterFile implements iAdapter
     $mode_dec = intval($this->fileMode, 8);
     $oldumask = umask(0);
 
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
     if (!@mkdir($path, $mode_dec) && !is_dir($path)) {
       $return = false;
     } else {

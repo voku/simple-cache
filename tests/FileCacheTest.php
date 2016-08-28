@@ -85,6 +85,56 @@ class FileCacheTest extends PHPUnit_Framework_TestCase
     self::assertSame(array(3, 2, 1), $return);
   }
 
+  public function testRemove()
+  {
+    $return = $this->cache->setItem('foobar_test', array(4, 2, 1));
+    self::assertSame(true, $return);
+
+    $return = $this->cache->setItem('foobar_test_v2', array(5, 2, 1));
+    self::assertSame(true, $return);
+
+    $return = $this->cache->setItem('foobar_test_v3', array(6, 2, 1));
+    self::assertSame(true, $return);
+
+    $return = $this->cache->getItem('foobar_test');
+    self::assertSame(array(4, 2, 1), $return);
+
+    $return = $this->cache->getItem('foobar_test_v2');
+    self::assertSame(array(5, 2, 1), $return);
+
+    $return = $this->cache->getItem('foobar_test_v3');
+    self::assertSame(array(6, 2, 1), $return);
+
+    // -- remove one item
+
+    $return = $this->cache->removeItem('foobar_test');
+    self::assertSame(true, $return);
+
+    // -- remove one item - test
+
+    $return = $this->cache->getItem('foobar_test');
+    self::assertSame(null, $return);
+
+    $return = $this->cache->getItem('foobar_test_v2');
+    self::assertSame(array(5, 2, 1), $return);
+
+    // -- remove all
+
+    $return = $this->cache->removeAll();
+    self::assertTrue($return);
+
+    // -- remove all - tests
+
+    $return = $this->cache->getItem('foobar_test');
+    self::assertSame(null, $return);
+
+    $return = $this->cache->getItem('foobar_test_v2');
+    self::assertSame(null, $return);
+
+    $return = $this->cache->getItem('foobar_test_v3');
+    self::assertSame(null, $return);
+  }
+
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.

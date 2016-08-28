@@ -102,6 +102,16 @@ class AdapterMemcached implements iAdapter
   }
 
   /**
+   * remove all cached items
+   *
+   * @return bool
+   */
+  public function removeAll()
+  {
+    return $this->memcached->flush();
+  }
+
+  /**
    * check if cached-item exists
    *
    * @param string $key

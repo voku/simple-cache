@@ -534,6 +534,20 @@ class Cache implements iCache
   }
 
   /**
+   * remove cache
+   *
+   * @return bool
+   */
+  public function removeAll()
+  {
+    if ($this->adapter instanceof iAdapter) {
+      return $this->adapter->removeAll();
+    } else {
+      return false;
+    }
+  }
+
+  /**
    * check if cached-item exists
    *
    * @param string $key

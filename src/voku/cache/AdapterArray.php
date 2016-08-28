@@ -113,13 +113,32 @@ class AdapterArray implements iAdapter
    *
    * @param string $key
    *
-   * @return mixed|void
+   * @return bool
    */
   public function remove($key)
   {
     $this->removeExpired($key);
 
-    unset(self::$values[$key]);
+    if (isset(self::$values[$key])) {
+      unset(self::$values[$key]);
+
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * remove cache
+   *
+   * @return true
+   */
+  public function removeAll()
+  {
+    self::$values = array();
+    self::$expired = array();
+
+    return true;
   }
 
   /**

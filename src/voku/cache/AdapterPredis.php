@@ -84,6 +84,21 @@ class AdapterPredis implements iAdapter
   }
 
   /**
+   * remove all
+   *
+   * @return bool
+   */
+  public function removeAll()
+  {
+    $return = array();
+    foreach ($this->client->keys('*') as $key) {
+      $return[] = $this->remove($key);
+    }
+
+    return !in_array(false, $return);
+  }
+
+  /**
    * check if cache is installed
    *
    * @return boolean
