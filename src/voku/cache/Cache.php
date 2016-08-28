@@ -11,6 +11,7 @@ namespace voku\cache;
  * - APC / APCu
  * - Xcache
  * - Array
+ * - File
  *
  * @package   voku\cache
  */
@@ -284,23 +285,25 @@ class Cache implements iCache
 
           $redis = null;
           $isRedisAvailable = false;
-          if (extension_loaded('redis')) {
-            if (class_exists('\Predis\Client')) {
-              /** @noinspection PhpUndefinedNamespaceInspection */
-              $redis = new \Predis\Client(
-                  array(
-                      'scheme'  => 'tcp',
-                      'host'    => '127.0.0.1',
-                      'port'    => 6379,
-                      'timeout' => '2.0',
-                  )
-              );
-              try {
-                $redis->connect();
-                $isRedisAvailable = $redis->getConnection()->isConnected();
-              } catch (\Exception $e) {
-                // nothing
-              }
+          if (
+              extension_loaded('redis')
+              &&
+              class_exists('\Predis\Client')
+          ) {
+            /** @noinspection PhpUndefinedNamespaceInspection */
+            $redis = new \Predis\Client(
+                array(
+                    'scheme'  => 'tcp',
+                    'host'    => '127.0.0.1',
+                    'port'    => 6379,
+                    'timeout' => '2.0',
+                )
+            );
+            try {
+              $redis->connect();
+              $isRedisAvailable = $redis->getConnection()->isConnected();
+            } catch (\Exception $e) {
+              // nothing
             }
           }
 
