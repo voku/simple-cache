@@ -62,12 +62,17 @@ class Cache implements iCache
   {
     $this->isAdminSession = $isAdminSession;
 
-    // check for active-cache
+    // First check if the cache is active at all.
     $this->setActive($cacheEnabled);
-    if ($this->isActive === true && $checkForUser === true) {
+    if (
+        $this->isActive === true
+        &&
+        $checkForUser === true
+    ) {
       $this->setActive($this->isCacheActiveForTheCurrentUser());
     }
 
+    // If the cache is active, then try to auto-connect to the best possible cache-system.
     if ($this->isActive === true) {
 
       $this->setPrefix($this->getTheDefaultPrefix());
@@ -82,7 +87,7 @@ class Cache implements iCache
         $adapter = $this->autoConnectToAvailableCacheSystem();
       }
 
-      // Memcache(d) has his own "serializer", so don't use it twice
+      // INFO: Memcache(d) has his own "serializer", so don't use it twice
       if (!is_object($serializer) && $serializer === null) {
         if (
             $adapter instanceof AdapterMemcached
@@ -91,13 +96,13 @@ class Cache implements iCache
         ) {
           $serializer = new SerializerNo();
         } else {
-          // set serializer as default
+          // set default serializer
           $serializer = new SerializerIgbinary();
         }
       }
     }
 
-    // check if we will use the cache
+    // Final checks ...
     if (
         $serializer instanceof iSerializer
         &&
@@ -185,7 +190,7 @@ class Cache implements iCache
   }
 
   /**
-   * check for developer
+   * Check for local developer.
    *
    * @return bool
    */
@@ -220,7 +225,7 @@ class Cache implements iCache
   }
 
   /**
-   * set the default-prefix via "SERVER"-var + "SESSION"-language
+   * Set the default-prefix via "SERVER"-var + "SESSION"-language.
    */
   protected function getTheDefaultPrefix()
   {
@@ -232,7 +237,7 @@ class Cache implements iCache
   }
 
   /**
-   * auto-connect to the available cache-system on the server
+   * Auto-connect to the available cache-system on the server.
    *
    * @return iAdapter
    */
@@ -248,7 +253,8 @@ class Cache implements iCache
       $isMemcachedAvailable = false;
       if (extension_loaded('memcached')) {
         $memcached = new \Memcached();
-        $isMemcachedAvailable = $memcached->addServer('127.0.0.1', '11211');
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
+        $isMemcachedAvailable = @$memcached->addServer('127.0.0.1', 11211);
       }
 
       if ($isMemcachedAvailable === false) {
@@ -258,7 +264,9 @@ class Cache implements iCache
       $adapterMemcached = new AdapterMemcached($memcached);
       if ($adapterMemcached->installed() === true) {
 
-        // fallback to Memcached
+        // -------------------------------------------------------------
+        // "Memcached"
+        // -------------------------------------------------------------
         $adapter = $adapterMemcached;
 
       } else {
@@ -278,7 +286,9 @@ class Cache implements iCache
         $adapterMemcache = new AdapterMemcache($memcache);
         if ($adapterMemcache->installed() === true) {
 
-          // fallback to Memcache
+          // -------------------------------------------------------------
+          // "Memcache"
+          // -------------------------------------------------------------
           $adapter = $adapterMemcache;
 
         } else {
@@ -314,7 +324,9 @@ class Cache implements iCache
           $adapterRedis = new AdapterPredis($redis);
           if ($adapterRedis->installed() === true) {
 
-            // fallback to Redis
+            // -------------------------------------------------------------
+            // Redis
+            // -------------------------------------------------------------
             $adapter = $adapterRedis;
 
           } else {
@@ -330,7 +342,9 @@ class Cache implements iCache
               $adapterApc = new AdapterApc();
               if ($adapterApc->installed() === true) {
 
-                // fallback to APC || APCu
+                // -------------------------------------------------------------
+                // "APC || APCu"
+                // -------------------------------------------------------------
                 $adapter = $adapterApc;
 
               } else {
@@ -338,11 +352,16 @@ class Cache implements iCache
                 $adapterFile = new AdapterFile();
                 if ($adapterFile->installed() === true) {
 
-                  // fallback to File-Cache
+                  // -------------------------------------------------------------
+                  // File-Cache
+                  // -------------------------------------------------------------
                   $adapter = $adapterFile;
 
                 } else {
-                  // no cache-adapter available -> use a array
+
+                  // -------------------------------------------------------------
+                  // Static-PHP-Cache
+                  // -------------------------------------------------------------
                   $adapter = new AdapterArray();
                 }
               }
@@ -359,7 +378,7 @@ class Cache implements iCache
   }
 
   /**
-   * set cacheIsReady state
+   * Set "isReady" state.
    *
    * @param boolean $isReady
    */
@@ -369,7 +388,7 @@ class Cache implements iCache
   }
 
   /**
-   * get the cacheIsReady state
+   * Get the "isReady" state.
    *
    * @return boolean
    */
@@ -379,7 +398,7 @@ class Cache implements iCache
   }
 
   /**
-   * get cached-item by key
+   * Get cached-item by key.
    *
    * @param string $key
    *
@@ -399,9 +418,9 @@ class Cache implements iCache
   }
 
   /**
-   * calculate store-key (prefix + $rawKey)
+   * Calculate store-key (prefix + $rawKey).
    *
-   * @param String $rawKey
+   * @param string $rawKey
    *
    * @return string
    */
@@ -417,6 +436,8 @@ class Cache implements iCache
   }
 
   /**
+   * Clean store-key (required e.g. for the "File"-Adapter).
+   *
    * @param string $str
    *
    * @return string
@@ -449,6 +470,8 @@ class Cache implements iCache
   }
 
   /**
+   * Get the prefix.
+   *
    * @return string
    */
   public function getPrefix()
@@ -457,7 +480,9 @@ class Cache implements iCache
   }
 
   /**
-   * set prefix [WARNING: do not use if you don't know what you do]
+   * !!! Set the prefix. !!!
+   *
+   * WARNING: Do not use if you don't know what you do. Because this will overwrite the default prefix.
    *
    * @param string $prefix
    */
@@ -467,7 +492,7 @@ class Cache implements iCache
   }
 
   /**
-   * set cache-item by key => value + date
+   * Set cache-item by key => value + date.
    *
    * @param string    $key
    * @param mixed     $value
@@ -490,7 +515,7 @@ class Cache implements iCache
   }
 
   /**
-   * set cache-item by key => value + ttl
+   * Set cache-item by key => value + ttl.
    *
    * @param string $key
    * @param mixed  $value
@@ -519,7 +544,7 @@ class Cache implements iCache
   }
 
   /**
-   * remove cached-item
+   * Remove a cached-item.
    *
    * @param string $key
    *
@@ -537,7 +562,7 @@ class Cache implements iCache
   }
 
   /**
-   * remove cache
+   * Remove all cached-items.
    *
    * @return bool
    */
@@ -551,7 +576,7 @@ class Cache implements iCache
   }
 
   /**
-   * check if cached-item exists
+   * Check if cached-item exists.
    *
    * @param string $key
    *
