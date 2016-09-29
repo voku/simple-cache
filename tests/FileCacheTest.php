@@ -135,6 +135,16 @@ class FileCacheTest extends PHPUnit_Framework_TestCase
     self::assertSame(null, $return);
   }
 
+  public function testGetUsedAdapterClassName()
+  {
+    self::assertSame('voku\cache\AdapterFile', $this->cache->getUsedAdapterClassName());
+  }
+
+  public function testGetUsedSerializerClassName()
+  {
+    self::assertSame('voku\cache\SerializerDefault', $this->cache->getUsedSerializerClassName());
+  }
+
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.

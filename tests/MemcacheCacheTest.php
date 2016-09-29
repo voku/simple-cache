@@ -4,7 +4,7 @@ use voku\cache\AdapterMemcache;
 use voku\cache\Cache;
 use voku\cache\iAdapter;
 use voku\cache\iSerializer;
-use voku\cache\SerializerDefault;
+use voku\cache\SerializerNo;
 
 /**
  * MemcacheCacheTest
@@ -72,6 +72,16 @@ class MemcacheCacheTest extends PHPUnit_Framework_TestCase
     self::assertSame(array(3, 2, 1), $return);
   }
 
+  public function testGetUsedAdapterClassName()
+  {
+    self::assertSame('voku\cache\AdapterMemcache', $this->cache->getUsedAdapterClassName());
+  }
+
+  public function testGetUsedSerializerClassName()
+  {
+    self::assertSame('voku\cache\SerializerNo', $this->cache->getUsedSerializerClassName());
+  }
+
   public function testSetGetCacheWithEndDateTime()
   {
     $expireDate = new DateTime();
@@ -104,7 +114,7 @@ class MemcacheCacheTest extends PHPUnit_Framework_TestCase
     }
 
     $this->adapter = new AdapterMemcache($memcache);
-    $this->serializer = new SerializerDefault();
+    $this->serializer = new SerializerNo();
 
     if ($this->adapter->installed() === false) {
       self::markTestSkipped(
@@ -116,7 +126,6 @@ class MemcacheCacheTest extends PHPUnit_Framework_TestCase
 
     // reset default prefix
     $this->cache->setPrefix('');
-
   }
 
   /**

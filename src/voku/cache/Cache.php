@@ -593,4 +593,23 @@ class Cache implements iCache
     }
   }
 
+  /**
+   * Get the current adapter class-name.
+   *
+   * @return string
+   */
+  public function getUsedAdapterClassName()
+  {
+    return get_class($this->adapter);
+  }
+
+  /**
+   * Get the current serializer class-name.
+   *
+   * @return string
+   */
+  public function getUsedSerializerClassName()
+  {
+    return get_class($this->serializer);
+  }
 }
