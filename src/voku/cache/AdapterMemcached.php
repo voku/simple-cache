@@ -47,13 +47,32 @@ class AdapterMemcached implements iAdapter
    */
   public function get($key)
   {
-    static $memcachedCache;
+    static $memcacheCache = array();
+    static $memcacheCacheCounter = array();
+    $staticCacheCounterHelper = 5;
 
-    if (array_key_exists($key, $memcachedCache) === true) {
-      return $memcachedCache[$key];
+    if (!isset($memcacheCacheCounter[$key])) {
+      $memcacheCacheCounter[$key] = 0;
+    }
+
+    if ($memcacheCacheCounter[$key] <= ($staticCacheCounterHelper + 1)) {
+      $memcacheCacheCounter[$key]++;
+    }
+
+    if (array_key_exists($key, $memcacheCache) === true) {
+
+      // get from static-cache
+      return $memcacheCache[$key];
+
     } else {
+
+      // get from cache-adapter
       $return = $this->memcached->get($key);
-      $memcachedCache[$key] = $return;
+
+      // save into static-cache
+      if ($memcacheCacheCounter[$key] >= $staticCacheCounterHelper) {
+        $memcacheCache[$key] = $return;
+      }
 
       return $return;
     }
