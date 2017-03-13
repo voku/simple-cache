@@ -119,6 +119,11 @@ class ArrayCacheTest extends PHPUnit_Framework_TestCase
 
     $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
     self::assertSame(array(3, 2, 1), $return);
+
+    sleep(4);
+
+    $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
+    self::assertSame(null, $return);
   }
 
   /**
