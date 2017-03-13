@@ -35,29 +35,56 @@ class AdapterMemcached implements iAdapter
   }
 
   /**
-   * set Memcached settings
+   * @inheritdoc
    */
-  private function setSettings()
+  public function exists($key)
   {
-    // Use faster compression if available
-    if (\Memcached::HAVE_IGBINARY) {
-      $this->memcached->setOption(\Memcached::OPT_SERIALIZER, \Memcached::SERIALIZER_IGBINARY);
-    }
-    $this->memcached->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
-    $this->memcached->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
-    $this->memcached->setOption(\Memcached::OPT_NO_BLOCK, true);
-    $this->memcached->setOption(\Memcached::OPT_TCP_NODELAY, true);
-    $this->memcached->setOption(\Memcached::OPT_COMPRESSION, false);
-    $this->memcached->setOption(\Memcached::OPT_CONNECT_TIMEOUT, 2);
+    return $this->get($key) !== false;
   }
 
   /**
-   * set cache-item by key => value
-   *
-   * @param string $key
-   * @param mixed  $value
-   *
-   * @return mixed|void
+   * @inheritdoc
+   */
+  public function get($key)
+  {
+    static $memcachedCache;
+
+    if (array_key_exists($key, $memcachedCache) === true) {
+      return $memcachedCache[$key];
+    } else {
+      $return = $this->memcached->get($key);
+      $memcachedCache[$key] = $return;
+
+      return $return;
+    }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function installed()
+  {
+    return $this->installed;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function remove($key)
+  {
+    return $this->memcached->delete($key);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function removeAll()
+  {
+    return $this->memcached->flush();
+  }
+
+  /**
+   * @inheritdoc
    */
   public function set($key, $value)
   {
@@ -72,13 +99,7 @@ class AdapterMemcached implements iAdapter
   }
 
   /**
-   * set cache-item by key => value + ttl
-   *
-   * @param string $key
-   * @param mixed  $value
-   * @param int    $ttl
-   *
-   * @return boolean
+   * @inheritdoc
    */
   public function setExpired($key, $value, $ttl)
   {
@@ -90,67 +111,20 @@ class AdapterMemcached implements iAdapter
   }
 
   /**
-   * remove cached-item by key
-   *
-   * @param string $key
-   *
-   * @return boolean
+   * Set the MemCached settings.
    */
-  public function remove($key)
+  private function setSettings()
   {
-    return $this->memcached->delete($key);
-  }
-
-  /**
-   * remove all cached items
-   *
-   * @return bool
-   */
-  public function removeAll()
-  {
-    return $this->memcached->flush();
-  }
-
-  /**
-   * check if cached-item exists
-   *
-   * @param string $key
-   *
-   * @return bool
-   */
-  public function exists($key)
-  {
-    return $this->get($key) !== false;
-  }
-
-  /**
-   * get cached-item by key
-   *
-   * @param String $key
-   *
-   * @return mixed
-   */
-  public function get($key)
-  {
-    static $memcachedCache;
-
-    if (isset($memcachedCache[$key])) {
-      return $memcachedCache[$key];
-    } else {
-      $return = $this->memcached->get($key);
-      $memcachedCache[$key] = $return;
-      return $return;
+    // Use faster compression if available
+    if (\Memcached::HAVE_IGBINARY) {
+      $this->memcached->setOption(\Memcached::OPT_SERIALIZER, \Memcached::SERIALIZER_IGBINARY);
     }
-  }
-
-  /**
-   * check if cache is installed
-   *
-   * @return boolean
-   */
-  public function installed()
-  {
-    return $this->installed;
+    $this->memcached->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
+    $this->memcached->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
+    $this->memcached->setOption(\Memcached::OPT_NO_BLOCK, true);
+    $this->memcached->setOption(\Memcached::OPT_TCP_NODELAY, true);
+    $this->memcached->setOption(\Memcached::OPT_COMPRESSION, false);
+    $this->memcached->setOption(\Memcached::OPT_CONNECT_TIMEOUT, 2);
   }
 
 }

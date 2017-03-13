@@ -11,7 +11,7 @@ interface iAdapter
 {
 
   /**
-   * get cache
+   * Get cached-item by key.
    *
    * @param $key
    *
@@ -20,55 +20,55 @@ interface iAdapter
   public function get($key);
 
   /**
-   * set cache
+   * Set cache-item by key => value.
    *
    * @param $key
    * @param $value
    *
-   * @return mixed
+   * @return bool
    */
   public function set($key, $value);
 
   /**
-   * set expired-cache
+   * Set cache-item by key => value + ttl.
    *
    * @param $key
    * @param $value
    * @param $ttl
    *
-   * @return mixed
+   * @return bool
    */
   public function setExpired($key, $value, $ttl);
 
   /**
-   * remove cache-key
+   * Remove cached-item by key.
    *
    * @param $key
    *
-   * @return mixed
+   * @return bool
    */
   public function remove($key);
 
   /**
-   * remove cache
+   * Remove all cached items.
    *
-   * @return mixed
+   * @return bool
    */
   public function removeAll();
 
   /**
-   * check if cache exists
+   * Check if cache-key exists.
    *
    * @param $key
    *
-   * @return mixed
+   * @return bool
    */
   public function exists($key);
 
   /**
-   * check if cache is installed
+   * Check if cache is installed.
    *
-   * @return mixed
+   * @return bool
    */
   public function installed();
 }

@@ -21,11 +21,17 @@ class AdapterArray implements iAdapter
   private static $expired = array();
 
   /**
-   * get cached-item by key
-   *
-   * @param String $key
-   *
-   * @return mixed
+   * @inheritdoc
+   */
+  public function exists($key)
+  {
+    $this->removeExpired($key);
+
+    return array_key_exists($key, self::$values);
+  }
+
+  /**
+   * @inheritdoc
    */
   public function get($key)
   {
@@ -33,7 +39,63 @@ class AdapterArray implements iAdapter
   }
 
   /**
-   * remove expired
+   * @inheritdoc
+   */
+  public function installed()
+  {
+    return true;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function remove($key)
+  {
+    $this->removeExpired($key);
+
+    if (array_key_exists($key, self::$values) === true) {
+      unset(self::$values[$key]);
+
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function removeAll()
+  {
+    self::$values = array();
+    self::$expired = array();
+
+    return true;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function set($key, $value)
+  {
+    self::$values[$key] = $value;
+
+    return true;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function setExpired($key, $value, $ttl)
+  {
+    self::$values[$key] = $value;
+    self::$expired[$key] = array(time(), $ttl);
+
+    return true;
+  }
+
+  /**
+   * Remove expired cache.
    *
    * @param string $key
    *
@@ -42,9 +104,9 @@ class AdapterArray implements iAdapter
   private function removeExpired($key)
   {
     if (
-        !isset(self::$expired[$key])
+        array_key_exists($key, self::$expired) === false
         ||
-        !isset(self::$values[$key])
+        array_key_exists($key, self::$values) === false
     ) {
       return false;
     }
@@ -59,95 +121,6 @@ class AdapterArray implements iAdapter
       unset(self::$expired[$key]);
     }
 
-    return true;
-  }
-
-  /**
-   * check if cached-item exists
-   *
-   * @param string $key
-   *
-   * @return bool
-   */
-  public function exists($key)
-  {
-    $this->removeExpired($key);
-
-    return isset(self::$values[$key]);
-  }
-
-  /**
-   * set cache-item by key => value
-   *
-   * @param string $key
-   * @param mixed  $value
-   *
-   * @return mixed|void
-   */
-  public function set($key, $value)
-  {
-    self::$values[$key] = $value;
-
-    return true;
-  }
-
-  /**
-   * set cache-item by key => value + ttl
-   *
-   * @param string $key
-   * @param mixed  $value
-   * @param int    $ttl
-   *
-   * @return mixed|void
-   */
-  public function setExpired($key, $value, $ttl)
-  {
-    self::$values[$key] = $value;
-    self::$expired[$key] = array(time(), $ttl);
-
-    return true;
-  }
-
-  /**
-   * remove cache-item by key
-   *
-   * @param string $key
-   *
-   * @return bool
-   */
-  public function remove($key)
-  {
-    $this->removeExpired($key);
-
-    if (isset(self::$values[$key])) {
-      unset(self::$values[$key]);
-
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * remove cache
-   *
-   * @return true
-   */
-  public function removeAll()
-  {
-    self::$values = array();
-    self::$expired = array();
-
-    return true;
-  }
-
-  /**
-   * check if cache is installed
-   *
-   * @return true
-   */
-  public function installed()
-  {
     return true;
   }
 

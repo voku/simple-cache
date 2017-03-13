@@ -33,11 +33,15 @@ class AdapterPredis implements iAdapter
   }
 
   /**
-   * get
-   *
-   * @param $key
-   *
-   * @return string
+   * @inheritdoc
+   */
+  public function exists($key)
+  {
+    return $this->client->exists($key);
+  }
+
+  /**
+   * @inheritdoc
    */
   public function get($key)
   {
@@ -45,38 +49,15 @@ class AdapterPredis implements iAdapter
   }
 
   /**
-   * set
-   *
-   * @param $key
-   * @param $value
-   *
-   * @return mixed
+   * @inheritdoc
    */
-  public function set($key, $value)
+  public function installed()
   {
-    return $this->client->set($key, $value);
+    return $this->installed;
   }
 
   /**
-   * set expired
-   *
-   * @param $key
-   * @param $value
-   * @param $ttl
-   *
-   * @return int
-   */
-  public function setExpired($key, $value, $ttl)
-  {
-    return $this->client->setex($key, $ttl, $value);
-  }
-
-  /**
-   * remove
-   *
-   * @param $key
-   *
-   * @return int
+   * @inheritdoc
    */
   public function remove($key)
   {
@@ -84,9 +65,7 @@ class AdapterPredis implements iAdapter
   }
 
   /**
-   * remove all
-   *
-   * @return bool
+   * @inheritdoc
    */
   public function removeAll()
   {
@@ -94,23 +73,18 @@ class AdapterPredis implements iAdapter
   }
 
   /**
-   * check if cache is installed
-   *
-   * @return boolean
+   * @inheritdoc
    */
-  public function installed()
+  public function set($key, $value)
   {
-    return $this->installed;
+    return $this->client->set($key, $value);
   }
 
-
   /**
-   * @param $key
-   *
-   * @return int
+   * @inheritdoc
    */
-  public function exists($key)
+  public function setExpired($key, $value, $ttl)
   {
-    return $this->client->exists($key);
+    return $this->client->setex($key, $ttl, $value);
   }
 }

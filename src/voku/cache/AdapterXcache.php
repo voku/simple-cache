@@ -22,11 +22,15 @@ class AdapterXcache implements iAdapter
   }
 
   /**
-   * get cached-item by key
-   *
-   * @param String $key
-   *
-   * @return mixed
+   * @inheritdoc
+   */
+  public function exists($key)
+  {
+    return xcache_isset($key);
+  }
+
+  /**
+   * @inheritdoc
    */
   public function get($key)
   {
@@ -34,38 +38,15 @@ class AdapterXcache implements iAdapter
   }
 
   /**
-   * set cache-item ky key => value
-   *
-   * @param string $key
-   * @param mixed $value
-   *
-   * @return bool
+   * @inheritdoc
    */
-  public function set($key, $value)
+  public function installed()
   {
-    return xcache_set($key, $value);
+    return $this->installed;
   }
 
   /**
-   * set expired
-   *
-   * @param $key
-   * @param $value
-   * @param $ttl
-   *
-   * @return bool
-   */
-  public function setExpired($key, $value, $ttl)
-  {
-    return xcache_set($key, $value, $ttl);
-  }
-
-  /**
-   * remove one cache-item
-   *
-   * @param $key
-   *
-   * @return bool
+   * @inheritdoc
    */
   public function remove($key)
   {
@@ -73,9 +54,7 @@ class AdapterXcache implements iAdapter
   }
 
   /**
-   * remove all cache-items
-   *
-   * @return bool
+   * @inheritdoc
    */
   public function removeAll()
   {
@@ -92,25 +71,19 @@ class AdapterXcache implements iAdapter
   }
 
   /**
-   * exists
-   *
-   * @param $key
-   *
-   * @return bool
+   * @inheritdoc
    */
-  public function exists($key)
+  public function set($key, $value)
   {
-    return xcache_isset($key);
+    return xcache_set($key, $value);
   }
 
   /**
-   * check if cache is installed
-   *
-   * @return boolean
+   * @inheritdoc
    */
-  public function installed()
+  public function setExpired($key, $value, $ttl)
   {
-    return $this->installed;
+    return xcache_set($key, $value, $ttl);
   }
 
 }

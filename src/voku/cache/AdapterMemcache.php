@@ -38,12 +38,56 @@ class AdapterMemcache implements iAdapter
   }
 
   /**
-   * set cache-item by key => value
-   *
-   * @param string $key
-   * @param mixed  $value
-   *
-   * @return mixed|void
+   * @inheritdoc
+   */
+  public function exists($key)
+  {
+    return $this->get($key) !== false;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function get($key)
+  {
+    static $memcacheCache;
+
+    if (array_key_exists($key, $memcacheCache) === true) {
+      return $memcacheCache[$key];
+    } else {
+      $return = $this->memcache->get($key);
+      $memcacheCache[$key] = $return;
+
+      return $return;
+    }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function installed()
+  {
+    return $this->installed;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function remove($key)
+  {
+    return $this->memcache->delete($key);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function removeAll()
+  {
+    return $this->memcache->flush();
+  }
+
+  /**
+   * @inheritdoc
    */
   public function set($key, $value)
   {
@@ -51,43 +95,7 @@ class AdapterMemcache implements iAdapter
   }
 
   /**
-   * get compressed-flag
-   *
-   * @return int 2 || 0
-   */
-  private function getCompressedFlag()
-  {
-    return $this->isCompressed() ? MEMCACHE_COMPRESSED : 0;
-  }
-
-  /**
-   * check if is compressed
-   *
-   * @return boolean
-   */
-  public function isCompressed()
-  {
-    return $this->compressed;
-  }
-
-  /**
-   * set compressed
-   *
-   * @param mixed $value will be converted to boolean
-   */
-  public function setCompressed($value)
-  {
-    $this->compressed = (bool)$value;
-  }
-
-  /**
-   * set cache-item by key => value + ttl
-   *
-   * @param string $key
-   * @param mixed  $value
-   * @param int    $ttl
-   *
-   * @return mixed|void
+   * @inheritdoc
    */
   public function setExpired($key, $value, $ttl)
   {
@@ -99,67 +107,33 @@ class AdapterMemcache implements iAdapter
   }
 
   /**
-   * remove cached-item by key
+   * Get the compressed-flag from MemCache.
    *
-   * @param string $key
-   *
-   * @return mixed|void
+   * @return int 2 || 0
    */
-  public function remove($key)
+  private function getCompressedFlag()
   {
-    return $this->memcache->delete($key);
+    return $this->isCompressed() ? MEMCACHE_COMPRESSED : 0;
   }
 
   /**
-   * remove all cached items
-   *
-   * @return bool
-   */
-  public function removeAll()
-  {
-    return $this->memcache->flush();
-  }
-
-  /**
-   * check if cached-item exists
-   *
-   * @param string $key
-   *
-   * @return bool
-   */
-  public function exists($key)
-  {
-    return $this->get($key) !== false;
-  }
-
-  /**
-   * get cached-item by key
-   *
-   * @param String $key
-   *
-   * @return mixed
-   */
-  public function get($key)
-  {
-    static $memcachedCache;
-
-    if (isset($memcachedCache[$key])) {
-      return $memcachedCache[$key];
-    } else {
-      $return = $this->memcache->get($key);
-      $memcachedCache[$key] = $return;
-      return $return;
-    }
-  }
-
-  /**
-   * check if cache is installed
+   * Check if compression from MemCache is active.
    *
    * @return boolean
    */
-  public function installed()
+  public function isCompressed()
   {
-    return $this->installed;
+    return $this->compressed;
+  }
+
+  /**
+   * Activate the compression from MemCache.
+   *
+   * @param mixed $value will be converted to boolean
+   */
+  public function setCompressed($value)
+  {
+    $this->compressed = (bool)$value;
   }
 
 }

@@ -334,7 +334,9 @@ class Cache implements iCache
             $adapterXcache = new AdapterXcache();
             if ($adapterXcache->installed() === true) {
 
-              // fallback to Xcache
+              // -------------------------------------------------------------
+              // "Xcache"
+              // -------------------------------------------------------------
               $adapter = $adapterXcache;
 
             } else {
@@ -343,26 +345,37 @@ class Cache implements iCache
               if ($adapterApc->installed() === true) {
 
                 // -------------------------------------------------------------
-                // "APC || APCu"
+                // "APC"
                 // -------------------------------------------------------------
                 $adapter = $adapterApc;
 
               } else {
 
-                $adapterFile = new AdapterFile();
-                if ($adapterFile->installed() === true) {
+                $adapterApcu = new AdapterApcu();
+                if ($adapterApcu->installed() === true) {
 
                   // -------------------------------------------------------------
-                  // File-Cache
+                  // "APCu"
                   // -------------------------------------------------------------
-                  $adapter = $adapterFile;
+                  $adapter = $adapterApcu;
 
                 } else {
 
-                  // -------------------------------------------------------------
-                  // Static-PHP-Cache
-                  // -------------------------------------------------------------
-                  $adapter = new AdapterArray();
+                  $adapterFile = new AdapterFile();
+                  if ($adapterFile->installed() === true) {
+
+                    // -------------------------------------------------------------
+                    // File-Cache
+                    // -------------------------------------------------------------
+                    $adapter = $adapterFile;
+
+                  } else {
+
+                    // -------------------------------------------------------------
+                    // Static-PHP-Cache
+                    // -------------------------------------------------------------
+                    $adapter = new AdapterArray();
+                  }
                 }
               }
             }

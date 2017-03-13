@@ -1,15 +1,15 @@
 <?php
 
-use voku\cache\AdapterArray;
+use voku\cache\AdapterApcu;
 use voku\cache\Cache;
 use voku\cache\iAdapter;
 use voku\cache\iSerializer;
 use voku\cache\SerializerDefault;
 
 /**
- * ArrayCacheTest
+ * ApcuCacheTest
  */
-class ArrayCacheTest extends PHPUnit_Framework_TestCase
+class ApcuCacheTest extends PHPUnit_Framework_TestCase
 {
 
   /**
@@ -31,34 +31,9 @@ class ArrayCacheTest extends PHPUnit_Framework_TestCase
       '_SESSION',
   );
 
-  public function testSetItemOfNull()
-  {
-    $return = $this->cache->setItem('foo_null', null);
-
-    self::assertSame(true, $return);
-
-    // -----
-
-    $return = $this->cache->getItem('foo_null');
-    self::assertSame(null, $return);
-  }
-
   public function testSetItem()
   {
     $return = $this->cache->setItem('foo', array(1, 2, 3, 4));
-    self::assertSame(true, $return);
-
-    $return = $this->cache->getItem('foo');
-    self::assertSame(array(1, 2, 3, 4), $return);
-
-    // -----
-
-    $ao = new ArrayObject();
-
-    $ao->prop = 'prop data';
-    $ao['arr'] = 'array data';
-
-    $return = $this->cache->setItem('ao', $ao);
 
     self::assertSame(true, $return);
   }
@@ -68,17 +43,6 @@ class ArrayCacheTest extends PHPUnit_Framework_TestCase
     $return = $this->cache->getItem('foo');
 
     self::assertSame(array(1, 2, 3, 4), $return);
-
-    // -----
-
-    $return = $this->cache->getItem('ao');
-
-    $ao = new ArrayObject();
-
-    $ao->prop = 'prop data';
-    $ao['arr'] = 'array data';
-
-    self::assertSame(true, $ao == $return);
   }
 
   public function testExistsItem()
@@ -127,8 +91,14 @@ class ArrayCacheTest extends PHPUnit_Framework_TestCase
    */
   protected function setUp()
   {
-    $this->adapter = new AdapterArray();
+    $this->adapter = new AdapterApcu();
     $this->serializer = new SerializerDefault();
+
+    if ($this->adapter->installed() === false) {
+      self::markTestSkipped(
+          'The APCu extension is not available.'
+      );
+    }
 
     $this->cache = new Cache($this->adapter, $this->serializer, false, true);
 

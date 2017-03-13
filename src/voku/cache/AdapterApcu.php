@@ -3,13 +3,13 @@
 namespace voku\cache;
 
 /**
- * AdapterApc: a APC-Cache adapter
+ * AdapterApcu: a APCu-Cache adapter
  *
- * http://php.net/manual/de/book.apc.php
+ * http://php.net/manual/de/book.apcu.php
  *
  * @package   voku\cache
  */
-class AdapterApc implements iAdapter
+class AdapterApcu implements iAdapter
 {
 
   /**
@@ -28,7 +28,7 @@ class AdapterApc implements iAdapter
   public function __construct()
   {
     if (
-        function_exists('apc_store') === true
+        function_exists('apcu_store') === true
         &&
         ini_get('apc.enabled')
     ) {
@@ -37,7 +37,7 @@ class AdapterApc implements iAdapter
   }
 
   /**
-   * Check if apc-cache exists.
+   * Check if apcu-cache exists.
    *
    * WARNING: use $this->exists($key) instead
    *
@@ -47,15 +47,15 @@ class AdapterApc implements iAdapter
    *
    * @internal
    */
-  public function apc_cache_exists($key)
+  public function apcu_cache_exists($key)
   {
-    return (bool)apc_fetch($key);
+    return (bool)apcu_fetch($key);
   }
 
   /**
-   * Clears the APC cache by type.
+   * Clears the APCu cache by type.
    *
-   * @param string $type - If $type is "user", the user cache will be cleared; otherwise,
+   * @param string $type   - If $type is "user", the user cache will be cleared; otherwise,
    *                       the system cache (cached files) will be cleared.
    *
    * @return boolean
@@ -64,21 +64,20 @@ class AdapterApc implements iAdapter
    */
   public function cacheClear($type)
   {
-    return apc_clear_cache($type);
+    return apcu_clear_cache($type);
   }
 
   /**
-   * Retrieves cached information from APC's data store
+   * Retrieves cached information from APCu's data store
    *
-   * @param string  $type    - If $type is "user", information about the user cache will be returned.
    * @param boolean $limited - If $limited is TRUE, the return value will exclude the individual list of cache entries.
    *                         This is useful when trying to optimize calls for statistics gathering.
    *
    * @return array of cached data (and meta-data) or FALSE on failure.
    */
-  public function cacheInfo($type = '', $limited = false)
+  public function cacheInfo($limited = false)
   {
-    return apc_cache_info($type, $limited);
+    return apcu_cache_info($limited);
   }
 
   /**
@@ -86,10 +85,10 @@ class AdapterApc implements iAdapter
    */
   public function exists($key)
   {
-    if (function_exists('apc_exists')) {
-      return apc_exists($key);
+    if (function_exists('apcu_exists')) {
+      return apcu_exists($key);
     } else {
-      return $this->apc_cache_exists($key);
+      return $this->apcu_cache_exists($key);
     }
   }
 
@@ -118,7 +117,7 @@ class AdapterApc implements iAdapter
    */
   public function remove($key)
   {
-    return apc_delete($key);
+    return apcu_delete($key);
   }
 
   /**
@@ -134,7 +133,7 @@ class AdapterApc implements iAdapter
    */
   public function set($key, $value)
   {
-    return apc_store($key, $value);
+    return apcu_store($key, $value);
   }
 
   /**
@@ -142,7 +141,7 @@ class AdapterApc implements iAdapter
    */
   public function setExpired($key, $data, $ttl)
   {
-    return apc_store($key, $data, $ttl);
+    return apcu_store($key, $data, $ttl);
   }
 
 }

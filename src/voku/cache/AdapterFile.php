@@ -51,134 +51,7 @@ class AdapterFile implements iAdapter
   }
 
   /**
-   * remove on cache-file
-   *
-   * @param string $key
-   *
-   * @return bool
-   */
-  public function remove($key)
-  {
-    $cacheFile = $this->getFileName($key);
-
-    return $this->deleteFile($cacheFile);
-  }
-
-  /**
-   * remove all cache-files
-   *
-   * @return bool
-   */
-  public function removeAll()
-  {
-    if (!$this->cacheDir) {
-      return false;
-    }
-
-    $return = array();
-    foreach (new \DirectoryIterator($this->cacheDir) as $fileInfo) {
-      if(!$fileInfo->isDot()) {
-        $return[] = unlink($fileInfo->getPathname());
-      }
-    }
-
-    return !in_array(false, $return);
-  }
-
-  /**
-   * @param string $key
-   *
-   * @return mixed
-   */
-  public function get($key)
-  {
-    $path = $this->getFileName($key);
-
-    if (!file_exists($path)) {
-      return null;
-    }
-
-    $data = $this->serializer->unserialize(file_get_contents($path));
-
-    if (!$data || !$this->validateDataFromCache($data)) {
-      return null;
-    }
-
-    if ($this->ttlHasExpired($data['ttl']) === true) {
-      $this->remove($key);
-      
-      return null;
-    }
-
-    return $data['value'];
-  }
-
-  /**
-   * @param $data
-   *
-   * @return bool
-   */
-  protected function validateDataFromCache($data)
-  {
-    if (!is_array($data)) {
-      return false;
-    }
-
-    foreach (array('value', 'ttl') as $missing) {
-      if (!array_key_exists($missing, $data)) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  /**
-   * @param string $key
-   *
-   * @return bool
-   */
-  public function exists($key)
-  {
-    return null !== $this->get($key);
-  }
-
-  /**
-   * @param string $key
-   * @param mixed  $value
-   *
-   * @return bool
-   */
-  public function set($key, $value)
-  {
-    return $this->setExpired($key, $value);
-  }
-
-  /**
-   * @param string $key
-   * @param mixed  $value
-   * @param int    $ttl
-   *
-   * @return bool
-   */
-  public function setExpired($key, $value, $ttl = 0)
-  {
-    $item = $this->serializer->serialize(
-        array(
-            'value' => $value,
-            'ttl'   => $ttl ? (int)$ttl + time() : 0,
-        )
-    );
-
-    if (!file_put_contents($this->getFileName($key), $item)) {
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
-   * recursively creates & chmod directories
+   * Recursively creates & chmod directories.
    *
    * @param string $path
    *
@@ -246,6 +119,104 @@ class AdapterFile implements iAdapter
   }
 
   /**
+   * @inheritdoc
+   */
+  public function exists($key)
+  {
+    return null !== $this->get($key);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function get($key)
+  {
+    $path = $this->getFileName($key);
+
+    if (!file_exists($path)) {
+      return null;
+    }
+
+    $data = $this->serializer->unserialize(file_get_contents($path));
+
+    if (!$data || !$this->validateDataFromCache($data)) {
+      return null;
+    }
+
+    if ($this->ttlHasExpired($data['ttl']) === true) {
+      $this->remove($key);
+
+      return null;
+    }
+
+    return $data['value'];
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function installed()
+  {
+    return $this->installed;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function remove($key)
+  {
+    $cacheFile = $this->getFileName($key);
+
+    return $this->deleteFile($cacheFile);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function removeAll()
+  {
+    if (!$this->cacheDir) {
+      return false;
+    }
+
+    $return = array();
+    foreach (new \DirectoryIterator($this->cacheDir) as $fileInfo) {
+      if (!$fileInfo->isDot()) {
+        $return[] = unlink($fileInfo->getPathname());
+      }
+    }
+
+    return in_array(false, $return, true) === false;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function set($key, $value)
+  {
+    return $this->setExpired($key, $value);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function setExpired($key, $value, $ttl = 0)
+  {
+    $item = $this->serializer->serialize(
+        array(
+            'value' => $value,
+            'ttl'   => $ttl ? (int)$ttl + time() : 0,
+        )
+    );
+
+    if (!file_put_contents($this->getFileName($key), $item)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
    * @param string $key
    *
    * @return string
@@ -253,6 +224,18 @@ class AdapterFile implements iAdapter
   protected function getFileName($key)
   {
     return $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_FILE_PREFIX . $key . self::CACHE_FILE_SUBFIX;
+  }
+
+  /**
+   * Set the file-mode for new cache-files.
+   *
+   * e.g. '0777', or '0755' ...
+   *
+   * @param $fileMode
+   */
+  public function setFileMode($fileMode)
+  {
+    $this->fileMode = $fileMode;
   }
 
   /**
@@ -270,22 +253,22 @@ class AdapterFile implements iAdapter
   }
 
   /**
-   * e.g. '0777', or '0755' ...
+   * @param $data
    *
-   * @param $fileMode
+   * @return bool
    */
-  public function setFileMode($fileMode)
+  protected function validateDataFromCache($data)
   {
-    $this->fileMode = $fileMode;
-  }
+    if (!is_array($data)) {
+      return false;
+    }
 
-  /**
-   * check if cache is installed
-   *
-   * @return boolean
-   */
-  public function installed()
-  {
-    return $this->installed;
+    foreach (array('value', 'ttl') as $missing) {
+      if (!array_key_exists($missing, $data)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

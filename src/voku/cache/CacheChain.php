@@ -62,11 +62,7 @@ class CacheChain implements iCache
   }
 
   /**
-   * get cached-item by key
-   *
-   * @param string $key
-   *
-   * @return null
+   * @inheritdoc
    */
   public function getItem($key)
   {
@@ -81,13 +77,7 @@ class CacheChain implements iCache
   }
 
   /**
-   * set cache-item by key => value + ttl
-   *
-   * @param string   $key
-   * @param mixed    $value
-   * @param null|int $ttl
-   *
-   * @return mixed|void
+   * @inheritdoc
    */
   public function setItem($key, $value, $ttl = null)
   {
@@ -98,13 +88,7 @@ class CacheChain implements iCache
   }
 
   /**
-   * set cache-item by key => value + date
-   *
-   * @param string    $key
-   * @param mixed     $value
-   * @param \DateTime $date
-   *
-   * @return mixed|void
+   * @inheritdoc
    */
   public function setItemToDate($key, $value, \DateTime $date)
   {
@@ -115,11 +99,7 @@ class CacheChain implements iCache
   }
 
   /**
-   * remove cached-item by key
-   *
-   * @param string $key
-   *
-   * @return mixed|void
+   * @inheritdoc
    */
   public function removeItem($key)
   {
@@ -130,11 +110,7 @@ class CacheChain implements iCache
   }
 
   /**
-   * check if cached-item exists
-   *
-   * @param string $key
-   *
-   * @return boolean
+   * @inheritdoc
    */
   public function existsItem($key)
   {
@@ -148,4 +124,14 @@ class CacheChain implements iCache
     return false;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function removeAll()
+  {
+    /* @var $cache iCache */
+    foreach ($this->caches as $cache) {
+      $cache->removeAll();
+    }
+  }
 }
