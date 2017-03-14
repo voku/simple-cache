@@ -25,18 +25,20 @@ with your cache-server. You can define the Adapter / Serializer in the "construc
 5. File-Cache
 6. Static-PHP-Cache
 
-##Get "Simple Cache"
+## Get "Simple Cache"
+
 You can download it from here, or require it using [composer](https://packagist.org/packages/voku/simple-cache).
 ```json
 {
-    "require": {
-    "voku/simple-cache": "2.*",
-    "predis/predis": "1.*" // if you will use redis as cache, then add predis
+  "require": {
+    "voku/simple-cache": "2.*"
   }
 }
 ```
 
+
 ## Install via "composer require"
+
 ```shell
 composer require voku/simple-cache
 composer require predis/predis # if you will use redis as cache, then add predis
@@ -55,6 +57,7 @@ $ttl = 3600; // 60s * 60 = 1h
 $cache->setItem('foo', 'bar', $ttl);
 $bar = $cache->getItem('foo');
 ```
+
 
 ## Usage 
 
@@ -92,9 +95,9 @@ if ($cache->getCacheIsReady() === true && $cache->existsItem('foo')) {
 }
 ```
 
+
 ## No-Cache for the admin or a specific ip-address
 
-If you use the parameter "$checkForUser" (true) from the constructor, then the cache isn't used for the admin-session.
-You can also overwrite the check for the user, if you add a global function named "checkForDev()".
+If you use the parameter "$checkForUser" (=== true) in the constructor, then the cache isn't used for the admin-session.
 
-
+-> You can also overwrite the check for the user, if you add a global function named "checkForDev()".
