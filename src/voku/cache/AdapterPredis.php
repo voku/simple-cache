@@ -22,15 +22,24 @@ class AdapterPredis implements iAdapter
   private $client;
 
   /**
-   * @param Client $client
+   * @param Client|null $client
    */
-  public function __construct($client)
+  public function __construct($client = null)
   {
     if ($client instanceof Client) {
-      $this->installed = true;
-      $this->client = $client;
+      $this->setPredisClient($client);
     }
   }
+
+  /**
+   * @param Client $client
+   */
+  public function setPredisClient(Client $client)
+  {
+    $this->installed = true;
+    $this->client = $client;
+  }
+
 
   /**
    * @inheritdoc

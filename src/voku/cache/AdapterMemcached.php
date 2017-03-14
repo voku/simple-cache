@@ -22,16 +22,23 @@ class AdapterMemcached implements iAdapter
   /**
    * __construct
    *
-   * @param \Memcached $memcached
+   * @param \Memcached|null $memcached
    */
-  public function __construct($memcached)
+  public function __construct($memcached = null)
   {
     if ($memcached instanceof \Memcached) {
-      $this->memcached = $memcached;
-      $this->installed = true;
-
-      $this->setSettings();
+      $this->setMemcached($memcached);
     }
+  }
+
+  /**
+   * @param \Memcached $memcached
+   */
+  public function setMemcached(\Memcached $memcached) {
+    $this->memcached = $memcached;
+    $this->installed = true;
+
+    $this->setSettings();
   }
 
   /**
@@ -47,35 +54,7 @@ class AdapterMemcached implements iAdapter
    */
   public function get($key)
   {
-    static $memcacheCache = array();
-    static $memcacheCacheCounter = array();
-    $staticCacheCounterHelper = 5;
-
-    if (!isset($memcacheCacheCounter[$key])) {
-      $memcacheCacheCounter[$key] = 0;
-    }
-
-    if ($memcacheCacheCounter[$key] <= ($staticCacheCounterHelper + 1)) {
-      $memcacheCacheCounter[$key]++;
-    }
-
-    if (array_key_exists($key, $memcacheCache) === true) {
-
-      // get from static-cache
-      return $memcacheCache[$key];
-
-    } else {
-
-      // get from cache-adapter
-      $return = $this->memcached->get($key);
-
-      // save into static-cache
-      if ($memcacheCacheCounter[$key] >= $staticCacheCounterHelper) {
-        $memcacheCache[$key] = $return;
-      }
-
-      return $return;
-    }
+    return $this->memcached->get($key);
   }
 
   /**

@@ -414,15 +414,54 @@ class Cache implements iCache
    * Get cached-item by key.
    *
    * @param string $key
+   * @param int    $staticCacheHitCounter WARNING: This static cache has no TTL, it will be cleaned on the next request
+   *                                      and it will use more memory as e.g. memcache.
    *
    * @return mixed
    */
-  public function getItem($key)
+  public function getItem($key, $staticCacheHitCounter = 0)
   {
+    // init
+    $staticCacheHitCounter = (int)$staticCacheHitCounter;
+
+    static $STATIC_CACHE = array();
+    static $STATIC_CACHE_COUNTER = array();;
+
     if ($this->adapter instanceof iAdapter) {
       $storeKey = $this->calculateStoreKey($key);
+
+      // check if we already using static-cache
+      if ($this->adapter instanceof AdapterArray) {
+        $staticCacheHitCounter = 0;
+      }
+
+      if ($staticCacheHitCounter !== 0) {
+        if (!isset($STATIC_CACHE_COUNTER[$storeKey])) {
+          $STATIC_CACHE_COUNTER[$storeKey] = 0;
+        }
+
+        if ($STATIC_CACHE_COUNTER[$storeKey] < ($staticCacheHitCounter + 1)) {
+          $STATIC_CACHE_COUNTER[$storeKey]++;
+        }
+
+        // get from static-cache
+        if (array_key_exists($storeKey, $STATIC_CACHE) === true) {
+          return $STATIC_CACHE[$storeKey];
+        }
+      }
+
       $serialized = $this->adapter->get($storeKey);
       $value = $serialized ? $this->serializer->unserialize($serialized) : null;
+
+      if (
+          $staticCacheHitCounter !== 0
+          &&
+          $STATIC_CACHE_COUNTER[$storeKey] >= $staticCacheHitCounter
+      ) {
+        // save into static-cache
+        $STATIC_CACHE[$storeKey] = $value;
+      }
+
     } else {
       return null;
     }

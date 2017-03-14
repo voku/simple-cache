@@ -40,9 +40,10 @@ class ApcuCacheTest extends PHPUnit_Framework_TestCase
 
   public function testGetItem()
   {
-    $return = $this->cache->getItem('foo');
-
-    self::assertSame(array(1, 2, 3, 4), $return);
+    for ($i = 0; $i <= 1000; $i++) {
+      $return = $this->cache->getItem('foo', 2);
+      self::assertSame(array(1, 2, 3, 4), $return);
+    }
   }
 
   public function testExistsItem()

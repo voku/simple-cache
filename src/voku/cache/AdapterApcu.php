@@ -39,17 +39,18 @@ class AdapterApcu implements iAdapter
   /**
    * Check if apcu-cache exists.
    *
-   * WARNING: use $this->exists($key) instead
+   * WARNING: we only keep this method for compatibly-reasons
+   *          -> use ->exists($key)
    *
    * @param string $key
    *
    * @return bool
    *
-   * @internal
+   * @deprecated
    */
   public function apcu_cache_exists($key)
   {
-    return (bool)apcu_fetch($key);
+    return $this->exists($key);
   }
 
   /**
@@ -85,11 +86,7 @@ class AdapterApcu implements iAdapter
    */
   public function exists($key)
   {
-    if (function_exists('apcu_exists')) {
-      return apcu_exists($key);
-    } else {
-      return $this->apcu_cache_exists($key);
-    }
+    return apcu_exists($key);
   }
 
   /**
@@ -98,7 +95,7 @@ class AdapterApcu implements iAdapter
   public function get($key)
   {
     if ($this->exists($key)) {
-      return apc_fetch($key);
+      return apcu_fetch($key);
     } else {
       return false;
     }

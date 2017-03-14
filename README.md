@@ -36,14 +36,14 @@ You can download it from here, or require it using [composer](https://packagist.
 }
 ```
 
-##Install via "composer require"
+## Install via "composer require"
 ```shell
 composer require voku/simple-cache
 composer require predis/predis # if you will use redis as cache, then add predis
 ```
 
 
-##Quick Start
+## Quick Start
 
 ```php
 use voku\cache\Cache;
@@ -56,7 +56,7 @@ $cache->setItem('foo', 'bar', $ttl);
 $bar = $cache->getItem('foo');
 ```
 
-##Usage 
+## Usage 
 
 ```php
 use voku\cache\Cache;
@@ -72,7 +72,27 @@ if ($cache->getCacheIsReady() === true && $cache->existsItem('foo')) {
 }
 ```
 
-##No-Cache for the admin or a specific ip-address
+If you have an heavy task e.g. a really-big-loop, then you can also use static-cache. 
+But keep in mind, that this will be stored into PHP (it needs more memory) and it will be cleaned when the request is done.
+
+```php
+use voku\cache\Cache;
+
+$cache = new Cache();
+  
+if ($cache->getCacheIsReady() === true && $cache->existsItem('foo')) {
+  for ($i = 0; $i <= 100000; $i++) {
+    echo $this->cache->getItem('foo', 3); // use also static-php-cache, when we hit the cache 3-times
+  }
+  return $cache->getItem('foo');
+} else {
+  $bar = someSpecialFunctionsWithAReturnValue();
+  $cache->setItem('foo', $bar);
+  return $bar;
+}
+```
+
+## No-Cache for the admin or a specific ip-address
 
 If you use the parameter "$checkForUser" (true) from the constructor, then the cache isn't used for the admin-session.
 You can also overwrite the check for the user, if you add a global function named "checkForDev()".
