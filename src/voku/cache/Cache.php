@@ -49,6 +49,16 @@ class Cache implements iCache
   private $isAdminSession = false;
 
   /**
+   * @var array
+   */
+  private static $STATIC_CACHE = array();
+
+  /**
+   * @var array
+   */
+  private static $STATIC_CACHE_COUNTER = array();
+
+  /**
    * __construct
    *
    * @param null|iAdapter    $adapter
@@ -424,9 +434,6 @@ class Cache implements iCache
     // init
     $staticCacheHitCounter = (int)$staticCacheHitCounter;
 
-    static $STATIC_CACHE = array();
-    static $STATIC_CACHE_COUNTER = array();;
-
     if ($this->adapter instanceof iAdapter) {
       $storeKey = $this->calculateStoreKey($key);
 
@@ -436,17 +443,17 @@ class Cache implements iCache
       }
 
       if ($staticCacheHitCounter !== 0) {
-        if (!isset($STATIC_CACHE_COUNTER[$storeKey])) {
-          $STATIC_CACHE_COUNTER[$storeKey] = 0;
+        if (!isset(self::$STATIC_CACHE_COUNTER[$storeKey])) {
+          self::$STATIC_CACHE_COUNTER[$storeKey] = 0;
         }
 
-        if ($STATIC_CACHE_COUNTER[$storeKey] < ($staticCacheHitCounter + 1)) {
-          $STATIC_CACHE_COUNTER[$storeKey]++;
+        if (self::$STATIC_CACHE_COUNTER[$storeKey] < ($staticCacheHitCounter + 1)) {
+          self::$STATIC_CACHE_COUNTER[$storeKey]++;
         }
 
         // get from static-cache
-        if (array_key_exists($storeKey, $STATIC_CACHE) === true) {
-          return $STATIC_CACHE[$storeKey];
+        if (array_key_exists($storeKey, self::$STATIC_CACHE) === true) {
+          return self::$STATIC_CACHE[$storeKey];
         }
       }
 
@@ -456,10 +463,10 @@ class Cache implements iCache
       if (
           $staticCacheHitCounter !== 0
           &&
-          $STATIC_CACHE_COUNTER[$storeKey] >= $staticCacheHitCounter
+          self::$STATIC_CACHE_COUNTER[$storeKey] >= $staticCacheHitCounter
       ) {
         // save into static-cache
-        $STATIC_CACHE[$storeKey] = $value;
+        self::$STATIC_CACHE[$storeKey] = $value;
       }
 
     } else {
@@ -638,6 +645,18 @@ class Cache implements iCache
   {
     if ($this->adapter instanceof iAdapter) {
       $storeKey = $this->calculateStoreKey($key);
+
+      if (!empty(self::$STATIC_CACHE)) {
+
+        if (!isset(self::$STATIC_CACHE_COUNTER[$storeKey])) {
+          self::$STATIC_CACHE_COUNTER[$storeKey] = 0;
+        }
+
+        // get from static-cache
+        if (array_key_exists($storeKey, self::$STATIC_CACHE) === true) {
+          return true;
+        }
+      }
 
       return $this->adapter->exists($storeKey);
     } else {
