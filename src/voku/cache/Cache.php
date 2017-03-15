@@ -614,6 +614,17 @@ class Cache implements iCache
     if ($this->adapter instanceof iAdapter) {
       $storeKey = $this->calculateStoreKey($key);
 
+      if (!empty(self::$STATIC_CACHE)) {
+
+        // remove static-cache
+        if (array_key_exists($storeKey, self::$STATIC_CACHE) === true) {
+          unset(
+              self::$STATIC_CACHE[$storeKey],
+              self::$STATIC_CACHE_COUNTER[$storeKey]
+          );
+        }
+      }
+
       return $this->adapter->remove($storeKey);
     } else {
       return false;
@@ -628,6 +639,14 @@ class Cache implements iCache
   public function removeAll()
   {
     if ($this->adapter instanceof iAdapter) {
+
+      if (!empty(self::$STATIC_CACHE)) {
+
+        // remove static-cache
+        self::$STATIC_CACHE = array();
+        self::$STATIC_CACHE_COUNTER = array();
+      }
+
       return $this->adapter->removeAll();
     } else {
       return false;
