@@ -667,10 +667,6 @@ class Cache implements iCache
 
       if (!empty(self::$STATIC_CACHE)) {
 
-        if (!isset(self::$STATIC_CACHE_COUNTER[$storeKey])) {
-          self::$STATIC_CACHE_COUNTER[$storeKey] = 0;
-        }
-
         // get from static-cache
         if (array_key_exists($storeKey, self::$STATIC_CACHE) === true) {
           return true;
