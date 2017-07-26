@@ -149,15 +149,15 @@ class Cache implements iCache
 
     if ($testCache != 1) {
       if (
-        // server == client
+          // admin is logged-in
+          $this->isAdminSession
+          ||
+          // server == client
           (
               isset($_SERVER['SERVER_ADDR'])
               &&
               $_SERVER['SERVER_ADDR'] == $this->getClientIp()
           )
-          ||
-          // admin is logged-in
-          $this->isAdminSession
           ||
           // user is a dev
           $this->checkForDev() === true
@@ -257,145 +257,145 @@ class Cache implements iCache
 
     if (is_object($adapterCache) && $adapterCache instanceof iAdapter) {
       return $adapterCache;
+    }
+
+    $memcached = null;
+    $isMemcachedAvailable = false;
+    if (extension_loaded('memcached')) {
+      $memcached = new \Memcached();
+      /** @noinspection PhpUsageOfSilenceOperatorInspection */
+      $isMemcachedAvailable = @$memcached->addServer('127.0.0.1', 11211);
+    }
+
+    if ($isMemcachedAvailable === false) {
+      $memcached = null;
+    }
+
+    $adapterMemcached = new AdapterMemcached($memcached);
+    if ($adapterMemcached->installed() === true) {
+
+      // -------------------------------------------------------------
+      // "Memcached"
+      // -------------------------------------------------------------
+      $adapter = $adapterMemcached;
+
     } else {
 
-      $memcached = null;
-      $isMemcachedAvailable = false;
-      if (extension_loaded('memcached')) {
-        $memcached = new \Memcached();
+      $memcache = null;
+      $isMemcacheAvailable = false;
+      if (class_exists('\Memcache')) {
+        $memcache = new \Memcache;
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
-        $isMemcachedAvailable = @$memcached->addServer('127.0.0.1', 11211);
+        $isMemcacheAvailable = @$memcache->connect('127.0.0.1', 11211);
       }
 
-      if ($isMemcachedAvailable === false) {
-        $memcached = null;
+      if ($isMemcacheAvailable === false) {
+        $memcache = null;
       }
 
-      $adapterMemcached = new AdapterMemcached($memcached);
-      if ($adapterMemcached->installed() === true) {
+      $adapterMemcache = new AdapterMemcache($memcache);
+      if ($adapterMemcache->installed() === true) {
 
         // -------------------------------------------------------------
-        // "Memcached"
+        // "Memcache"
         // -------------------------------------------------------------
-        $adapter = $adapterMemcached;
+        $adapter = $adapterMemcache;
 
       } else {
 
-        $memcache = null;
-        $isMemcacheAvailable = false;
-        if (class_exists('\Memcache')) {
-          $memcache = new \Memcache;
-          /** @noinspection PhpUsageOfSilenceOperatorInspection */
-          $isMemcacheAvailable = @$memcache->connect('127.0.0.1', 11211);
+        $redis = null;
+        $isRedisAvailable = false;
+        if (
+            extension_loaded('redis')
+            &&
+            class_exists('\Predis\Client')
+        ) {
+          /** @noinspection PhpUndefinedNamespaceInspection */
+          /** @noinspection PhpUndefinedClassInspection */
+          $redis = new \Predis\Client(
+              array(
+                  'scheme'  => 'tcp',
+                  'host'    => '127.0.0.1',
+                  'port'    => 6379,
+                  'timeout' => '2.0',
+              )
+          );
+          try {
+            $redis->connect();
+            $isRedisAvailable = $redis->getConnection()->isConnected();
+          } catch (\Exception $e) {
+            // nothing
+          }
         }
 
-        if ($isMemcacheAvailable === false) {
-          $memcache = null;
+        if ($isRedisAvailable === false) {
+          $redis = null;
         }
 
-        $adapterMemcache = new AdapterMemcache($memcache);
-        if ($adapterMemcache->installed() === true) {
+        $adapterRedis = new AdapterPredis($redis);
+        if ($adapterRedis->installed() === true) {
 
           // -------------------------------------------------------------
-          // "Memcache"
+          // Redis
           // -------------------------------------------------------------
-          $adapter = $adapterMemcache;
+          $adapter = $adapterRedis;
 
         } else {
 
-          $redis = null;
-          $isRedisAvailable = false;
-          if (
-              extension_loaded('redis')
-              &&
-              class_exists('\Predis\Client')
-          ) {
-            /** @noinspection PhpUndefinedNamespaceInspection */
-            $redis = new \Predis\Client(
-                array(
-                    'scheme'  => 'tcp',
-                    'host'    => '127.0.0.1',
-                    'port'    => 6379,
-                    'timeout' => '2.0',
-                )
-            );
-            try {
-              $redis->connect();
-              $isRedisAvailable = $redis->getConnection()->isConnected();
-            } catch (\Exception $e) {
-              // nothing
-            }
-          }
-
-          if ($isRedisAvailable === false) {
-            $redis = null;
-          }
-
-          $adapterRedis = new AdapterPredis($redis);
-          if ($adapterRedis->installed() === true) {
+          $adapterXcache = new AdapterXcache();
+          if ($adapterXcache->installed() === true) {
 
             // -------------------------------------------------------------
-            // Redis
+            // "Xcache"
             // -------------------------------------------------------------
-            $adapter = $adapterRedis;
+            $adapter = $adapterXcache;
 
           } else {
 
-            $adapterXcache = new AdapterXcache();
-            if ($adapterXcache->installed() === true) {
+            $adapterApc = new AdapterApc();
+            if ($adapterApc->installed() === true) {
 
               // -------------------------------------------------------------
-              // "Xcache"
+              // "APC"
               // -------------------------------------------------------------
-              $adapter = $adapterXcache;
+              $adapter = $adapterApc;
 
             } else {
 
-              $adapterApc = new AdapterApc();
-              if ($adapterApc->installed() === true) {
+              $adapterApcu = new AdapterApcu();
+              if ($adapterApcu->installed() === true) {
 
                 // -------------------------------------------------------------
-                // "APC"
+                // "APCu"
                 // -------------------------------------------------------------
-                $adapter = $adapterApc;
+                $adapter = $adapterApcu;
 
               } else {
 
-                $adapterApcu = new AdapterApcu();
-                if ($adapterApcu->installed() === true) {
+                $adapterFile = new AdapterFile();
+                if ($adapterFile->installed() === true) {
 
                   // -------------------------------------------------------------
-                  // "APCu"
+                  // File-Cache
                   // -------------------------------------------------------------
-                  $adapter = $adapterApcu;
+                  $adapter = $adapterFile;
 
                 } else {
 
-                  $adapterFile = new AdapterFile();
-                  if ($adapterFile->installed() === true) {
-
-                    // -------------------------------------------------------------
-                    // File-Cache
-                    // -------------------------------------------------------------
-                    $adapter = $adapterFile;
-
-                  } else {
-
-                    // -------------------------------------------------------------
-                    // Static-PHP-Cache
-                    // -------------------------------------------------------------
-                    $adapter = new AdapterArray();
-                  }
+                  // -------------------------------------------------------------
+                  // Static-PHP-Cache
+                  // -------------------------------------------------------------
+                  $adapter = new AdapterArray();
                 }
               }
             }
           }
         }
       }
-
-      // save to static cache
-      $adapterCache = $adapter;
     }
+
+    // save to static cache
+    $adapterCache = $adapter;
 
     return $adapter;
   }
@@ -555,7 +555,7 @@ class Cache implements iCache
    *
    * @param string    $key
    * @param mixed     $value
-   * @param \DateTime $date
+   * @param \DateTime $date <p>If the date is in the past, we will remove the existing cache-item.</p>
    *
    * @return boolean
    * @throws \Exception
@@ -594,12 +594,12 @@ class Cache implements iCache
 
       if ($ttl) {
         return $this->adapter->setExpired($storeKey, $serialized, $ttl);
-      } else {
-        return $this->adapter->set($storeKey, $serialized);
       }
-    } else {
-      return false;
+
+      return $this->adapter->set($storeKey, $serialized);
     }
+
+    return false;
   }
 
   /**
@@ -626,9 +626,9 @@ class Cache implements iCache
       }
 
       return $this->adapter->remove($storeKey);
-    } else {
-      return false;
     }
+
+    return false;
   }
 
   /**
@@ -648,9 +648,9 @@ class Cache implements iCache
       }
 
       return $this->adapter->removeAll();
-    } else {
-      return false;
     }
+
+    return false;
   }
 
   /**
@@ -674,9 +674,9 @@ class Cache implements iCache
       }
 
       return $this->adapter->exists($storeKey);
-    } else {
-      return false;
     }
+
+    return false;
   }
 
   /**

@@ -133,7 +133,32 @@ class AdapterFile implements iAdapter
   {
     $path = $this->getFileName($key);
 
-    if (!file_exists($path)) {
+    if (
+        file_exists($path) === false
+        ||
+        filesize($path) === 0
+    ) {
+      return null;
+    }
+
+    // init
+    $string = '';
+
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
+    $fp = @fopen($path, 'rb');
+    if ($fp) {
+      $locked = flock($fp, LOCK_SH);
+      if ($locked) {
+        while (!feof($fp)) {
+          $line = fgets($fp);
+          $string .= $line;
+        }
+      }
+      flock($fp, LOCK_UN);
+    }
+    fclose($fp);
+
+    if (!$string) {
       return null;
     }
 
@@ -209,11 +234,20 @@ class AdapterFile implements iAdapter
         )
     );
 
-    if (!file_put_contents($this->getFileName($key), $item)) {
-      return false;
-    }
+    $octetWritten = false;
+    $cacheFile = $this->getFileName($key);
 
-    return true;
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
+    $fp = @fopen($cacheFile, 'ab');
+    if ($fp && flock($fp, LOCK_EX)) {
+      ftruncate($fp, 0);
+      $octetWritten = fwrite($fp, $item);
+      fflush($fp);
+      flock($fp, LOCK_UN);
+    }
+    fclose($fp);
+
+    return $octetWritten !== false;
   }
 
   /**
