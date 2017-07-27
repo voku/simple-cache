@@ -31,6 +31,11 @@ class AdapterFile implements iAdapter
    * @var string
    */
   protected $fileMode = '0755';
+  
+  /**
+   * @var string
+   */
+  protected $internalFileValueCache = array();
 
   /**
    * @param string $cacheDir
@@ -117,13 +122,48 @@ class AdapterFile implements iAdapter
 
     return false;
   }
+  
+  /**
+   * @param string $key
+   *
+   * @return mixed <p>Will return null if the was no value, otherwise it will return the cache value.</p>
+   */
+  protected function getInternalFileValueCache($key)
+  {
+    if (isset($this->internalFileValueCache[$key]) === true) {
+      return $this->internalFileValueCache[$key];
+    }
+    
+    return null;
+  }
+  
+  /**
+   * @param string $key
+   * @param mixed  $value
+   */
+  protected function setInternalFileValueCache($key, $value)
+  {
+    $this->internalFileValueCache[$key] = $value;
+  }
+  
+  /**
+   * @param string $key
+   */
+  protected function removeInternalFileValueCache($key)
+  {
+    unset($this->internalFileValueCache[$key]);
+  }
 
   /**
    * @inheritdoc
    */
   public function exists($key)
   {
-    return null !== $this->get($key);
+    $value = $this->get($key);
+    
+    $this->setInternalFileValueCache($key, $value);
+    
+    return null !== $value;
   }
 
   /**
@@ -131,6 +171,11 @@ class AdapterFile implements iAdapter
    */
   public function get($key)
   {
+    $cachedValue = $this->getInternalFileValueCache($key);
+    if ($cachedValue !== null) {
+      return $cachedValue;
+    }
+    
     $path = $this->getFileName($key);
 
     if (
@@ -146,13 +191,10 @@ class AdapterFile implements iAdapter
 
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
     $fp = @fopen($path, 'rb');
-    if ($fp) {
-      $locked = flock($fp, LOCK_SH);
-      if ($locked) {
-        while (!feof($fp)) {
-          $line = fgets($fp);
-          $string .= $line;
-        }
+    if ($fp && flock($fp, LOCK_SH | LOCK_NB)) {
+      while (!feof($fp)) {
+        $line = fgets($fp);
+        $string .= $line;
       }
       flock($fp, LOCK_UN);
     }
@@ -190,6 +232,8 @@ class AdapterFile implements iAdapter
    */
   public function remove($key)
   {
+    $this->removeInternalFileValueCache($key);
+    
     $cacheFile = $this->getFileName($key);
 
     return $this->deleteFile($cacheFile);
@@ -200,6 +244,8 @@ class AdapterFile implements iAdapter
    */
   public function removeAll()
   {
+    $this->internalFileValueCache = array();
+    
     if (!$this->cacheDir) {
       return false;
     }
@@ -239,7 +285,7 @@ class AdapterFile implements iAdapter
 
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
     $fp = @fopen($cacheFile, 'ab');
-    if ($fp && flock($fp, LOCK_EX)) {
+    if ($fp && flock($fp, LOCK_EX | LOCK_NB)) {
       ftruncate($fp, 0);
       $octetWritten = fwrite($fp, $item);
       fflush($fp);
