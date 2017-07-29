@@ -5,7 +5,7 @@ namespace voku\cache;
 /**
  * AdapterXcache: Xcache-adapter
  *
- * @package   voku\cache
+ * @package voku\cache
  */
 class AdapterXcache implements iAdapter
 {

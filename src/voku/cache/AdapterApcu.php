@@ -7,7 +7,7 @@ namespace voku\cache;
  *
  * http://php.net/manual/de/book.apcu.php
  *
- * @package   voku\cache
+ * @package voku\cache
  */
 class AdapterApcu implements iAdapter
 {

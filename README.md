@@ -76,7 +76,7 @@ if ($cache->getCacheIsReady() === true && $cache->existsItem('foo')) {
 ```
 
 If you have an heavy task e.g. a really-big-loop, then you can also use static-cache. 
-But keep in mind, that this will be stored into PHP (it needs more memory) and it will be cleaned when the request is done.
+But keep in mind, that this will be stored into PHP (it needs more memory).
 
 ```php
 use voku\cache\Cache;
@@ -95,6 +95,8 @@ if ($cache->getCacheIsReady() === true && $cache->existsItem('foo')) {
 }
 ```
 
+PS: By default, the static cache is also used by >= 10 cache hits. But you can configure 
+this behavior via $cache->setStaticCacheHitCounter(INT).
 
 ## No-Cache for the admin or a specific ip-address
 

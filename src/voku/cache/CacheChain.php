@@ -5,7 +5,7 @@ namespace voku\cache;
 /**
  * CacheChain: global-cache-chain class
  *
- * @package   voku\cache
+ * @package voku\cache
  */
 class CacheChain implements iCache
 {

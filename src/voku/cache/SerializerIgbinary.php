@@ -6,7 +6,7 @@ namespace voku\cache;
  * SerializerIgbinary: serialize / unserialize
  *
 
- * @package   voku\cache
+ * @package voku\cache
  */
 class SerializerIgbinary implements iSerializer
 {
@@ -25,39 +25,31 @@ class SerializerIgbinary implements iSerializer
   }
 
   /**
-   * serialize
-   *
-   * @param mixed $value
-   *
-   * @return string
+   * @inheritdoc
    */
   public function serialize($value)
   {
     if (self::$_exists_igbinary === true) {
       /** @noinspection PhpUndefinedFunctionInspection */
       return igbinary_serialize($value);
-    } else {
-      // fallback
-      return serialize($value);
     }
+
+    // fallback
+    return serialize($value);
   }
 
   /**
-   * unserialize
-   *
-   * @param string $value
-   *
-   * @return mixed
+   * @inheritdoc
    */
   public function unserialize($value)
   {
     if (self::$_exists_igbinary === true) {
       /** @noinspection PhpUndefinedFunctionInspection */
       return igbinary_unserialize($value);
-    } else {
-      // fallback
-      return unserialize($value);
     }
+
+    // fallback
+    return unserialize($value);
   }
 
 }

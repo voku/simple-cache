@@ -56,7 +56,17 @@ class Cache implements iCache
   /**
    * @var array
    */
+  private static $STATIC_CACHE_EXPIRE = array();
+
+  /**
+   * @var array
+   */
   private static $STATIC_CACHE_COUNTER = array();
+
+  /**
+   * @var int
+   */
+  private $staticCacheHitCounter = 10;
 
   /**
    * __construct
@@ -424,53 +434,64 @@ class Cache implements iCache
    * Get cached-item by key.
    *
    * @param string $key
-   * @param int    $staticCacheHitCounter WARNING: This static cache has no TTL, it will be cleaned on the next request
-   *                                      and it will use more memory as e.g. memcache.
+   * @param int    $forceStaticCacheHitCounter
    *
    * @return mixed
    */
-  public function getItem($key, $staticCacheHitCounter = 0)
+  public function getItem($key, $forceStaticCacheHitCounter = 0)
   {
     // init
-    $staticCacheHitCounter = (int)$staticCacheHitCounter;
+    $forceStaticCacheHitCounter = (int)$forceStaticCacheHitCounter;
 
-    if ($this->adapter instanceof iAdapter) {
-      $storeKey = $this->calculateStoreKey($key);
-
-      // check if we already using static-cache
-      if ($this->adapter instanceof AdapterArray) {
-        $staticCacheHitCounter = 0;
-      }
-
-      if ($staticCacheHitCounter !== 0) {
-        if (!isset(self::$STATIC_CACHE_COUNTER[$storeKey])) {
-          self::$STATIC_CACHE_COUNTER[$storeKey] = 0;
-        }
-
-        if (self::$STATIC_CACHE_COUNTER[$storeKey] < ($staticCacheHitCounter + 1)) {
-          self::$STATIC_CACHE_COUNTER[$storeKey]++;
-        }
-
-        // get from static-cache
-        if (array_key_exists($storeKey, self::$STATIC_CACHE) === true) {
-          return self::$STATIC_CACHE[$storeKey];
-        }
-      }
-
-      $serialized = $this->adapter->get($storeKey);
-      $value = $serialized ? $this->serializer->unserialize($serialized) : null;
-
-      if (
-          $staticCacheHitCounter !== 0
-          &&
-          self::$STATIC_CACHE_COUNTER[$storeKey] >= $staticCacheHitCounter
-      ) {
-        // save into static-cache
-        self::$STATIC_CACHE[$storeKey] = $value;
-      }
-
-    } else {
+    if (!$this->adapter instanceof iAdapter) {
       return null;
+    }
+
+    $storeKey = $this->calculateStoreKey($key);
+
+    // check if we already using static-cache
+    $useStaticCache = true;
+    if ($this->adapter instanceof AdapterArray) {
+      $useStaticCache = false;
+    }
+
+    if (!isset(self::$STATIC_CACHE_COUNTER[$storeKey])) {
+      self::$STATIC_CACHE_COUNTER[$storeKey] = 0;
+    }
+
+    // get from static-cache
+    if (
+        $useStaticCache === true
+        &&
+        $this->checkForStaticCache($storeKey) === true
+    ) {
+      return self::$STATIC_CACHE[$storeKey];
+    }
+
+    $serialized = $this->adapter->get($storeKey);
+    $value = $serialized ? $this->serializer->unserialize($serialized) : null;
+
+    self::$STATIC_CACHE_COUNTER[$storeKey]++;
+
+    // save into static-cache if needed
+    if (
+        $useStaticCache === true
+        &&
+        (
+          (
+            $forceStaticCacheHitCounter !== 0
+            &&
+            self::$STATIC_CACHE_COUNTER[$storeKey] >= $forceStaticCacheHitCounter
+          )
+          ||
+          (
+            $this->staticCacheHitCounter !== 0
+            &&
+            self::$STATIC_CACHE_COUNTER[$storeKey] >= $this->staticCacheHitCounter
+          )
+        )
+    ) {
+      self::$STATIC_CACHE[$storeKey] = $value;
     }
 
     return $value;
@@ -551,6 +572,26 @@ class Cache implements iCache
   }
 
   /**
+   * Get the current value, when the static cache is used.
+   *
+   * @return int
+   */
+  public function getStaticCacheHitCounter()
+  {
+    return $this->staticCacheHitCounter;
+  }
+
+  /**
+   * Set the static-hit-counter: Who often do we hit the cache, before we use static cache?
+   *
+   * @param int $staticCacheHitCounter
+   */
+  public function setStaticCacheHitCounter($staticCacheHitCounter)
+  {
+    $this->staticCacheHitCounter = (int)$staticCacheHitCounter;
+  }
+
+  /**
    * Set cache-item by key => value + date.
    *
    * @param string    $key
@@ -585,21 +626,29 @@ class Cache implements iCache
   public function setItem($key, $value, $ttl = 0)
   {
     if (
-        $this->adapter instanceof iAdapter
-        &&
-        $this->serializer instanceof iSerializer
+        !$this->adapter instanceof iAdapter
+        ||
+        !$this->serializer instanceof iSerializer
     ) {
-      $storeKey = $this->calculateStoreKey($key);
-      $serialized = $this->serializer->serialize($value);
-
-      if ($ttl) {
-        return $this->adapter->setExpired($storeKey, $serialized, $ttl);
-      }
-
-      return $this->adapter->set($storeKey, $serialized);
+      return false;
     }
 
-    return false;
+    $storeKey = $this->calculateStoreKey($key);
+    $serialized = $this->serializer->serialize($value);
+
+    // update static-cache, if it's exists
+    if (array_key_exists($storeKey, self::$STATIC_CACHE) === true) {
+      self::$STATIC_CACHE[$storeKey] = $value;
+    }
+
+    if ($ttl) {
+      // always cache the TTL time, maybe we need this later ...
+      self::$STATIC_CACHE_EXPIRE[$storeKey] = ($ttl ? (int)$ttl + time() : 0);
+
+      return $this->adapter->setExpired($storeKey, $serialized, $ttl);
+    }
+
+    return $this->adapter->set($storeKey, $serialized);
   }
 
   /**
@@ -611,24 +660,26 @@ class Cache implements iCache
    */
   public function removeItem($key)
   {
-    if ($this->adapter instanceof iAdapter) {
-      $storeKey = $this->calculateStoreKey($key);
-
-      if (!empty(self::$STATIC_CACHE)) {
-
-        // remove static-cache
-        if (array_key_exists($storeKey, self::$STATIC_CACHE) === true) {
-          unset(
-              self::$STATIC_CACHE[$storeKey],
-              self::$STATIC_CACHE_COUNTER[$storeKey]
-          );
-        }
-      }
-
-      return $this->adapter->remove($storeKey);
+    if (!$this->adapter instanceof iAdapter) {
+      return false;
     }
 
-    return false;
+    $storeKey = $this->calculateStoreKey($key);
+
+    // remove static-cache
+    if (
+        !empty(self::$STATIC_CACHE)
+        &&
+        array_key_exists($storeKey, self::$STATIC_CACHE) === true
+    ) {
+      unset(
+          self::$STATIC_CACHE[$storeKey],
+          self::$STATIC_CACHE_COUNTER[$storeKey],
+          self::$STATIC_CACHE_EXPIRE[$storeKey]
+      );
+    }
+
+    return $this->adapter->remove($storeKey);
   }
 
   /**
@@ -638,19 +689,18 @@ class Cache implements iCache
    */
   public function removeAll()
   {
-    if ($this->adapter instanceof iAdapter) {
-
-      if (!empty(self::$STATIC_CACHE)) {
-
-        // remove static-cache
-        self::$STATIC_CACHE = array();
-        self::$STATIC_CACHE_COUNTER = array();
-      }
-
-      return $this->adapter->removeAll();
+    if (!$this->adapter instanceof iAdapter) {
+      return false;
     }
 
-    return false;
+    // remove static-cache
+    if (!empty(self::$STATIC_CACHE)) {
+      self::$STATIC_CACHE = array();
+      self::$STATIC_CACHE_COUNTER = array();
+      self::$STATIC_CACHE_EXPIRE = array();
+    }
+
+    return $this->adapter->removeAll();
   }
 
   /**
@@ -662,18 +712,37 @@ class Cache implements iCache
    */
   public function existsItem($key)
   {
-    if ($this->adapter instanceof iAdapter) {
-      $storeKey = $this->calculateStoreKey($key);
+    if (!$this->adapter instanceof iAdapter) {
+      return false;
+    }
 
-      if (!empty(self::$STATIC_CACHE)) {
+    $storeKey = $this->calculateStoreKey($key);
 
-        // get from static-cache
-        if (array_key_exists($storeKey, self::$STATIC_CACHE) === true) {
-          return true;
-        }
-      }
+    // check static-cache
+    if ($this->checkForStaticCache($storeKey) === true) {
+      return true;
+    }
 
-      return $this->adapter->exists($storeKey);
+    return $this->adapter->exists($storeKey);
+  }
+
+  /**
+   * @param string $storeKey
+   *
+   * @return bool
+   */
+  private function checkForStaticCache($storeKey)
+  {
+    if (
+        !empty(self::$STATIC_CACHE)
+        &&
+        array_key_exists($storeKey, self::$STATIC_CACHE) === true
+        &&
+        array_key_exists($storeKey, self::$STATIC_CACHE_EXPIRE) === true
+        &&
+        time() <= self::$STATIC_CACHE_EXPIRE[$storeKey]
+    ) {
+      return true;
     }
 
     return false;

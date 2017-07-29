@@ -5,7 +5,7 @@ namespace voku\cache;
 /**
  * AdapterMemcached: Memcached-adapter
  *
- * @package   voku\cache
+ * @package voku\cache
  */
 class AdapterMemcached implements iAdapter
 {

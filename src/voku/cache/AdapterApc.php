@@ -7,7 +7,7 @@ namespace voku\cache;
  *
  * http://php.net/manual/de/book.apc.php
  *
- * @package   voku\cache
+ * @package voku\cache
  */
 class AdapterApc implements iAdapter
 {
@@ -88,9 +88,9 @@ class AdapterApc implements iAdapter
   {
     if (function_exists('apc_exists')) {
       return apc_exists($key);
-    } else {
-      return $this->apc_cache_exists($key);
     }
+
+    return $this->apc_cache_exists($key);
   }
 
   /**
@@ -100,9 +100,9 @@ class AdapterApc implements iAdapter
   {
     if ($this->exists($key)) {
       return apc_fetch($key);
-    } else {
-      return false;
     }
+
+    return false;
   }
 
   /**

@@ -7,7 +7,7 @@ use Predis\Client;
 /**
  * AdapterPredis: Memcached-adapter
  *
- * @package   voku\cache
+ * @package voku\cache
  */
 class AdapterPredis implements iAdapter
 {

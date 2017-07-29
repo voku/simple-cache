@@ -5,7 +5,7 @@ namespace voku\cache;
 /**
  * AdapterFile: File-adapter
  *
- * @package   voku\cache
+ * @package voku\cache
  */
 class AdapterFile implements iAdapter
 {
@@ -31,11 +31,6 @@ class AdapterFile implements iAdapter
    * @var string
    */
   protected $fileMode = '0755';
-  
-  /**
-   * @var string
-   */
-  protected $internalFileValueCache = array();
 
   /**
    * @param string $cacheDir
@@ -91,7 +86,7 @@ class AdapterFile implements iAdapter
     }
 
     $mode_dec = intval($this->fileMode, 8);
-    $oldumask = umask(0);
+    $old_umask = umask(0);
 
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
     if (!@mkdir($path, $mode_dec) && !is_dir($path)) {
@@ -104,7 +99,7 @@ class AdapterFile implements iAdapter
       $return = chmod($path, $mode_dec);
     }
 
-    umask($oldumask);
+    umask($old_umask);
 
     return $return;
   }
@@ -122,37 +117,6 @@ class AdapterFile implements iAdapter
 
     return false;
   }
-  
-  /**
-   * @param string $key
-   *
-   * @return mixed <p>Will return null if the was no value, otherwise it will return the cache value.</p>
-   */
-  protected function getInternalFileValueCache($key)
-  {
-    if (isset($this->internalFileValueCache[$key]) === true) {
-      return $this->internalFileValueCache[$key];
-    }
-    
-    return null;
-  }
-  
-  /**
-   * @param string $key
-   * @param mixed  $value
-   */
-  protected function setInternalFileValueCache($key, $value)
-  {
-    $this->internalFileValueCache[$key] = $value;
-  }
-  
-  /**
-   * @param string $key
-   */
-  protected function removeInternalFileValueCache($key)
-  {
-    unset($this->internalFileValueCache[$key]);
-  }
 
   /**
    * @inheritdoc
@@ -160,9 +124,7 @@ class AdapterFile implements iAdapter
   public function exists($key)
   {
     $value = $this->get($key);
-    
-    $this->setInternalFileValueCache($key, $value);
-    
+
     return null !== $value;
   }
 
@@ -171,11 +133,6 @@ class AdapterFile implements iAdapter
    */
   public function get($key)
   {
-    $cachedValue = $this->getInternalFileValueCache($key);
-    if ($cachedValue !== null) {
-      return $cachedValue;
-    }
-    
     $path = $this->getFileName($key);
 
     if (
@@ -232,8 +189,6 @@ class AdapterFile implements iAdapter
    */
   public function remove($key)
   {
-    $this->removeInternalFileValueCache($key);
-    
     $cacheFile = $this->getFileName($key);
 
     return $this->deleteFile($cacheFile);
@@ -244,8 +199,6 @@ class AdapterFile implements iAdapter
    */
   public function removeAll()
   {
-    $this->internalFileValueCache = array();
-    
     if (!$this->cacheDir) {
       return false;
     }

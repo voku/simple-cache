@@ -45,9 +45,11 @@ class FileCacheTest extends PHPUnit_Framework_TestCase
 
   public function testGetItem()
   {
-    $return = $this->cache->getItem('2571_519ä#-`9de.foo::bar');
+    for ($i = 0; $i <= 20; $i++) {
+      $return = $this->cache->getItem('2571_519ä#-`9de.foo::bar');
 
-    self::assertSame(array(1, 2, 3, 4), $return);
+      self::assertSame(array(1, 2, 3, 4), $return);
+    }
   }
 
   public function testExistsItem()
@@ -140,6 +142,47 @@ class FileCacheTest extends PHPUnit_Framework_TestCase
     self::assertSame(null, $return);
   }
 
+
+  public function testSetGetCacheWithEndDateTimeAndStaticCacheAuto()
+  {
+    $expireDate = new DateTime();
+    $interval = DateInterval::createFromDateString('+1 seconds');
+    $expireDate->add($interval);
+
+    $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', array(3, 2, 1), $expireDate);
+    self::assertSame(true, $return);
+
+    for ($i = 0; $i <= 20; $i++) {
+      $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
+      self::assertSame(array(3, 2, 1), $return);
+    }
+
+    sleep(2);
+
+    $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
+    self::assertSame(null, $return);
+  }
+
+  public function testSetGetCacheWithEndDateTimeAndStaticCacheForce()
+  {
+    $expireDate = new DateTime();
+    $interval = DateInterval::createFromDateString('+1 seconds');
+    $expireDate->add($interval);
+
+    $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', array(3, 2, 1), $expireDate);
+    self::assertSame(true, $return);
+
+    for ($i = 0; $i <= 4; $i++) {
+      $return = $this->cache->getItem('testSetGetCacheWithEndDateTime', 2);
+      self::assertSame(array(3, 2, 1), $return);
+    }
+
+    sleep(2);
+
+    $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
+    self::assertSame(null, $return);
+  }
+
   public function testGetUsedAdapterClassName()
   {
     self::assertSame('voku\cache\AdapterFile', $this->cache->getUsedAdapterClassName());
@@ -163,7 +206,6 @@ class FileCacheTest extends PHPUnit_Framework_TestCase
 
     // reset default prefix
     $this->cache->setPrefix('');
-
   }
 
   /**

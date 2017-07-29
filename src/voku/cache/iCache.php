@@ -5,7 +5,7 @@ namespace voku\cache;
 /**
  * iCache: cache-global interface
  *
- * @package   voku\cache
+ * @package voku\cache
  */
 interface iCache
 {

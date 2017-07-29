@@ -111,7 +111,7 @@ class ArrayCacheTest extends PHPUnit_Framework_TestCase
   public function testSetGetCacheWithEndDateTime()
   {
     $expireDate = new DateTime();
-    $interval = DateInterval::createFromDateString('+3 seconds');
+    $interval = DateInterval::createFromDateString('+1 seconds');
     $expireDate->add($interval);
 
     $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', array(3, 2, 1), $expireDate);
@@ -120,7 +120,7 @@ class ArrayCacheTest extends PHPUnit_Framework_TestCase
     $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
     self::assertSame(array(3, 2, 1), $return);
 
-    sleep(4);
+    sleep(2);
 
     $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
     self::assertSame(null, $return);

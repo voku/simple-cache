@@ -5,17 +5,13 @@ namespace voku\cache;
 /**
  * SerializerNo: no serialize / unserialize !!!
  *
- * @package   voku\cache
+ * @package voku\cache
  */
 class SerializerNo implements iSerializer
 {
 
   /**
-   * serialize
-   *
-   * @param mixed $value
-   *
-   * @return string
+   * @inheritdoc
    */
   public function serialize($value)
   {
@@ -23,11 +19,7 @@ class SerializerNo implements iSerializer
   }
 
   /**
-   * unserialize
-   *
-   * @param string $value
-   *
-   * @return mixed
+   * @inheritdoc
    */
   public function unserialize($value)
   {
