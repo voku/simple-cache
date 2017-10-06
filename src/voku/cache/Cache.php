@@ -647,7 +647,8 @@ class Cache implements iCache
 
       if ($ttl instanceof \DateInterval) {
         // Converting to a TTL in seconds
-        $ttl = (new \DateTime('now'))->add($ttl)->getTimestamp() - time();
+        $dateTimeNow = new \DateTime('now');
+        $ttl = $dateTimeNow->add($ttl)->getTimestamp() - time();
       }
 
       // always cache the TTL time, maybe we need this later ...
