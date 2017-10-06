@@ -2,6 +2,8 @@
 
 namespace voku\cache;
 
+use voku\cache\Exception\InvalidArgumentException;
+
 /**
  * Cache: global-cache class
  *
@@ -21,52 +23,52 @@ class Cache implements iCache
   /**
    * @var iAdapter
    */
-  private $adapter;
+  protected $adapter;
 
   /**
    * @var iSerializer
    */
-  private $serializer;
+  protected $serializer;
 
   /**
    * @var string
    */
-  private $prefix = '';
+  protected $prefix = '';
 
   /**
    * @var bool
    */
-  private $isReady = false;
+  protected $isReady = false;
 
   /**
    * @var bool
    */
-  private $isActive = true;
+  protected $isActive = true;
 
   /**
    * @var mixed no cache, if admin-session is set
    */
-  private $isAdminSession = false;
+  protected $isAdminSession = false;
 
   /**
    * @var array
    */
-  private static $STATIC_CACHE = array();
+  protected static $STATIC_CACHE = array();
 
   /**
    * @var array
    */
-  private static $STATIC_CACHE_EXPIRE = array();
+  protected static $STATIC_CACHE_EXPIRE = array();
 
   /**
    * @var array
    */
-  private static $STATIC_CACHE_COUNTER = array();
+  protected static $STATIC_CACHE_COUNTER = array();
 
   /**
    * @var int
    */
-  private $staticCacheHitCounter = 10;
+  protected $staticCacheHitCounter = 10;
 
   /**
    * __construct
@@ -78,7 +80,7 @@ class Cache implements iCache
    * @param string|boolean   $isAdminSession set a user-id, if the user is a admin (so we can disable cache for this
    *                                         user)
    */
-  public function __construct($adapter = null, $serializer = null, $checkForUser = true, $cacheEnabled = true, $isAdminSession = false)
+  public function __construct(iAdapter $adapter = null, iSerializer $serializer = null, $checkForUser = true, $cacheEnabled = true, $isAdminSession = false)
   {
     $this->isAdminSession = $isAdminSession;
 
@@ -190,7 +192,7 @@ class Cache implements iCache
    *
    * @return  string
    */
-  private function getClientIp($trust_proxy_headers = false)
+  protected function getClientIp($trust_proxy_headers = false)
   {
     $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'NO_REMOTE_ADDR';
 
@@ -214,7 +216,7 @@ class Cache implements iCache
    *
    * @return bool
    */
-  private function checkForDev()
+  protected function checkForDev()
   {
     $return = false;
 
@@ -415,7 +417,7 @@ class Cache implements iCache
    *
    * @param boolean $isReady
    */
-  private function setCacheIsReady($isReady)
+  protected function setCacheIsReady($isReady)
   {
     $this->isReady = (boolean)$isReady;
   }
@@ -504,7 +506,7 @@ class Cache implements iCache
    *
    * @return string
    */
-  private function calculateStoreKey($rawKey)
+  protected function calculateStoreKey($rawKey)
   {
     $str = $this->getPrefix() . $rawKey;
 
@@ -522,7 +524,7 @@ class Cache implements iCache
    *
    * @return string
    */
-  private function cleanStoreKey($str)
+  protected function cleanStoreKey($str)
   {
     $str = preg_replace("/[\r\n\t ]+/", ' ', $str);
     $str = str_replace(
@@ -606,7 +608,7 @@ class Cache implements iCache
     $ttl = $date->getTimestamp() - time();
 
     if ($ttl <= 0) {
-      throw new \Exception('Date in the past.');
+      throw new InvalidArgumentException('Date in the past.');
     }
 
     $storeKey = $this->calculateStoreKey($key);
@@ -619,7 +621,7 @@ class Cache implements iCache
    *
    * @param string $key
    * @param mixed  $value
-   * @param int    $ttl
+   * @param null|int|\DateInterval $ttl
    *
    * @return bool
    */
@@ -642,6 +644,12 @@ class Cache implements iCache
     }
 
     if ($ttl) {
+
+      if ($ttl instanceof \DateInterval) {
+        // Converting to a TTL in seconds
+        $ttl = (new \DateTime('now'))->add($ttl)->getTimestamp() - time();
+      }
+
       // always cache the TTL time, maybe we need this later ...
       self::$STATIC_CACHE_EXPIRE[$storeKey] = ($ttl ? (int)$ttl + time() : 0);
 
@@ -731,7 +739,7 @@ class Cache implements iCache
    *
    * @return bool
    */
-  private function checkForStaticCache($storeKey)
+  protected function checkForStaticCache($storeKey)
   {
     if (
         !empty(self::$STATIC_CACHE)

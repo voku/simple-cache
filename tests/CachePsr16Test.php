@@ -1,13 +1,13 @@
 <?php
 
-use voku\cache\Cache;
+use voku\cache\CachePsr16;
 use voku\cache\iAdapter;
 use voku\cache\iSerializer;
 
 /**
- * CacheTest
+ * CachePsr16Test
  */
-class CacheTest extends PHPUnit_Framework_TestCase
+class CachePsr16Test extends PHPUnit_Framework_TestCase
 {
 
   /**
@@ -21,7 +21,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
   public $adapter;
 
   /**
-   * @var Cache
+   * @var CachePsr16
    */
   public $cache;
 
@@ -35,10 +35,10 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
     $this->cache->setPrefix($prefix);
     $this->adapter->expects(self::once())
-        ->method('get')
-        ->with(self::equalTo($prefix . 'lall'));
+                  ->method('exists')
+                  ->with(self::equalTo($prefix . 'lall'));
 
-    $this->cache->getItem('lall');
+    $this->cache->get('lall');
   }
 
   public function testGetNotExists()
@@ -46,11 +46,11 @@ class CacheTest extends PHPUnit_Framework_TestCase
     $key = 'some:test:key';
 
     $this->adapter->expects(self::once())
-        ->method('get')
+        ->method('exists')
         ->with(self::equalTo($key))
         ->will(self::returnValue(false));
 
-    $actual = $this->cache->getItem($key);
+    $actual = $this->cache->get($key, null);
 
     self::assertNull($actual);
   }
@@ -60,36 +60,26 @@ class CacheTest extends PHPUnit_Framework_TestCase
     $key = 'some:test:key';
     $expected = uniqid(time(), true);
 
+    $this->cache->set($key, $expected);
+
     $this->adapter->expects(self::once())
-        ->method('get')
-        ->with(self::equalTo($key))
-        ->will(self::returnValue($expected));
+                  ->method('exists')
+                  ->with(self::equalTo($key))
+                  ->will(self::returnValue(true));
+
+    $this->adapter->expects(self::once())
+                  ->method('get')
+                  ->with(self::equalTo($key))
+                  ->will(self::returnValue($expected));
 
     $this->serializer->expects(self::once())
-        ->method('unserialize')
-        ->with(self::equalTo($expected))
-        ->will(self::returnValue($expected));
+                     ->method('unserialize')
+                     ->with(self::equalTo($expected))
+                     ->will(self::returnValue($expected));
 
-    $actual = $this->cache->getItem($key);
+    $actual = $this->cache->get($key);
 
     self::assertSame($expected, $actual);
-  }
-
-  public function testSet()
-  {
-    $key = 'some:test:key';
-    $value = uniqid(time(), true);
-
-    $this->serializer->expects(self::once())
-        ->method('serialize')
-        ->with(self::equalTo($value))
-        ->will(self::returnValue($value));
-
-    $this->adapter->expects(self::once())
-        ->method('setExpired')
-        ->with(self::equalTo($key), self::equalTo($value));
-
-    $this->cache->setItem($key, $value, 10);
   }
 
   public function testSetWithTtl()
@@ -107,40 +97,25 @@ class CacheTest extends PHPUnit_Framework_TestCase
         ->method('setExpired')
         ->with(self::equalTo($key), self::equalTo($value), self::equalTo($ttl));
 
-    $this->cache->setItem($key, $value, $ttl);
+    $this->cache->set($key, $value, $ttl);
   }
 
-  public function testSetToDate()
+  public function testSetWithTtlDateInterval()
   {
     $key = 'some:test:key';
     $value = uniqid(time(), true);
-    $date = new DateTime();
-    $time = $date->getTimestamp();
-    $date->add(new DateInterval('PT1H'));
+    $ttl = new DateInterval('PT1H');
 
     $this->serializer->expects(self::once())
-        ->method('serialize')
-        ->with(self::equalTo($value))
-        ->will(self::returnValue($value));
+                     ->method('serialize')
+                     ->with(self::equalTo($value))
+                     ->will(self::returnValue($value));
 
     $this->adapter->expects(self::once())
-        ->method('setExpired')
-        ->with(self::equalTo($key), self::equalTo($value), self::equalTo($date->getTimestamp() - $time));
+                  ->method('setExpired')
+                  ->with(self::equalTo($key), self::equalTo($value));
 
-    $this->cache->setItemToDate($key, $value, $date);
-  }
-
-  /**
-   * @expectedException Exception
-   */
-  public function testSetWrongDate()
-  {
-    $key = 'some:test:key';
-    $value = uniqid(time(), true);
-    $date = new DateTime();
-    $date->sub(new DateInterval('PT1H'));
-
-    $this->cache->setItemToDate($key, $value, $date);
+    $this->cache->set($key, $value, $ttl);
   }
 
   public function testRemove()
@@ -151,7 +126,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
         ->method('remove')
         ->with(self::equalTo($key));
 
-    $this->cache->removeItem($key);
+    $this->cache->delete($key);
   }
 
   public function testExists()
@@ -162,7 +137,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
         ->method('exists')
         ->with(self::equalTo($key));
 
-    $this->cache->existsItem($key);
+    $this->cache->has($key);
   }
 
   /**
@@ -171,10 +146,10 @@ class CacheTest extends PHPUnit_Framework_TestCase
    */
   protected function setUp()
   {
-    $this->adapter = $this->createMock('voku\cache\AdapterApc');
+    $this->adapter = $this->createMock('voku\cache\AdapterArray');
     $this->serializer = $this->createMock('voku\cache\SerializerDefault');
 
-    $this->cache = new Cache($this->adapter, $this->serializer, false, true);
+    $this->cache = new CachePsr16($this->adapter, $this->serializer, false, true);
 
     // reset default prefix
     $this->cache->setPrefix('');

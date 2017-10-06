@@ -2,6 +2,8 @@
 
 namespace voku\cache;
 
+use voku\cache\Exception\InvalidArgumentException;
+
 /**
  * AdapterMemcache: Memcache-adapter
  *
@@ -89,6 +91,11 @@ class AdapterMemcache implements iAdapter
    */
   public function set($key, $value)
   {
+    // Make sure we are under the proper limit
+    if (strlen($key) > 250) {
+      throw new InvalidArgumentException('The passed cache key is over 250 bytes:' . print_r($key, true));
+    }
+
     return $this->memcache->set($key, $value, $this->getCompressedFlag());
   }
 
