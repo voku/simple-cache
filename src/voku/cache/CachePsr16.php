@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace voku\cache;
 
 use Psr\SimpleCache\CacheInterface;
@@ -12,7 +14,7 @@ class CachePsr16 extends Cache implements CacheInterface
    *
    * @return bool True on success and false on failure.
    */
-  public function clear()
+  public function clear(): bool
   {
     return $this->removeAll();
   }
@@ -26,9 +28,9 @@ class CachePsr16 extends Cache implements CacheInterface
    *
    * @throws InvalidArgumentException
    */
-  public function delete($key)
+  public function delete($key): bool
   {
-    if (!is_string($key)) {
+    if (!\is_string($key)) {
       throw new InvalidArgumentException('$key is not a string:' . print_r($key, true));
     }
 
@@ -44,9 +46,9 @@ class CachePsr16 extends Cache implements CacheInterface
    *
    * @throws InvalidArgumentException
    */
-  public function deleteMultiple($keys)
+  public function deleteMultiple($keys): bool
   {
-    if (!is_array($keys) && !($keys instanceof \Traversable)) {
+    if (!\is_array($keys) && !($keys instanceof \Traversable)) {
       throw new InvalidArgumentException('$keys is not iterable:' . print_r($keys, true));
     }
 
@@ -54,11 +56,8 @@ class CachePsr16 extends Cache implements CacheInterface
     foreach ((array)$keys as $key) {
       $results = $this->delete($key);
     }
-    if (in_array(false, $results, true) === false) {
-      return true;
-    }
 
-    return false;
+    return \in_array(false, $results, true) === false;
   }
 
   /**
@@ -93,7 +92,7 @@ class CachePsr16 extends Cache implements CacheInterface
    */
   public function getMultiple($keys, $default = null)
   {
-    if (!is_array($keys) && !($keys instanceof \Traversable)) {
+    if (!\is_array($keys) && !($keys instanceof \Traversable)) {
       throw new InvalidArgumentException('$keys is not iterable:' . print_r($keys, true));
     }
 
@@ -119,9 +118,9 @@ class CachePsr16 extends Cache implements CacheInterface
    *
    * @throws InvalidArgumentException
    */
-  public function has($key)
+  public function has($key): bool
   {
-    if (!is_string($key)) {
+    if (!\is_string($key)) {
       throw new InvalidArgumentException('$key is not a string:' . print_r($key, true));
     }
 
@@ -141,9 +140,9 @@ class CachePsr16 extends Cache implements CacheInterface
    *
    * @throws InvalidArgumentException
    */
-  public function set($key, $value, $ttl = null)
+  public function set($key, $value, $ttl = null): bool
   {
-    if (!is_string($key)) {
+    if (!\is_string($key)) {
       throw new InvalidArgumentException('$key is not a string:' . print_r($key, true));
     }
 
@@ -162,9 +161,9 @@ class CachePsr16 extends Cache implements CacheInterface
    *
    * @throws InvalidArgumentException
    */
-  public function setMultiple($values, $ttl = null)
+  public function setMultiple($values, $ttl = null): bool
   {
-    if (!is_array($values) && !($values instanceof \Traversable)) {
+    if (!\is_array($values) && !($values instanceof \Traversable)) {
       throw new InvalidArgumentException('$values is not iterable:' . print_r($values, true));
     }
 
@@ -172,10 +171,7 @@ class CachePsr16 extends Cache implements CacheInterface
     foreach ((array)$values as $key => $value) {
       $results = $this->set($key, $value, $ttl);
     }
-    if (in_array(false, $results, true) === false) {
-      return true;
-    }
 
-    return false;
+    return \in_array(false, $results, true) === false;
   }
 }

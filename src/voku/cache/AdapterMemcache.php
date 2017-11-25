@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace voku\cache;
 
 use voku\cache\Exception\InvalidArgumentException;
@@ -22,7 +24,7 @@ class AdapterMemcache implements iAdapter
   private $memcache;
 
   /**
-   * @var boolean
+   * @var bool
    */
   private $compressed = false;
 
@@ -49,7 +51,7 @@ class AdapterMemcache implements iAdapter
   /**
    * @inheritdoc
    */
-  public function exists($key)
+  public function exists(string $key): bool
   {
     return $this->get($key) !== false;
   }
@@ -57,7 +59,7 @@ class AdapterMemcache implements iAdapter
   /**
    * @inheritdoc
    */
-  public function get($key)
+  public function get(string $key)
   {
     return $this->memcache->get($key);
   }
@@ -65,7 +67,7 @@ class AdapterMemcache implements iAdapter
   /**
    * @inheritdoc
    */
-  public function installed()
+  public function installed(): bool
   {
     return $this->installed;
   }
@@ -73,7 +75,7 @@ class AdapterMemcache implements iAdapter
   /**
    * @inheritdoc
    */
-  public function remove($key)
+  public function remove(string $key): bool
   {
     return $this->memcache->delete($key);
   }
@@ -81,7 +83,7 @@ class AdapterMemcache implements iAdapter
   /**
    * @inheritdoc
    */
-  public function removeAll()
+  public function removeAll(): bool
   {
     return $this->memcache->flush();
   }
@@ -89,10 +91,10 @@ class AdapterMemcache implements iAdapter
   /**
    * @inheritdoc
    */
-  public function set($key, $value)
+  public function set(string $key, $value): bool
   {
     // Make sure we are under the proper limit
-    if (strlen($key) > 250) {
+    if (\strlen($key) > 250) {
       throw new InvalidArgumentException('The passed cache key is over 250 bytes:' . print_r($key, true));
     }
 
@@ -102,7 +104,7 @@ class AdapterMemcache implements iAdapter
   /**
    * @inheritdoc
    */
-  public function setExpired($key, $value, $ttl)
+  public function setExpired(string $key, $value, int $ttl = 0): bool
   {
     if ($ttl > 2592000) {
       $ttl = 2592000;
@@ -116,7 +118,7 @@ class AdapterMemcache implements iAdapter
    *
    * @return int 2 || 0
    */
-  private function getCompressedFlag()
+  private function getCompressedFlag(): int
   {
     return $this->isCompressed() ? MEMCACHE_COMPRESSED : 0;
   }
@@ -124,9 +126,9 @@ class AdapterMemcache implements iAdapter
   /**
    * Check if compression from MemCache is active.
    *
-   * @return boolean
+   * @return bool
    */
-  public function isCompressed()
+  public function isCompressed(): bool
   {
     return $this->compressed;
   }
@@ -134,7 +136,7 @@ class AdapterMemcache implements iAdapter
   /**
    * Activate the compression from MemCache.
    *
-   * @param mixed $value will be converted to boolean
+   * @param mixed $value will be converted to bool
    */
   public function setCompressed($value)
   {

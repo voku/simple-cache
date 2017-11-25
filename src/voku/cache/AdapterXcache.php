@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace voku\cache;
 
 /**
@@ -16,7 +18,7 @@ class AdapterXcache implements iAdapter
    */
   public function __construct()
   {
-    if (extension_loaded('xcache') === true) {
+    if (\extension_loaded('xcache') === true) {
       $this->installed = true;
     }
   }
@@ -24,23 +26,23 @@ class AdapterXcache implements iAdapter
   /**
    * @inheritdoc
    */
-  public function exists($key)
+  public function exists(string $key): bool
   {
-    return xcache_isset($key);
+    return \xcache_isset($key);
   }
 
   /**
    * @inheritdoc
    */
-  public function get($key)
+  public function get(string $key)
   {
-    return xcache_get($key);
+    return \xcache_get($key);
   }
 
   /**
    * @inheritdoc
    */
-  public function installed()
+  public function installed(): bool
   {
     return $this->installed;
   }
@@ -48,20 +50,20 @@ class AdapterXcache implements iAdapter
   /**
    * @inheritdoc
    */
-  public function remove($key)
+  public function remove(string $key): bool
   {
-    return xcache_unset($key);
+    return \xcache_unset($key);
   }
 
   /**
    * @inheritdoc
    */
-  public function removeAll()
+  public function removeAll(): bool
   {
-    if (defined('XC_TYPE_VAR')) {
+    if (\defined('XC_TYPE_VAR')) {
       $xCacheCount = xcache_count(XC_TYPE_VAR);
       for ($i = 0; $i < $xCacheCount; $i++) {
-        xcache_clear_cache(XC_TYPE_VAR, $i);
+        \xcache_clear_cache(XC_TYPE_VAR, $i);
       }
 
       return true;
@@ -73,17 +75,17 @@ class AdapterXcache implements iAdapter
   /**
    * @inheritdoc
    */
-  public function set($key, $value)
+  public function set(string $key, $value): bool
   {
-    return xcache_set($key, $value);
+    return \xcache_set($key, $value);
   }
 
   /**
    * @inheritdoc
    */
-  public function setExpired($key, $value, $ttl)
+  public function setExpired(string $key, $value, int $ttl = 0): bool
   {
-    return xcache_set($key, $value, $ttl);
+    return \xcache_set($key, $value, $ttl);
   }
 
 }

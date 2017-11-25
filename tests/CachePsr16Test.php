@@ -7,7 +7,7 @@ use voku\cache\iSerializer;
 /**
  * CachePsr16Test
  */
-class CachePsr16Test extends PHPUnit_Framework_TestCase
+class CachePsr16Test extends \PHPUnit\Framework\TestCase
 {
 
   /**

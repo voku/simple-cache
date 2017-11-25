@@ -9,7 +9,7 @@ use voku\cache\SerializerDefault;
 /**
  * MemcachedCacheTest
  */
-class MemcachedCacheTest extends PHPUnit_Framework_TestCase
+class MemcachedCacheTest extends \PHPUnit\Framework\TestCase
 {
 
   /**

@@ -7,7 +7,7 @@ use voku\cache\iSerializer;
 /**
  * CacheTest
  */
-class CacheTest extends PHPUnit_Framework_TestCase
+class CacheTest extends \PHPUnit\Framework\TestCase
 {
 
   /**

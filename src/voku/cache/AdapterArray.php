@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace voku\cache;
 
 /**
@@ -13,17 +15,17 @@ class AdapterArray implements iAdapter
   /**
    * @var array
    */
-  private static $values = array();
+  private static $values = [];
 
   /**
    * @var array
    */
-  private static $expired = array();
+  private static $expired = [];
 
   /**
    * @inheritdoc
    */
-  public function exists($key)
+  public function exists(string $key): bool
   {
     $this->removeExpired($key);
 
@@ -33,7 +35,7 @@ class AdapterArray implements iAdapter
   /**
    * @inheritdoc
    */
-  public function get($key)
+  public function get(string $key)
   {
     return $this->exists($key) ? self::$values[$key] : null;
   }
@@ -41,7 +43,7 @@ class AdapterArray implements iAdapter
   /**
    * @inheritdoc
    */
-  public function installed()
+  public function installed(): bool
   {
     return true;
   }
@@ -49,7 +51,7 @@ class AdapterArray implements iAdapter
   /**
    * @inheritdoc
    */
-  public function remove($key)
+  public function remove(string $key): bool
   {
     $this->removeExpired($key);
 
@@ -65,10 +67,10 @@ class AdapterArray implements iAdapter
   /**
    * @inheritdoc
    */
-  public function removeAll()
+  public function removeAll(): bool
   {
-    self::$values = array();
-    self::$expired = array();
+    self::$values = [];
+    self::$expired = [];
 
     return true;
   }
@@ -76,7 +78,7 @@ class AdapterArray implements iAdapter
   /**
    * @inheritdoc
    */
-  public function set($key, $value)
+  public function set(string $key, $value): bool
   {
     self::$values[$key] = $value;
 
@@ -86,10 +88,13 @@ class AdapterArray implements iAdapter
   /**
    * @inheritdoc
    */
-  public function setExpired($key, $value, $ttl)
+  public function setExpired(string $key, $value, int $ttl = 0): bool
   {
     self::$values[$key] = $value;
-    self::$expired[$key] = array(time(), $ttl);
+
+    if ($ttl !== null) {
+      self::$expired[$key] = [time(), $ttl];
+    }
 
     return true;
   }
@@ -99,9 +104,9 @@ class AdapterArray implements iAdapter
    *
    * @param string $key
    *
-   * @return boolean
+   * @return bool
    */
-  private function removeExpired($key)
+  private function removeExpired($key): bool
   {
     if (
         array_key_exists($key, self::$expired) === false

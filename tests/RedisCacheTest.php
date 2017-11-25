@@ -9,7 +9,7 @@ use voku\cache\SerializerDefault;
 /**
  * RedisCacheTest
  */
-class RedisCacheTest extends PHPUnit_Framework_TestCase
+class RedisCacheTest extends \PHPUnit\Framework\TestCase
 {
 
   /**

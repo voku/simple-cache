@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace voku\cache;
 
 use voku\cache\Exception\InvalidArgumentException;
@@ -53,17 +55,17 @@ class Cache implements iCache
   /**
    * @var array
    */
-  protected static $STATIC_CACHE = array();
+  protected static $STATIC_CACHE = [];
 
   /**
    * @var array
    */
-  protected static $STATIC_CACHE_EXPIRE = array();
+  protected static $STATIC_CACHE_EXPIRE = [];
 
   /**
    * @var array
    */
-  protected static $STATIC_CACHE_COUNTER = array();
+  protected static $STATIC_CACHE_COUNTER = [];
 
   /**
    * @var int
@@ -75,12 +77,12 @@ class Cache implements iCache
    *
    * @param null|iAdapter    $adapter
    * @param null|iSerializer $serializer
-   * @param boolean          $checkForUser   check for dev-ip or if cms-user is logged-in
-   * @param boolean          $cacheEnabled   false will disable the cache (use it e.g. for global settings)
-   * @param string|boolean   $isAdminSession set a user-id, if the user is a admin (so we can disable cache for this
+   * @param bool             $checkForUser   check for dev-ip or if cms-user is logged-in
+   * @param bool             $cacheEnabled   false will disable the cache (use it e.g. for global settings)
+   * @param string|bool      $isAdminSession set a user-id, if the user is a admin (so we can disable cache for this
    *                                         user)
    */
-  public function __construct(iAdapter $adapter = null, iSerializer $serializer = null, $checkForUser = true, $cacheEnabled = true, $isAdminSession = false)
+  public function __construct(iAdapter $adapter = null, iSerializer $serializer = null, bool $checkForUser = true, bool $cacheEnabled = true, $isAdminSession = false)
   {
     $this->isAdminSession = $isAdminSession;
 
@@ -102,7 +104,7 @@ class Cache implements iCache
       if (
           $adapter === null
           ||
-          !is_object($adapter)
+          !\is_object($adapter)
           ||
           !$adapter instanceof iAdapter
       ) {
@@ -110,7 +112,7 @@ class Cache implements iCache
       }
 
       // INFO: Memcache(d) has his own "serializer", so don't use it twice
-      if (!is_object($serializer) && $serializer === null) {
+      if (!\is_object($serializer) && $serializer === null) {
         if (
             $adapter instanceof AdapterMemcached
             ||
@@ -140,11 +142,11 @@ class Cache implements iCache
   /**
    * enable / disable the cache
    *
-   * @param boolean $isActive
+   * @param bool $isActive
    */
-  public function setActive($isActive)
+  public function setActive(bool $isActive)
   {
-    $this->isActive = (boolean)$isActive;
+    $this->isActive = $isActive;
   }
 
   /**
@@ -152,7 +154,7 @@ class Cache implements iCache
    *
    * @return bool
    */
-  public function isCacheActiveForTheCurrentUser()
+  public function isCacheActiveForTheCurrentUser(): bool
   {
     $active = true;
 
@@ -161,7 +163,7 @@ class Cache implements iCache
 
     if ($testCache != 1) {
       if (
-          // admin is logged-in
+        // admin is logged-in
           $this->isAdminSession
           ||
           // server == client
@@ -184,25 +186,27 @@ class Cache implements iCache
   /**
    * returns the IP address of the client
    *
-   * @param   bool $trust_proxy_headers   Whether or not to trust the
+   * @param bool $trust_proxy_headers     <p>
+   *                                      Whether or not to trust the
    *                                      proxy headers HTTP_CLIENT_IP
    *                                      and HTTP_X_FORWARDED_FOR. ONLY
    *                                      use if your $_SERVER is behind a
    *                                      proxy that sets these values
+   *                                      </p>
    *
-   * @return  string
+   * @return string
    */
-  protected function getClientIp($trust_proxy_headers = false)
+  protected function getClientIp(bool $trust_proxy_headers = false): string
   {
-    $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'NO_REMOTE_ADDR';
+    $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? 'NO_REMOTE_ADDR';
 
     if ($trust_proxy_headers) {
       return $remoteAddr;
     }
 
-    if (isset($_SERVER['HTTP_CLIENT_IP']) && $_SERVER['HTTP_CLIENT_IP']) {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
       $ip = $_SERVER['HTTP_CLIENT_IP'];
-    } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR']) {
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
       $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
     } else {
       $ip = $remoteAddr;
@@ -216,17 +220,17 @@ class Cache implements iCache
    *
    * @return bool
    */
-  protected function checkForDev()
+  protected function checkForDev(): bool
   {
     $return = false;
 
-    if (function_exists('checkForDev')) {
+    if (\function_exists('checkForDev')) {
       $return = checkForDev();
     } else {
 
       // for testing with dev-address
       $noDev = isset($_GET['noDev']) ? (int)$_GET['noDev'] : 0;
-      $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'NO_REMOTE_ADDR';
+      $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? 'NO_REMOTE_ADDR';
 
       if (
           $noDev != 1
@@ -251,11 +255,11 @@ class Cache implements iCache
    */
   protected function getTheDefaultPrefix()
   {
-    return (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '') . '_' .
-           (isset($_SERVER['THEME']) ? $_SERVER['THEME'] : '') . '_' .
-           (isset($_SERVER['STAGE']) ? $_SERVER['STAGE'] : '') . '_' .
-           (isset($_SESSION['language']) ? $_SESSION['language'] : '') . '_' .
-           (isset($_SESSION['language_extra']) ? $_SESSION['language_extra'] : '');
+    return ($_SERVER['SERVER_NAME'] ?? '') . '_' .
+           ($_SERVER['THEME'] ?? '') . '_' .
+           ($_SERVER['STAGE'] ?? '') . '_' .
+           ($_SESSION['language'] ?? '') . '_' .
+           ($_SESSION['language_extra'] ?? '');
   }
 
   /**
@@ -263,17 +267,17 @@ class Cache implements iCache
    *
    * @return iAdapter
    */
-  protected function autoConnectToAvailableCacheSystem()
+  protected function autoConnectToAvailableCacheSystem(): iAdapter
   {
     static $adapterCache;
 
-    if (is_object($adapterCache) && $adapterCache instanceof iAdapter) {
+    if (\is_object($adapterCache) && $adapterCache instanceof iAdapter) {
       return $adapterCache;
     }
 
     $memcached = null;
     $isMemcachedAvailable = false;
-    if (extension_loaded('memcached')) {
+    if (\extension_loaded('memcached')) {
       $memcached = new \Memcached();
       /** @noinspection PhpUsageOfSilenceOperatorInspection */
       $isMemcachedAvailable = @$memcached->addServer('127.0.0.1', 11211);
@@ -318,22 +322,24 @@ class Cache implements iCache
         $redis = null;
         $isRedisAvailable = false;
         if (
-            extension_loaded('redis')
+            \extension_loaded('redis')
             &&
             class_exists('\Predis\Client')
         ) {
           /** @noinspection PhpUndefinedNamespaceInspection */
           /** @noinspection PhpUndefinedClassInspection */
           $redis = new \Predis\Client(
-              array(
+              [
                   'scheme'  => 'tcp',
                   'host'    => '127.0.0.1',
                   'port'    => 6379,
                   'timeout' => '2.0',
-              )
+              ]
           );
           try {
+            /** @noinspection PhpUndefinedMethodInspection */
             $redis->connect();
+            /** @noinspection PhpUndefinedMethodInspection */
             $isRedisAvailable = $redis->getConnection()->isConnected();
           } catch (\Exception $e) {
             // nothing
@@ -415,19 +421,19 @@ class Cache implements iCache
   /**
    * Set "isReady" state.
    *
-   * @param boolean $isReady
+   * @param bool $isReady
    */
-  protected function setCacheIsReady($isReady)
+  protected function setCacheIsReady(bool $isReady)
   {
-    $this->isReady = (boolean)$isReady;
+    $this->isReady = $isReady;
   }
 
   /**
    * Get the "isReady" state.
    *
-   * @return boolean
+   * @return bool
    */
-  public function getCacheIsReady()
+  public function getCacheIsReady(): bool
   {
     return $this->isReady;
   }
@@ -440,11 +446,8 @@ class Cache implements iCache
    *
    * @return mixed
    */
-  public function getItem($key, $forceStaticCacheHitCounter = 0)
+  public function getItem(string $key, int $forceStaticCacheHitCounter = 0)
   {
-    // init
-    $forceStaticCacheHitCounter = (int)$forceStaticCacheHitCounter;
-
     if (!$this->adapter instanceof iAdapter) {
       return null;
     }
@@ -480,17 +483,17 @@ class Cache implements iCache
         $useStaticCache === true
         &&
         (
-          (
-            $forceStaticCacheHitCounter !== 0
-            &&
-            self::$STATIC_CACHE_COUNTER[$storeKey] >= $forceStaticCacheHitCounter
-          )
-          ||
-          (
-            $this->staticCacheHitCounter !== 0
-            &&
-            self::$STATIC_CACHE_COUNTER[$storeKey] >= $this->staticCacheHitCounter
-          )
+            (
+                $forceStaticCacheHitCounter !== 0
+                &&
+                self::$STATIC_CACHE_COUNTER[$storeKey] >= $forceStaticCacheHitCounter
+            )
+            ||
+            (
+                $this->staticCacheHitCounter !== 0
+                &&
+                self::$STATIC_CACHE_COUNTER[$storeKey] >= $this->staticCacheHitCounter
+            )
         )
     ) {
       self::$STATIC_CACHE[$storeKey] = $value;
@@ -506,7 +509,7 @@ class Cache implements iCache
    *
    * @return string
    */
-  protected function calculateStoreKey($rawKey)
+  protected function calculateStoreKey(string $rawKey): string
   {
     $str = $this->getPrefix() . $rawKey;
 
@@ -524,12 +527,12 @@ class Cache implements iCache
    *
    * @return string
    */
-  protected function cleanStoreKey($str)
+  protected function cleanStoreKey(string $str): string
   {
     $str = preg_replace("/[\r\n\t ]+/", ' ', $str);
     $str = str_replace(
-        array('"', '*', ':', '<', '>', '?', "'", '|'),
-        array(
+        ['"', '*', ':', '<', '>', '?', "'", '|'],
+        [
             '-+-',
             '-+-+-',
             '-+-+-+-',
@@ -538,7 +541,7 @@ class Cache implements iCache
             '-+-+-+-+-+-+-',
             '-+-+-+-+-+-+-+-',
             '-+-+-+-+-+-+-+-+-',
-        ),
+        ],
         $str
     );
     $str = html_entity_decode($str, ENT_QUOTES, 'UTF-8');
@@ -556,7 +559,7 @@ class Cache implements iCache
    *
    * @return string
    */
-  public function getPrefix()
+  public function getPrefix(): string
   {
     return $this->prefix;
   }
@@ -568,9 +571,9 @@ class Cache implements iCache
    *
    * @param string $prefix
    */
-  public function setPrefix($prefix)
+  public function setPrefix(string $prefix)
   {
-    $this->prefix = (string)$prefix;
+    $this->prefix = $prefix;
   }
 
   /**
@@ -578,7 +581,7 @@ class Cache implements iCache
    *
    * @return int
    */
-  public function getStaticCacheHitCounter()
+  public function getStaticCacheHitCounter(): int
   {
     return $this->staticCacheHitCounter;
   }
@@ -588,9 +591,9 @@ class Cache implements iCache
    *
    * @param int $staticCacheHitCounter
    */
-  public function setStaticCacheHitCounter($staticCacheHitCounter)
+  public function setStaticCacheHitCounter(int $staticCacheHitCounter)
   {
-    $this->staticCacheHitCounter = (int)$staticCacheHitCounter;
+    $this->staticCacheHitCounter = $staticCacheHitCounter;
   }
 
   /**
@@ -600,10 +603,10 @@ class Cache implements iCache
    * @param mixed     $value
    * @param \DateTime $date <p>If the date is in the past, we will remove the existing cache-item.</p>
    *
-   * @return boolean
+   * @return bool
    * @throws \Exception
    */
-  public function setItemToDate($key, $value, \DateTime $date)
+  public function setItemToDate(string $key, $value, \DateTime $date): bool
   {
     $ttl = $date->getTimestamp() - time();
 
@@ -619,13 +622,13 @@ class Cache implements iCache
   /**
    * Set cache-item by key => value + ttl.
    *
-   * @param string $key
-   * @param mixed  $value
+   * @param string                 $key
+   * @param mixed                  $value
    * @param null|int|\DateInterval $ttl
    *
    * @return bool
    */
-  public function setItem($key, $value, $ttl = 0)
+  public function setItem(string $key, $value, $ttl = 0): bool
   {
     if (
         !$this->adapter instanceof iAdapter
@@ -667,7 +670,7 @@ class Cache implements iCache
    *
    * @return bool
    */
-  public function removeItem($key)
+  public function removeItem(string $key): bool
   {
     if (!$this->adapter instanceof iAdapter) {
       return false;
@@ -696,7 +699,7 @@ class Cache implements iCache
    *
    * @return bool
    */
-  public function removeAll()
+  public function removeAll(): bool
   {
     if (!$this->adapter instanceof iAdapter) {
       return false;
@@ -704,9 +707,9 @@ class Cache implements iCache
 
     // remove static-cache
     if (!empty(self::$STATIC_CACHE)) {
-      self::$STATIC_CACHE = array();
-      self::$STATIC_CACHE_COUNTER = array();
-      self::$STATIC_CACHE_EXPIRE = array();
+      self::$STATIC_CACHE = [];
+      self::$STATIC_CACHE_COUNTER = [];
+      self::$STATIC_CACHE_EXPIRE = [];
     }
 
     return $this->adapter->removeAll();
@@ -717,9 +720,9 @@ class Cache implements iCache
    *
    * @param string $key
    *
-   * @return boolean
+   * @return bool
    */
-  public function existsItem($key)
+  public function existsItem(string $key): bool
   {
     if (!$this->adapter instanceof iAdapter) {
       return false;
@@ -740,21 +743,15 @@ class Cache implements iCache
    *
    * @return bool
    */
-  protected function checkForStaticCache($storeKey)
+  protected function checkForStaticCache(string $storeKey): bool
   {
-    if (
-        !empty(self::$STATIC_CACHE)
-        &&
-        array_key_exists($storeKey, self::$STATIC_CACHE) === true
-        &&
-        array_key_exists($storeKey, self::$STATIC_CACHE_EXPIRE) === true
-        &&
-        time() <= self::$STATIC_CACHE_EXPIRE[$storeKey]
-    ) {
-      return true;
-    }
-
-    return false;
+    return !empty(self::$STATIC_CACHE)
+           &&
+           array_key_exists($storeKey, self::$STATIC_CACHE) === true
+           &&
+           array_key_exists($storeKey, self::$STATIC_CACHE_EXPIRE) === true
+           &&
+           time() <= self::$STATIC_CACHE_EXPIRE[$storeKey];
   }
 
   /**
@@ -762,9 +759,9 @@ class Cache implements iCache
    *
    * @return string
    */
-  public function getUsedAdapterClassName()
+  public function getUsedAdapterClassName(): string
   {
-    return get_class($this->adapter);
+    return \get_class($this->adapter);
   }
 
   /**
@@ -772,8 +769,8 @@ class Cache implements iCache
    *
    * @return string
    */
-  public function getUsedSerializerClassName()
+  public function getUsedSerializerClassName(): string
   {
-    return get_class($this->serializer);
+    return \get_class($this->serializer);
   }
 }

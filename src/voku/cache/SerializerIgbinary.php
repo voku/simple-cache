@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace voku\cache;
 
 /**
  * SerializerIgbinary: serialize / unserialize
  *
-
  * @package voku\cache
  */
 class SerializerIgbinary implements iSerializer
@@ -21,7 +22,11 @@ class SerializerIgbinary implements iSerializer
    */
   public function __construct()
   {
-    self::$_exists_igbinary = (function_exists('igbinary_serialize') && function_exists('igbinary_unserialize'));
+    self::$_exists_igbinary = (
+        \function_exists('igbinary_serialize')
+        &&
+        \function_exists('igbinary_unserialize')
+    );
   }
 
   /**

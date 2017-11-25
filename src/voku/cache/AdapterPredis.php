@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace voku\cache;
 
 use Predis\Client;
@@ -44,7 +46,7 @@ class AdapterPredis implements iAdapter
   /**
    * @inheritdoc
    */
-  public function exists($key)
+  public function exists(string $key): bool
   {
     return $this->client->exists($key);
   }
@@ -52,7 +54,7 @@ class AdapterPredis implements iAdapter
   /**
    * @inheritdoc
    */
-  public function get($key)
+  public function get(string $key)
   {
     return $this->client->get($key);
   }
@@ -60,7 +62,7 @@ class AdapterPredis implements iAdapter
   /**
    * @inheritdoc
    */
-  public function installed()
+  public function installed(): bool
   {
     return $this->installed;
   }
@@ -68,7 +70,7 @@ class AdapterPredis implements iAdapter
   /**
    * @inheritdoc
    */
-  public function remove($key)
+  public function remove(string $key): bool
   {
     return $this->client->del($key);
   }
@@ -76,7 +78,7 @@ class AdapterPredis implements iAdapter
   /**
    * @inheritdoc
    */
-  public function removeAll()
+  public function removeAll(): bool
   {
     return $this->client->flushall();
   }
@@ -84,7 +86,7 @@ class AdapterPredis implements iAdapter
   /**
    * @inheritdoc
    */
-  public function set($key, $value)
+  public function set(string $key, $value): bool
   {
     return $this->client->set($key, $value);
   }
@@ -92,7 +94,7 @@ class AdapterPredis implements iAdapter
   /**
    * @inheritdoc
    */
-  public function setExpired($key, $value, $ttl)
+  public function setExpired(string $key, $value, int $ttl = 0): bool
   {
     return $this->client->setex($key, $ttl, $value);
   }

@@ -9,7 +9,7 @@ use voku\cache\SerializerDefault;
 /**
  * ApcCacheTest
  */
-class ApcCacheTest extends PHPUnit_Framework_TestCase
+class ApcCacheTest extends \PHPUnit\Framework\TestCase
 {
 
   /**

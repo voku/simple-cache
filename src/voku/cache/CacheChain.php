@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace voku\cache;
 
 /**
@@ -44,7 +46,7 @@ class CacheChain implements iCache
    * add cache
    *
    * @param iCache  $cache
-   * @param boolean $prepend
+   * @param bool $prepend
    *
    * @throws \InvalidArgumentException
    */
@@ -64,7 +66,7 @@ class CacheChain implements iCache
   /**
    * @inheritdoc
    */
-  public function getItem($key)
+  public function getItem(string $key)
   {
     /* @var $cache iCache */
     foreach ($this->caches as $cache) {
@@ -79,7 +81,7 @@ class CacheChain implements iCache
   /**
    * @inheritdoc
    */
-  public function setItem($key, $value, $ttl = null)
+  public function setItem(string $key, $value, $ttl = null): bool
   {
     /* @var $cache iCache */
     foreach ($this->caches as $cache) {
@@ -90,7 +92,7 @@ class CacheChain implements iCache
   /**
    * @inheritdoc
    */
-  public function setItemToDate($key, $value, \DateTime $date)
+  public function setItemToDate(string $key, $value, \DateTime $date)
   {
     /* @var $cache iCache */
     foreach ($this->caches as $cache) {
@@ -101,7 +103,7 @@ class CacheChain implements iCache
   /**
    * @inheritdoc
    */
-  public function removeItem($key)
+  public function removeItem(string $key): bool
   {
     /* @var $cache iCache */
     foreach ($this->caches as $cache) {
@@ -112,7 +114,7 @@ class CacheChain implements iCache
   /**
    * @inheritdoc
    */
-  public function existsItem($key)
+  public function existsItem(string $key): bool
   {
     /* @var $cache iCache */
     foreach ($this->caches as $cache) {
@@ -127,7 +129,7 @@ class CacheChain implements iCache
   /**
    * @inheritdoc
    */
-  public function removeAll()
+  public function removeAll(): bool
   {
     /* @var $cache iCache */
     foreach ($this->caches as $cache) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace voku\cache;
 
 use voku\cache\Exception\InvalidArgumentException;
@@ -46,7 +48,7 @@ class AdapterMemcached implements iAdapter
   /**
    * @inheritdoc
    */
-  public function exists($key)
+  public function exists(string $key): bool
   {
     return $this->get($key) !== false;
   }
@@ -54,7 +56,7 @@ class AdapterMemcached implements iAdapter
   /**
    * @inheritdoc
    */
-  public function get($key)
+  public function get(string $key)
   {
     return $this->memcached->get($key);
   }
@@ -62,7 +64,7 @@ class AdapterMemcached implements iAdapter
   /**
    * @inheritdoc
    */
-  public function installed()
+  public function installed(): bool
   {
     return $this->installed;
   }
@@ -70,7 +72,7 @@ class AdapterMemcached implements iAdapter
   /**
    * @inheritdoc
    */
-  public function remove($key)
+  public function remove(string $key): bool
   {
     return $this->memcached->delete($key);
   }
@@ -78,7 +80,7 @@ class AdapterMemcached implements iAdapter
   /**
    * @inheritdoc
    */
-  public function removeAll()
+  public function removeAll(): bool
   {
     return $this->memcached->flush();
   }
@@ -86,10 +88,10 @@ class AdapterMemcached implements iAdapter
   /**
    * @inheritdoc
    */
-  public function set($key, $value)
+  public function set(string $key, $value): bool
   {
     // Make sure we are under the proper limit
-    if (strlen($this->memcached->getOption(\Memcached::OPT_PREFIX_KEY) . $key) > 250) {
+    if (\strlen($this->memcached->getOption(\Memcached::OPT_PREFIX_KEY) . $key) > 250) {
       throw new InvalidArgumentException('The passed cache key is over 250 bytes:' . print_r($key, true));
     }
 
@@ -99,7 +101,7 @@ class AdapterMemcached implements iAdapter
   /**
    * @inheritdoc
    */
-  public function setExpired($key, $value, $ttl)
+  public function setExpired(string $key, $value, int $ttl = 0): bool
   {
     if ($ttl > 2592000) {
       $ttl = 2592000;

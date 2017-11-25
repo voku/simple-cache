@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace voku\cache;
 
 /**
@@ -13,57 +15,57 @@ interface iCache
   /**
    * get item
    *
-   * @param $key
+   * @param string $key
    *
    * @return mixed
    */
-  public function getItem($key);
+  public function getItem(string $key);
 
   /**
    * set item
    *
-   * @param      $key
-   * @param      $value
-   * @param null $ttl
+   * @param string   $key
+   * @param mixed    $value
+   * @param null|int $ttl
    *
-   * @return mixed
+   * @return bool
    */
-  public function setItem($key, $value, $ttl = null);
+  public function setItem(string $key, $value, $ttl = 0): bool;
 
   /**
    * set item a special expire-date
    *
-   * @param           $key
-   * @param           $value
+   * @param string    $key
+   * @param mixed     $value
    * @param \DateTime $date
    *
-   * @return mixed
+   * @return bool
    */
-  public function setItemToDate($key, $value, \DateTime $date);
+  public function setItemToDate(string $key, $value, \DateTime $date): bool;
 
   /**
    * remove item
    *
-   * @param $key
+   * @param string $key
    *
-   * @return mixed
+   * @return bool
    */
-  public function removeItem($key);
+  public function removeItem(string $key): bool;
 
   /**
    * remove all items
    *
-   * @return mixed
+   * @return bool
    */
-  public function removeAll();
+  public function removeAll(): bool;
 
   /**
    * check if item exists
    *
-   * @param $key
+   * @param string $key
    *
-   * @return mixed
+   * @return bool
    */
-  public function existsItem($key);
+  public function existsItem(string $key): bool;
 
 }

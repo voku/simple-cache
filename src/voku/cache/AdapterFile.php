@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace voku\cache;
 
 /**
@@ -40,7 +42,7 @@ class AdapterFile implements iAdapter
     $this->serializer = new SerializerIgbinary();
 
     if (!$cacheDir) {
-      $cacheDir = realpath(sys_get_temp_dir()) . '/simple_php_cache';
+      $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache';
     }
 
     $this->cacheDir = (string)$cacheDir;
@@ -57,7 +59,7 @@ class AdapterFile implements iAdapter
    *
    * @return bool
    */
-  protected function createCacheDirectory($path)
+  protected function createCacheDirectory($path): bool
   {
     if (
         !$path
@@ -72,34 +74,34 @@ class AdapterFile implements iAdapter
     }
 
     // if the directory already exists, just return true
-    if (is_dir($path) && is_writable($path)) {
+    if (\is_dir($path) && \is_writable($path)) {
       return true;
     }
 
     // if more than one level, try parent first
-    if (dirname($path) !== '.') {
-      $return = $this->createCacheDirectory(dirname($path));
+    if (\dirname($path) !== '.') {
+      $return = $this->createCacheDirectory(\dirname($path));
       // if creating parent fails, we can abort immediately
       if (!$return) {
         return false;
       }
     }
 
-    $mode_dec = intval($this->fileMode, 8);
-    $old_umask = umask(0);
+    $mode_dec = \intval($this->fileMode, 8);
+    $old_umask = \umask(0);
 
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    if (!@mkdir($path, $mode_dec) && !is_dir($path)) {
+    if (!@\mkdir($path, $mode_dec) && !\is_dir($path)) {
       $return = false;
     } else {
       $return = true;
     }
 
-    if (is_dir($path) && !is_writable($path)) {
-      $return = chmod($path, $mode_dec);
+    if (\is_dir($path) && !\is_writable($path)) {
+      $return = \chmod($path, $mode_dec);
     }
 
-    umask($old_umask);
+    \umask($old_umask);
 
     return $return;
   }
@@ -109,10 +111,10 @@ class AdapterFile implements iAdapter
    *
    * @return bool
    */
-  protected function deleteFile($cacheFile)
+  protected function deleteFile($cacheFile): bool
   {
-    if (is_file($cacheFile)) {
-      return unlink($cacheFile);
+    if (\is_file($cacheFile)) {
+      return \unlink($cacheFile);
     }
 
     return false;
@@ -121,7 +123,7 @@ class AdapterFile implements iAdapter
   /**
    * @inheritdoc
    */
-  public function exists($key)
+  public function exists(string $key): bool
   {
     $value = $this->get($key);
 
@@ -131,7 +133,7 @@ class AdapterFile implements iAdapter
   /**
    * @inheritdoc
    */
-  public function get($key)
+  public function get(string $key)
   {
     $path = $this->getFileName($key);
 
@@ -179,7 +181,7 @@ class AdapterFile implements iAdapter
   /**
    * @inheritdoc
    */
-  public function installed()
+  public function installed(): bool
   {
     return $this->installed;
   }
@@ -187,7 +189,7 @@ class AdapterFile implements iAdapter
   /**
    * @inheritdoc
    */
-  public function remove($key)
+  public function remove(string $key): bool
   {
     $cacheFile = $this->getFileName($key);
 
@@ -197,7 +199,7 @@ class AdapterFile implements iAdapter
   /**
    * @inheritdoc
    */
-  public function removeAll()
+  public function removeAll(): bool
   {
     if (!$this->cacheDir) {
       return false;
@@ -210,13 +212,13 @@ class AdapterFile implements iAdapter
       }
     }
 
-    return in_array(false, $return, true) === false;
+    return \in_array(false, $return, true) === false;
   }
 
   /**
    * @inheritdoc
    */
-  public function set($key, $value)
+  public function set(string $key, $value): bool
   {
     return $this->setExpired($key, $value);
   }
@@ -224,7 +226,7 @@ class AdapterFile implements iAdapter
   /**
    * @inheritdoc
    */
-  public function setExpired($key, $value, $ttl = 0)
+  public function setExpired(string $key, $value, int $ttl = 0): bool
   {
     $item = $this->serializer->serialize(
         array(
@@ -254,7 +256,7 @@ class AdapterFile implements iAdapter
    *
    * @return string
    */
-  protected function getFileName($key)
+  protected function getFileName(string $key): string
   {
     return $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_FILE_PREFIX . $key . self::CACHE_FILE_SUBFIX;
   }
@@ -276,7 +278,7 @@ class AdapterFile implements iAdapter
    *
    * @return bool
    */
-  protected function ttlHasExpired($ttl)
+  protected function ttlHasExpired(int $ttl): bool
   {
     if ($ttl === 0) {
       return false;
@@ -286,13 +288,13 @@ class AdapterFile implements iAdapter
   }
 
   /**
-   * @param $data
+   * @param mixed $data
    *
    * @return bool
    */
-  protected function validateDataFromCache($data)
+  protected function validateDataFromCache($data): bool
   {
-    if (!is_array($data)) {
+    if (!\is_array($data)) {
       return false;
     }
 

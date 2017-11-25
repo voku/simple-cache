@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace voku\cache;
 
 /**
@@ -28,9 +30,9 @@ class AdapterApcu implements iAdapter
   public function __construct()
   {
     if (
-        function_exists('apcu_store') === true
+        \function_exists('apcu_store') === true
         &&
-        ini_get('apc.enabled')
+        \ini_get('apc.enabled')
     ) {
       $this->installed = true;
     }
@@ -48,7 +50,7 @@ class AdapterApcu implements iAdapter
    *
    * @deprecated
    */
-  public function apcu_cache_exists($key)
+  public function apcu_cache_exists($key): bool
   {
     return $this->exists($key);
   }
@@ -59,52 +61,52 @@ class AdapterApcu implements iAdapter
    * @param string $type   - If $type is "user", the user cache will be cleared; otherwise,
    *                       the system cache (cached files) will be cleared.
    *
-   * @return boolean
+   * @return bool
    *
    * @internal
    */
-  public function cacheClear($type)
+  public function cacheClear(string $type): bool
   {
-    return apcu_clear_cache($type);
+    return \apcu_clear_cache($type);
   }
 
   /**
    * Retrieves cached information from APCu's data store
    *
-   * @param boolean $limited - If $limited is TRUE, the return value will exclude the individual list of cache entries.
+   * @param bool $limited - If $limited is TRUE, the return value will exclude the individual list of cache entries.
    *                         This is useful when trying to optimize calls for statistics gathering.
    *
    * @return array of cached data (and meta-data) or FALSE on failure.
    */
-  public function cacheInfo($limited = false)
+  public function cacheInfo(bool $limited = false): array
   {
-    return apcu_cache_info($limited);
+    return \apcu_cache_info($limited);
   }
 
   /**
    * @inheritdoc
    */
-  public function exists($key)
+  public function exists(string $key): bool
   {
-    return apcu_exists($key);
+    return \apcu_exists($key);
   }
 
   /**
    * @inheritdoc
    */
-  public function get($key)
+  public function get(string $key)
   {
     if ($this->exists($key)) {
-      return apcu_fetch($key);
-    } else {
-      return false;
+      return \apcu_fetch($key);
     }
+
+    return false;
   }
 
   /**
    * @inheritdoc
    */
-  public function installed()
+  public function installed(): bool
   {
     return $this->installed;
   }
@@ -112,15 +114,15 @@ class AdapterApcu implements iAdapter
   /**
    * @inheritdoc
    */
-  public function remove($key)
+  public function remove(string $key): bool
   {
-    return apcu_delete($key);
+    return \apcu_delete($key);
   }
 
   /**
    * @inheritdoc
    */
-  public function removeAll()
+  public function removeAll(): bool
   {
     return $this->cacheClear('system') && $this->cacheClear('user');
   }
@@ -128,17 +130,17 @@ class AdapterApcu implements iAdapter
   /**
    * @inheritdoc
    */
-  public function set($key, $value)
+  public function set(string $key, $value): bool
   {
-    return apcu_store($key, $value);
+    return \apcu_store($key, $value);
   }
 
   /**
    * @inheritdoc
    */
-  public function setExpired($key, $data, $ttl)
+  public function setExpired(string $key, $data, int $ttl = 0): bool
   {
-    return apcu_store($key, $data, $ttl);
+    return \apcu_store($key, $data, $ttl);
   }
 
 }
