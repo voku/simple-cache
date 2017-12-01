@@ -37,7 +37,7 @@ class CacheChain implements iCache
    *
    * @return array
    */
-  public function getCaches()
+  public function getCaches(): array
   {
     return $this->caches;
   }
@@ -83,21 +83,31 @@ class CacheChain implements iCache
    */
   public function setItem(string $key, $value, $ttl = null): bool
   {
+    // init
+    $results = [];
+
     /* @var $cache iCache */
     foreach ($this->caches as $cache) {
-      $cache->setItem($key, $value, $ttl);
+      $results[] =$cache->setItem($key, $value, $ttl);
     }
+
+    return \in_array(false, $results, true) === false;
   }
 
   /**
    * @inheritdoc
    */
-  public function setItemToDate(string $key, $value, \DateTime $date)
+  public function setItemToDate(string $key, $value, \DateTime $date): bool
   {
+    // init
+    $results = [];
+
     /* @var $cache iCache */
     foreach ($this->caches as $cache) {
-      $cache->setItemToDate($key, $value, $date);
+      $results[] = $cache->setItemToDate($key, $value, $date);
     }
+
+    return \in_array(false, $results, true) === false;
   }
 
   /**
@@ -105,10 +115,15 @@ class CacheChain implements iCache
    */
   public function removeItem(string $key): bool
   {
+    // init
+    $results = [];
+
     /* @var $cache iCache */
     foreach ($this->caches as $cache) {
-      $cache->removeItem($key);
+      $results[] = $cache->removeItem($key);
     }
+
+    return \in_array(false, $results, true) === false;
   }
 
   /**
@@ -131,9 +146,14 @@ class CacheChain implements iCache
    */
   public function removeAll(): bool
   {
+    // init
+    $results = [];
+
     /* @var $cache iCache */
     foreach ($this->caches as $cache) {
-      $cache->removeAll();
+      $results[] = $cache->removeAll();
     }
+
+    return \in_array(false, $results, true) === false;
   }
 }
