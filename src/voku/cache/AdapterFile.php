@@ -157,7 +157,9 @@ class AdapterFile implements iAdapter
       }
       flock($fp, LOCK_UN);
     }
-    fclose($fp);
+    if ($fp) {
+      fclose($fp);
+    }
 
     if (!$string) {
       return null;
