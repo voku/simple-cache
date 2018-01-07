@@ -58,8 +58,7 @@ class AdapterApcu implements iAdapter
   /**
    * Clears the APCu cache by type.
    *
-   * @param string $type   - If $type is "user", the user cache will be cleared; otherwise,
-   *                       the system cache (cached files) will be cleared.
+   * @param string $type <p>WARNING: is not used in APCu only valid for APC</p>
    *
    * @return bool
    *
@@ -67,7 +66,7 @@ class AdapterApcu implements iAdapter
    */
   public function cacheClear(string $type): bool
   {
-    return (bool)\apcu_clear_cache($type);
+    return (bool)\apcu_clear_cache();
   }
 
   /**
@@ -76,7 +75,7 @@ class AdapterApcu implements iAdapter
    * @param bool $limited    - If $limited is TRUE, the return value will exclude the individual list of cache entries.
    *                         This is useful when trying to optimize calls for statistics gathering.
    *
-   * @return array of cached data (and meta-data) or FALSE on failure.
+   * @return array|bool <p>Array of cached data (and meta-data) or FALSE on failure.</p>
    */
   public function cacheInfo(bool $limited = false): array
   {
