@@ -1,3 +1,8 @@
+# Changelog 3.1.1 (2018-01-07)
+
+- "AdapterApcu" -> fixed php-warning from "apcu_clear_cache()"
+
+
 # Changelog 3.1.0 (2018-01-07)
 
 - "AdapterOpCache" -> added
