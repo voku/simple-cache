@@ -1,15 +1,15 @@
 <?php
 
-use voku\cache\AdapterFile;
+use voku\cache\AdapterOpCache;
 use voku\cache\Cache;
 use voku\cache\iAdapter;
 use voku\cache\iSerializer;
-use voku\cache\SerializerDefault;
+use voku\cache\SerializerIgbinary;
 
 /**
- * FileCacheTest
+ * OpCacheTest
  */
-class FileCacheTest extends \PHPUnit\Framework\TestCase
+class OpCacheTest extends \PHPUnit\Framework\TestCase
 {
 
   /**
@@ -47,7 +47,7 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
   }
 
   /**
-   * @depends  testSetItem
+   * @depends testSetItem
    */
   public function testGetItem()
   {
@@ -61,7 +61,7 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
   }
 
   /**
-   * @depends  testSetItem
+   * @depends testSetItem
    */
   public function testExistsItem()
   {
@@ -96,11 +96,7 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
     $interval = DateInterval::createFromDateString('+3 seconds');
     $expireDate->add($interval);
 
-    $return = $this->cache->setItemToDate(
-        'testSetGetCacheWithEndDateTime',
-        [3, 2, 1],
-        $expireDate
-    );
+    $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', [3, 2, 1], $expireDate);
     self::assertSame(true, $return);
 
     $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
@@ -157,18 +153,13 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
     self::assertSame(null, $return);
   }
 
-
   public function testSetGetCacheWithEndDateTimeAndStaticCacheAuto()
   {
     $expireDate = new DateTime();
     $interval = DateInterval::createFromDateString('+1 seconds');
     $expireDate->add($interval);
 
-    $return = $this->cache->setItemToDate(
-        'testSetGetCacheWithEndDateTime',
-        [3, 2, 1],
-        $expireDate
-    );
+    $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', [3, 2, 1], $expireDate);
     self::assertSame(true, $return);
 
     for ($i = 0; $i <= 20; $i++) {
@@ -188,11 +179,7 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
     $interval = DateInterval::createFromDateString('+1 seconds');
     $expireDate->add($interval);
 
-    $return = $this->cache->setItemToDate(
-        'testSetGetCacheWithEndDateTime',
-        [3, 2, 1],
-        $expireDate
-    );
+    $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', [3, 2, 1], $expireDate);
     self::assertSame(true, $return);
 
     for ($i = 0; $i <= 4; $i++) {
@@ -208,12 +195,12 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
 
   public function testGetUsedAdapterClassName()
   {
-    self::assertSame('voku\cache\AdapterFile', $this->cache->getUsedAdapterClassName());
+    self::assertSame('voku\cache\AdapterOpCache', $this->cache->getUsedAdapterClassName());
   }
 
   public function testGetUsedSerializerClassName()
   {
-    self::assertSame('voku\cache\SerializerDefault', $this->cache->getUsedSerializerClassName());
+    self::assertSame('voku\cache\SerializerIgbinary', $this->cache->getUsedSerializerClassName());
   }
 
   /**
@@ -222,8 +209,8 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
    */
   protected function setUp()
   {
-    $this->adapter = new AdapterFile();
-    $this->serializer = new SerializerDefault();
+    $this->adapter = new AdapterOpCache();
+    $this->serializer = new SerializerIgbinary();
 
     $this->cache = new Cache($this->adapter, $this->serializer, false, true);
 

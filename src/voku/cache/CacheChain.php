@@ -15,20 +15,20 @@ class CacheChain implements iCache
   /**
    * @var array iCache
    */
-  private $caches = array();
+  private $caches = [];
 
   /**
    * __construct
    *
    * @param array $caches
    */
-  public function __construct(array $caches = array())
+  public function __construct(array $caches = [])
   {
     array_map(
-        array(
+        [
             $this,
-            'addCache'
-        ), $caches
+            'addCache',
+        ], $caches
     );
   }
 
@@ -45,8 +45,8 @@ class CacheChain implements iCache
   /**
    * add cache
    *
-   * @param iCache  $cache
-   * @param bool $prepend
+   * @param iCache $cache
+   * @param bool   $prepend
    *
    * @throws \InvalidArgumentException
    */
@@ -88,7 +88,7 @@ class CacheChain implements iCache
 
     /* @var $cache iCache */
     foreach ($this->caches as $cache) {
-      $results[] =$cache->setItem($key, $value, $ttl);
+      $results[] = $cache->setItem($key, $value, $ttl);
     }
 
     return \in_array(false, $results, true) === false;

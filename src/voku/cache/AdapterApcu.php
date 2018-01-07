@@ -67,13 +67,13 @@ class AdapterApcu implements iAdapter
    */
   public function cacheClear(string $type): bool
   {
-    return \apcu_clear_cache($type);
+    return (bool)\apcu_clear_cache($type);
   }
 
   /**
    * Retrieves cached information from APCu's data store
    *
-   * @param bool $limited - If $limited is TRUE, the return value will exclude the individual list of cache entries.
+   * @param bool $limited    - If $limited is TRUE, the return value will exclude the individual list of cache entries.
    *                         This is useful when trying to optimize calls for statistics gathering.
    *
    * @return array of cached data (and meta-data) or FALSE on failure.
@@ -88,7 +88,7 @@ class AdapterApcu implements iAdapter
    */
   public function exists(string $key): bool
   {
-    return \apcu_exists($key);
+    return (bool)\apcu_exists($key);
   }
 
   /**
@@ -100,7 +100,7 @@ class AdapterApcu implements iAdapter
       return \apcu_fetch($key);
     }
 
-    return false;
+    return null;
   }
 
   /**
@@ -116,7 +116,7 @@ class AdapterApcu implements iAdapter
    */
   public function remove(string $key): bool
   {
-    return \apcu_delete($key);
+    return (bool)\apcu_delete($key);
   }
 
   /**
@@ -124,7 +124,7 @@ class AdapterApcu implements iAdapter
    */
   public function removeAll(): bool
   {
-    return $this->cacheClear('system') && $this->cacheClear('user');
+    return (bool)($this->cacheClear('system') && $this->cacheClear('user'));
   }
 
   /**
@@ -132,7 +132,7 @@ class AdapterApcu implements iAdapter
    */
   public function set(string $key, $value): bool
   {
-    return \apcu_store($key, $value);
+    return (bool)\apcu_store($key, $value);
   }
 
   /**
@@ -140,7 +140,7 @@ class AdapterApcu implements iAdapter
    */
   public function setExpired(string $key, $data, int $ttl = 0): bool
   {
-    return \apcu_store($key, $data, $ttl);
+    return (bool)\apcu_store($key, $data, $ttl);
   }
 
 }

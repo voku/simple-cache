@@ -43,7 +43,8 @@ class AdapterMemcache implements iAdapter
   /**
    * @param \Memcache $memcache
    */
-  public function setMemcache(\Memcache $memcache) {
+  public function setMemcache(\Memcache $memcache)
+  {
     $this->memcache = $memcache;
     $this->installed = true;
   }

@@ -15,7 +15,7 @@ use voku\cache\Exception\InvalidArgumentException;
  * - APC / APCu
  * - Xcache
  * - Array
- * - File
+ * - File / OpCache
  *
  * @package   voku\cache
  */
@@ -299,7 +299,7 @@ class Cache implements iCache
 
       $memcache = null;
       $isMemcacheAvailable = false;
-      if (class_exists('\Memcache')) {
+      if (\class_exists('\Memcache')) {
         $memcache = new \Memcache;
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         $isMemcacheAvailable = @$memcache->connect('127.0.0.1', 11211);
@@ -324,7 +324,7 @@ class Cache implements iCache
         if (
             \extension_loaded('redis')
             &&
-            class_exists('\Predis\Client')
+            \class_exists('\Predis\Client')
         ) {
           /** @noinspection PhpUndefinedNamespaceInspection */
           /** @noinspection PhpUndefinedClassInspection */
@@ -370,33 +370,33 @@ class Cache implements iCache
 
           } else {
 
-            $adapterApc = new AdapterApc();
-            if ($adapterApc->installed() === true) {
+            $adapterApcu = new AdapterApcu();
+            if ($adapterApcu->installed() === true) {
 
               // -------------------------------------------------------------
-              // "APC"
+              // "APCu"
               // -------------------------------------------------------------
-              $adapter = $adapterApc;
+              $adapter = $adapterApcu;
 
             } else {
 
-              $adapterApcu = new AdapterApcu();
-              if ($adapterApcu->installed() === true) {
+              $adapterApc = new AdapterApc();
+              if ($adapterApc->installed() === true) {
 
                 // -------------------------------------------------------------
-                // "APCu"
+                // "APC"
                 // -------------------------------------------------------------
-                $adapter = $adapterApcu;
+                $adapter = $adapterApc;
 
               } else {
 
-                $adapterFile = new AdapterFile();
-                if ($adapterFile->installed() === true) {
+                $adapterObCache = new AdapterOpCache();
+                if ($adapterObCache->installed() === true) {
 
                   // -------------------------------------------------------------
-                  // File-Cache
+                  // OpCache (via PHP-files)
                   // -------------------------------------------------------------
-                  $adapter = $adapterFile;
+                  $adapter = $adapterObCache;
 
                 } else {
 
@@ -529,29 +529,7 @@ class Cache implements iCache
    */
   protected function cleanStoreKey(string $str): string
   {
-    $str = preg_replace("/[\r\n\t ]+/", ' ', $str);
-    $str = str_replace(
-        ['"', '*', ':', '<', '>', '?', "'", '|'],
-        [
-            '-+-',
-            '-+-+-',
-            '-+-+-+-',
-            '-+-+-+-+-',
-            '-+-+-+-+-+-',
-            '-+-+-+-+-+-+-',
-            '-+-+-+-+-+-+-+-',
-            '-+-+-+-+-+-+-+-+-',
-        ],
-        $str
-    );
-    $str = html_entity_decode($str, ENT_QUOTES, 'UTF-8');
-    $str = htmlentities($str, ENT_QUOTES, 'UTF-8');
-    $str = preg_replace('/(&)([a-z])([a-z]+;)/i', '$2', $str);
-    $str = str_replace(' ', '-', $str);
-    $str = rawurlencode($str);
-    $str = str_replace('%', '-', $str);
-
-    return $str;
+    return \md5($str);
   }
 
   /**
@@ -604,19 +582,18 @@ class Cache implements iCache
    * @param \DateTime $date <p>If the date is in the past, we will remove the existing cache-item.</p>
    *
    * @return bool
-   * @throws \Exception
+   *
+   * @throws InvalidArgumentException <p>If the $date is in the past.</p>
    */
   public function setItemToDate(string $key, $value, \DateTime $date): bool
   {
-    $ttl = $date->getTimestamp() - time();
+    $ttl = $date->getTimestamp() - \time();
 
     if ($ttl <= 0) {
       throw new InvalidArgumentException('Date in the past.');
     }
 
-    $storeKey = $this->calculateStoreKey($key);
-
-    return $this->setItem($storeKey, $value, $ttl);
+    return $this->setItem($key, $value, $ttl);
   }
 
   /**
@@ -642,7 +619,7 @@ class Cache implements iCache
     $serialized = $this->serializer->serialize($value);
 
     // update static-cache, if it's exists
-    if (array_key_exists($storeKey, self::$STATIC_CACHE) === true) {
+    if (\array_key_exists($storeKey, self::$STATIC_CACHE) === true) {
       self::$STATIC_CACHE[$storeKey] = $value;
     }
 
@@ -651,11 +628,11 @@ class Cache implements iCache
       if ($ttl instanceof \DateInterval) {
         // Converting to a TTL in seconds
         $dateTimeNow = new \DateTime('now');
-        $ttl = $dateTimeNow->add($ttl)->getTimestamp() - time();
+        $ttl = $dateTimeNow->add($ttl)->getTimestamp() - \time();
       }
 
       // always cache the TTL time, maybe we need this later ...
-      self::$STATIC_CACHE_EXPIRE[$storeKey] = ($ttl ? (int)$ttl + time() : 0);
+      self::$STATIC_CACHE_EXPIRE[$storeKey] = ($ttl ? (int)$ttl + \time() : 0);
 
       return $this->adapter->setExpired($storeKey, $serialized, $ttl);
     }
@@ -682,7 +659,7 @@ class Cache implements iCache
     if (
         !empty(self::$STATIC_CACHE)
         &&
-        array_key_exists($storeKey, self::$STATIC_CACHE) === true
+        \array_key_exists($storeKey, self::$STATIC_CACHE) === true
     ) {
       unset(
           self::$STATIC_CACHE[$storeKey],
@@ -747,11 +724,11 @@ class Cache implements iCache
   {
     return !empty(self::$STATIC_CACHE)
            &&
-           array_key_exists($storeKey, self::$STATIC_CACHE) === true
+           \array_key_exists($storeKey, self::$STATIC_CACHE) === true
            &&
-           array_key_exists($storeKey, self::$STATIC_CACHE_EXPIRE) === true
+           \array_key_exists($storeKey, self::$STATIC_CACHE_EXPIRE) === true
            &&
-           time() <= self::$STATIC_CACHE_EXPIRE[$storeKey];
+           \time() <= self::$STATIC_CACHE_EXPIRE[$storeKey];
   }
 
   /**
@@ -761,7 +738,12 @@ class Cache implements iCache
    */
   public function getUsedAdapterClassName(): string
   {
-    return \get_class($this->adapter);
+    if ($this->adapter) {
+      /** @noinspection GetClassUsageInspection */
+      return \get_class($this->adapter);
+    }
+
+    return '';
   }
 
   /**
@@ -771,6 +753,11 @@ class Cache implements iCache
    */
   public function getUsedSerializerClassName(): string
   {
-    return \get_class($this->serializer);
+    if ($this->serializer) {
+      /** @noinspection GetClassUsageInspection */
+      return \get_class($this->serializer);
+    }
+
+    return '';
   }
 }

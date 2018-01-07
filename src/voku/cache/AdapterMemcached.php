@@ -38,7 +38,8 @@ class AdapterMemcached implements iAdapter
   /**
    * @param \Memcached $memcached
    */
-  public function setMemcached(\Memcached $memcached) {
+  public function setMemcached(\Memcached $memcached)
+  {
     $this->memcached = $memcached;
     $this->installed = true;
 

@@ -25,9 +25,9 @@ class CachePsr16Test extends \PHPUnit\Framework\TestCase
    */
   public $cache;
 
-  protected $backupGlobalsBlacklist = array(
+  protected $backupGlobalsBlacklist = [
       '_SESSION',
-  );
+  ];
 
   public function testKeyPrefix()
   {
@@ -46,9 +46,9 @@ class CachePsr16Test extends \PHPUnit\Framework\TestCase
     $key = 'some:test:key';
 
     $this->adapter->expects(self::once())
-        ->method('exists')
-        ->with(self::equalTo($key))
-        ->will(self::returnValue(false));
+                  ->method('exists')
+                  ->with(self::equalTo($key))
+                  ->will(self::returnValue(false));
 
     $actual = $this->cache->get($key, null);
 
@@ -89,13 +89,13 @@ class CachePsr16Test extends \PHPUnit\Framework\TestCase
     $ttl = mt_rand(20, 5000);
 
     $this->serializer->expects(self::once())
-        ->method('serialize')
-        ->with(self::equalTo($value))
-        ->will(self::returnValue($value));
+                     ->method('serialize')
+                     ->with(self::equalTo($value))
+                     ->will(self::returnValue($value));
 
     $this->adapter->expects(self::once())
-        ->method('setExpired')
-        ->with(self::equalTo($key), self::equalTo($value), self::equalTo($ttl));
+                  ->method('setExpired')
+                  ->with(self::equalTo($key), self::equalTo($value), self::equalTo($ttl));
 
     $this->cache->set($key, $value, $ttl);
   }
@@ -123,8 +123,8 @@ class CachePsr16Test extends \PHPUnit\Framework\TestCase
     $key = 'some:test:key';
 
     $this->adapter->expects(self::once())
-        ->method('remove')
-        ->with(self::equalTo($key));
+                  ->method('remove')
+                  ->with(self::equalTo($key));
 
     $this->cache->delete($key);
   }
@@ -134,8 +134,8 @@ class CachePsr16Test extends \PHPUnit\Framework\TestCase
     $key = 'some:test:key';
 
     $this->adapter->expects(self::once())
-        ->method('exists')
-        ->with(self::equalTo($key));
+                  ->method('exists')
+                  ->with(self::equalTo($key));
 
     $this->cache->has($key);
   }

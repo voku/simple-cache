@@ -17,7 +17,7 @@ interface iAdapter
    *
    * @param string $key
    *
-   * @return mixed
+   * @return mixed|null <p>will return NULL if the key not exists</p>
    */
   public function get(string $key);
 
@@ -25,7 +25,7 @@ interface iAdapter
    * Set cache-item by key => value.
    *
    * @param string $key
-   * @param mixed $value
+   * @param mixed  $value
    *
    * @return bool
    */
@@ -35,8 +35,8 @@ interface iAdapter
    * Set cache-item by key => value + ttl.
    *
    * @param string $key
-   * @param mixed $value
-   * @param int $ttl
+   * @param mixed  $value
+   * @param int    $ttl
    *
    * @return bool
    */
@@ -72,5 +72,5 @@ interface iAdapter
    *
    * @return bool
    */
-  public function installed() : bool;
+  public function installed(): bool;
 }

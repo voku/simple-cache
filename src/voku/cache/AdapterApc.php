@@ -66,14 +66,14 @@ class AdapterApc implements iAdapter
    */
   public function cacheClear(string $type): bool
   {
-    return \apc_clear_cache($type);
+    return (bool)\apc_clear_cache($type);
   }
 
   /**
    * Retrieves cached information from APC's data store
    *
-   * @param string  $type    - If $type is "user", information about the user cache will be returned.
-   * @param bool $limited - If $limited is TRUE, the return value will exclude the individual list of cache entries.
+   * @param string $type     - If $type is "user", information about the user cache will be returned.
+   * @param bool   $limited  - If $limited is TRUE, the return value will exclude the individual list of cache entries.
    *                         This is useful when trying to optimize calls for statistics gathering.
    *
    * @return array of cached data (and meta-data) or FALSE on failure.
@@ -89,7 +89,7 @@ class AdapterApc implements iAdapter
   public function exists(string $key): bool
   {
     if (\function_exists('apc_exists')) {
-      return \apc_exists($key);
+      return (bool)\apc_exists($key);
     }
 
     return $this->apc_cache_exists($key);
@@ -104,7 +104,7 @@ class AdapterApc implements iAdapter
       return \apc_fetch($key);
     }
 
-    return false;
+    return null;
   }
 
   /**
@@ -120,7 +120,7 @@ class AdapterApc implements iAdapter
    */
   public function remove(string $key): bool
   {
-    return \apc_delete($key);
+    return (bool)\apc_delete($key);
   }
 
   /**
@@ -128,7 +128,7 @@ class AdapterApc implements iAdapter
    */
   public function removeAll(): bool
   {
-    return $this->cacheClear('system') && $this->cacheClear('user');
+    return (bool)($this->cacheClear('system') && $this->cacheClear('user'));
   }
 
   /**
@@ -136,7 +136,7 @@ class AdapterApc implements iAdapter
    */
   public function set(string $key, $value): bool
   {
-    return \apc_store($key, $value);
+    return (bool)\apc_store($key, $value);
   }
 
   /**
@@ -144,7 +144,7 @@ class AdapterApc implements iAdapter
    */
   public function setExpired(string $key, $data, int $ttl = 0): bool
   {
-    return \apc_store($key, $data, $ttl);
+    return (bool)\apc_store($key, $data, $ttl);
   }
 
 }

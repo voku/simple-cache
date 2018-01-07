@@ -27,13 +27,13 @@ class RedisCacheTest extends \PHPUnit\Framework\TestCase
    */
   public $cache;
 
-  protected $backupGlobalsBlacklist = array(
+  protected $backupGlobalsBlacklist = [
       '_SESSION',
-  );
+  ];
 
   public function testSetItem()
   {
-    $return = $this->cache->setItem('foo', array(1, 2, 3, 4));
+    $return = $this->cache->setItem('foo', [1, 2, 3, 4]);
 
     self::assertSame(true, $return);
   }
@@ -42,7 +42,7 @@ class RedisCacheTest extends \PHPUnit\Framework\TestCase
   {
     $return = $this->cache->getItem('foo');
 
-    self::assertSame(array(1, 2, 3, 4), $return);
+    self::assertSame([1, 2, 3, 4], $return);
   }
 
   public function testExistsItem()
@@ -86,11 +86,11 @@ class RedisCacheTest extends \PHPUnit\Framework\TestCase
     $prefix = $this->cache->getPrefix();
     self::assertSame('bar', $prefix);
 
-    $return = $this->cache->setItem('foo', array(3, 2, 1));
+    $return = $this->cache->setItem('foo', [3, 2, 1]);
     self::assertSame(true, $return);
 
     $return = $this->cache->getItem('foo');
-    self::assertSame(array(3, 2, 1), $return);
+    self::assertSame([3, 2, 1], $return);
   }
 
   public function testSetGetCacheWithEndDateTime()
@@ -99,11 +99,11 @@ class RedisCacheTest extends \PHPUnit\Framework\TestCase
     $interval = DateInterval::createFromDateString('+3 seconds');
     $expireDate->add($interval);
 
-    $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', array(3, 2, 1), $expireDate);
+    $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', [3, 2, 1], $expireDate);
     self::assertSame(true, $return);
 
     $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
-    self::assertSame(array(3, 2, 1), $return);
+    self::assertSame([3, 2, 1], $return);
   }
 
   /**
@@ -121,12 +121,12 @@ class RedisCacheTest extends \PHPUnit\Framework\TestCase
     ) {
       /** @noinspection PhpUndefinedNamespaceInspection */
       $redis = new \Predis\Client(
-          array(
+          [
               'scheme'  => 'tcp',
               'host'    => '127.0.0.1',
               'port'    => 6379,
               'timeout' => '2.0',
-          )
+          ]
       );
       try {
         $redis->connect();

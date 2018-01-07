@@ -35,7 +35,7 @@ class AdapterFile implements iAdapter
   protected $fileMode = '0755';
 
   /**
-   * @param string $cacheDir
+   * @param string|null $cacheDir
    */
   public function __construct($cacheDir = null)
   {
@@ -138,9 +138,9 @@ class AdapterFile implements iAdapter
     $path = $this->getFileName($key);
 
     if (
-        file_exists($path) === false
+        \file_exists($path) === false
         ||
-        filesize($path) === 0
+        \filesize($path) === 0
     ) {
       return null;
     }
@@ -149,23 +149,23 @@ class AdapterFile implements iAdapter
     $string = '';
 
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    $fp = @fopen($path, 'rb');
-    if ($fp && flock($fp, LOCK_SH | LOCK_NB)) {
-      while (!feof($fp)) {
-        $line = fgets($fp);
+    $fp = @\fopen($path, 'rb');
+    if ($fp && \flock($fp, LOCK_SH | LOCK_NB)) {
+      while (!\feof($fp)) {
+        $line = \fgets($fp);
         $string .= $line;
       }
-      flock($fp, LOCK_UN);
+      \flock($fp, LOCK_UN);
     }
     if ($fp) {
-      fclose($fp);
+      \fclose($fp);
     }
 
     if (!$string) {
       return null;
     }
 
-    $data = $this->serializer->unserialize(file_get_contents($path));
+    $data = $this->serializer->unserialize($string);
 
     if (!$data || !$this->validateDataFromCache($data)) {
       return null;
@@ -207,10 +207,10 @@ class AdapterFile implements iAdapter
       return false;
     }
 
-    $return = array();
+    $return = [];
     foreach (new \DirectoryIterator($this->cacheDir) as $fileInfo) {
       if (!$fileInfo->isDot()) {
-        $return[] = unlink($fileInfo->getPathname());
+        $return[] = \unlink($fileInfo->getPathname());
       }
     }
 
@@ -233,7 +233,7 @@ class AdapterFile implements iAdapter
     $item = $this->serializer->serialize(
         array(
             'value' => $value,
-            'ttl'   => $ttl ? (int)$ttl + time() : 0,
+            'ttl'   => $ttl ? $ttl + \time() : 0,
         )
     );
 
@@ -241,14 +241,14 @@ class AdapterFile implements iAdapter
     $cacheFile = $this->getFileName($key);
 
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    $fp = @fopen($cacheFile, 'ab');
-    if ($fp && flock($fp, LOCK_EX | LOCK_NB)) {
-      ftruncate($fp, 0);
-      $octetWritten = fwrite($fp, $item);
-      fflush($fp);
-      flock($fp, LOCK_UN);
+    $fp = @\fopen($cacheFile, 'ab');
+    if ($fp && \flock($fp, LOCK_EX | LOCK_NB)) {
+      \ftruncate($fp, 0);
+      $octetWritten = \fwrite($fp, $item);
+      \fflush($fp);
+      \flock($fp, LOCK_UN);
     }
-    fclose($fp);
+    \fclose($fp);
 
     return $octetWritten !== false;
   }
@@ -286,7 +286,7 @@ class AdapterFile implements iAdapter
       return false;
     }
 
-    return (time() > $ttl);
+    return (\time() > $ttl);
   }
 
   /**
@@ -300,8 +300,8 @@ class AdapterFile implements iAdapter
       return false;
     }
 
-    foreach (array('value', 'ttl') as $missing) {
-      if (!array_key_exists($missing, $data)) {
+    foreach (['value', 'ttl'] as $missing) {
+      if (!\array_key_exists($missing, $data)) {
         return false;
       }
     }

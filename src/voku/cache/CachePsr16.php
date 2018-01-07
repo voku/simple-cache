@@ -52,7 +52,7 @@ class CachePsr16 extends Cache implements CacheInterface
       throw new InvalidArgumentException('$keys is not iterable:' . print_r($keys, true));
     }
 
-    $results = array();
+    $results = [];
     foreach ((array)$keys as $key) {
       $results = $this->delete($key);
     }
@@ -96,7 +96,7 @@ class CachePsr16 extends Cache implements CacheInterface
       throw new InvalidArgumentException('$keys is not iterable:' . print_r($keys, true));
     }
 
-    $result = array();
+    $result = [];
     foreach ((array)$keys as $key) {
       $result[$key] = $this->has($key) ? $this->get($key) : $default;
     }
@@ -167,7 +167,7 @@ class CachePsr16 extends Cache implements CacheInterface
       throw new InvalidArgumentException('$values is not iterable:' . print_r($values, true));
     }
 
-    $results = array();
+    $results = [];
     foreach ((array)$values as $key => $value) {
       $results = $this->set($key, $value, $ttl);
     }
