@@ -1,14 +1,11 @@
 [![Build Status](https://travis-ci.org/voku/simple-cache.svg?branch=master)](https://travis-ci.org/voku/simple-cache)
 [![Coverage Status](https://coveralls.io/repos/github/voku/simple-cache/badge.svg?branch=master)](https://coveralls.io/github/voku/simple-cache?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/voku/simple-cache/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/voku/simple-cache/?branch=master)
-[![Codacy Badge](https://www.codacy.com/project/badge/5846d2a46599486486b3956c0ce11a18)](https://www.codacy.com/app/voku/simple-cache)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5846d2a46599486486b3956c0ce11a18)](https://www.codacy.com/app/voku/simple-cache)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/4926981d-ecb1-482b-a15c-447954b9bd66/mini.png)](https://insight.sensiolabs.com/projects/4926981d-ecb1-482b-a15c-447954b9bd66)
-[![Reference Status](https://www.versioneye.com/php/voku:simple-cache/reference_badge.svg?style=flat)](https://www.versioneye.com/php/voku:simple-cache/references)
-[![Dependency Status](https://www.versioneye.com/php/voku:simple-cache/dev-master/badge.svg)](https://www.versioneye.com/php/voku:simple-cache/dev-master)
 [![Latest Stable Version](https://poser.pugx.org/voku/simple-cache/v/stable)](https://packagist.org/packages/voku/simple-cache) 
 [![Total Downloads](https://poser.pugx.org/voku/simple-cache/downloads)](https://packagist.org/packages/voku/simple-cache) 
 [![Latest Unstable Version](https://poser.pugx.org/voku/simple-cache/v/unstable)](https://packagist.org/packages/voku/simple-cache)
-[![PHP 7 ready](http://php7ready.timesplinter.ch/voku/simple-cache/badge.svg)](https://travis-ci.org/voku/simple-cache)
 [![License](https://poser.pugx.org/voku/simple-cache/license)](https://packagist.org/packages/voku/simple-cache)
 
 
