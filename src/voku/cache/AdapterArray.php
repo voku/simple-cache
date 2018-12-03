@@ -6,8 +6,6 @@ namespace voku\cache;
 
 /**
  * AdapterArray: simple array-cache adapter
- *
- * @package voku\cache
  */
 class AdapterArray implements iAdapter
 {

@@ -6,8 +6,6 @@ namespace voku\cache;
 
 /**
  * iAdapter: cache-adapter interface
- *
- * @package voku\cache
  */
 interface iAdapter
 {

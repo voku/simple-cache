@@ -6,14 +6,12 @@ namespace voku\cache;
 
 /**
  * CacheChain: global-cache-chain class
- *
- * @package voku\cache
  */
 class CacheChain implements iCache
 {
 
   /**
-   * @var array iCache
+   * @var array|iCache[]
    */
   private $caches = [];
 
@@ -68,7 +66,6 @@ class CacheChain implements iCache
    */
   public function getItem(string $key)
   {
-    /* @var $cache iCache */
     foreach ($this->caches as $cache) {
       if ($cache->existsItem($key)) {
         return $cache->getItem($key);
@@ -86,7 +83,6 @@ class CacheChain implements iCache
     // init
     $results = [];
 
-    /* @var $cache iCache */
     foreach ($this->caches as $cache) {
       $results[] = $cache->setItem($key, $value, $ttl);
     }
@@ -118,7 +114,6 @@ class CacheChain implements iCache
     // init
     $results = [];
 
-    /* @var $cache iCache */
     foreach ($this->caches as $cache) {
       $results[] = $cache->removeItem($key);
     }
@@ -131,7 +126,6 @@ class CacheChain implements iCache
    */
   public function existsItem(string $key): bool
   {
-    /* @var $cache iCache */
     foreach ($this->caches as $cache) {
       if ($cache->existsItem($key)) {
         return true;
@@ -149,7 +143,6 @@ class CacheChain implements iCache
     // init
     $results = [];
 
-    /* @var $cache iCache */
     foreach ($this->caches as $cache) {
       $results[] = $cache->removeAll();
     }

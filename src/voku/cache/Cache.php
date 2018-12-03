@@ -48,9 +48,29 @@ class Cache implements iCache
   protected $isActive = true;
 
   /**
-   * @var mixed no cache, if admin-session is set
+   * @var bool
    */
-  protected $isAdminSession = false;
+  protected $useCheckForDev;
+
+  /**
+   * @var bool
+   */
+  protected $useCheckForAdminSession;
+
+  /**
+   * @var bool
+   */
+  protected $useCheckForServerIpIsClientIp;
+
+  /**
+   * @var string
+   */
+  protected $disableCacheGetParameter;
+
+  /**
+   * @var bool
+   */
+  protected $isAdminSession;
 
   /**
    * @var array
@@ -77,21 +97,43 @@ class Cache implements iCache
    *
    * @param null|iAdapter    $adapter
    * @param null|iSerializer $serializer
-   * @param bool             $checkForUser   check for dev-ip or if cms-user is logged-in
-   * @param bool             $cacheEnabled   false will disable the cache (use it e.g. for global settings)
-   * @param string|bool      $isAdminSession set a user-id, if the user is a admin (so we can disable cache for this
-   *                                         user)
+   * @param bool             $checkForUsage                 <p>admin-session || server-ip == client-ip || check for
+   *                                                        dev</p>
+   * @param bool             $cacheEnabled                  <p>false will disable the cache (use it e.g. for global
+   *                                                        settings)</p>
+   * @param string|bool      $isAdminSession                <p>set a admin-id, if the user is a admin (so we can
+   *                                                        disable cache for this user)
+   * @param bool             $useCheckForAdminSession       <p>use $isAdminSession flag or not</p>
+   * @param bool             $useCheckForDev                <p>use checkForDev() or not</p>
+   * @param bool             $useCheckForServerIpIsClientIp <p>use check for server-ip == client-ip or not</p>
+   * @param string           $disableCacheGetParameter      <p>set the _GET parameter for disabling the cache, disable this check via empty string</p>
    */
-  public function __construct(iAdapter $adapter = null, iSerializer $serializer = null, bool $checkForUser = true, bool $cacheEnabled = true, $isAdminSession = false)
+  public function __construct(
+      iAdapter $adapter = null,
+      iSerializer $serializer = null,
+      bool $checkForUsage = true,
+      bool $cacheEnabled = true,
+      bool $isAdminSession = false,
+      bool $useCheckForDev = true,
+      bool $useCheckForAdminSession = true,
+      bool $useCheckForServerIpIsClientIp = true,
+      string $disableCacheGetParameter = 'testWithoutCache'
+  )
   {
     $this->isAdminSession = $isAdminSession;
 
+    $this->useCheckForDev = $useCheckForDev;
+    $this->useCheckForAdminSession = $useCheckForAdminSession;
+    $this->useCheckForServerIpIsClientIp = $useCheckForServerIpIsClientIp;
+
+    $this->disableCacheGetParameter = $disableCacheGetParameter;
+
     // First check if the cache is active at all.
-    $this->setActive($cacheEnabled);
+    $this->isActive = $cacheEnabled;
     if (
         $this->isActive === true
         &&
-        $checkForUser === true
+        $checkForUsage === true
     ) {
       $this->setActive($this->isCacheActiveForTheCurrentUser());
     }
@@ -101,13 +143,7 @@ class Cache implements iCache
 
       $this->setPrefix($this->getTheDefaultPrefix());
 
-      if (
-          $adapter === null
-          ||
-          !\is_object($adapter)
-          ||
-          !$adapter instanceof iAdapter
-      ) {
+      if ($adapter === null) {
         $adapter = $this->autoConnectToAvailableCacheSystem();
       }
 
@@ -128,9 +164,9 @@ class Cache implements iCache
 
     // Final checks ...
     if (
-        $serializer instanceof iSerializer
+        $serializer !== null
         &&
-        $adapter instanceof iAdapter
+        $adapter !== null
     ) {
       $this->setCacheIsReady(true);
 
@@ -159,22 +195,36 @@ class Cache implements iCache
     $active = true;
 
     // test the cache, with this GET-parameter
-    $testCache = isset($_GET['testCache']) ? (int)$_GET['testCache'] : 0;
+    if ($this->disableCacheGetParameter) {
+      $testCache = isset($_GET[$this->disableCacheGetParameter]) ? (int)$_GET[$this->disableCacheGetParameter] : 0;
+    } else {
+      $testCache = 0;
+    }
 
     if ($testCache != 1) {
       if (
-        // admin is logged-in
-          $this->isAdminSession
+        // admin session is active
+          (
+              $this->useCheckForAdminSession
+              &&
+              $this->isAdminSession
+          )
           ||
           // server == client
           (
+              $this->useCheckForServerIpIsClientIp === true
+              &&
               isset($_SERVER['SERVER_ADDR'])
               &&
               $_SERVER['SERVER_ADDR'] == $this->getClientIp()
           )
           ||
           // user is a dev
-          $this->checkForDev() === true
+          (
+              $this->useCheckForDev === true
+              &&
+              $this->checkForDev() === true
+          )
       ) {
         $active = false;
       }
@@ -253,7 +303,7 @@ class Cache implements iCache
   /**
    * Set the default-prefix via "SERVER"-var + "SESSION"-language.
    */
-  protected function getTheDefaultPrefix()
+  protected function getTheDefaultPrefix(): string
   {
     return ($_SERVER['SERVER_NAME'] ?? '') . '_' .
            ($_SERVER['THEME'] ?? '') . '_' .
@@ -278,6 +328,7 @@ class Cache implements iCache
     $memcached = null;
     $isMemcachedAvailable = false;
     if (\extension_loaded('memcached')) {
+      /** @noinspection PhpComposerExtensionStubsInspection */
       $memcached = new \Memcached();
       /** @noinspection PhpUsageOfSilenceOperatorInspection */
       $isMemcachedAvailable = @$memcached->addServer('127.0.0.1', 11211);
@@ -299,7 +350,9 @@ class Cache implements iCache
 
       $memcache = null;
       $isMemcacheAvailable = false;
+      /** @noinspection ClassConstantCanBeUsedInspection */
       if (\class_exists('\Memcache')) {
+        /** @noinspection PhpComposerExtensionStubsInspection */
         $memcache = new \Memcache;
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         $isMemcacheAvailable = @$memcache->connect('127.0.0.1', 11211);
@@ -513,7 +566,7 @@ class Cache implements iCache
   {
     $str = $this->getPrefix() . $rawKey;
 
-    if ($this->adapter instanceof AdapterFile) {
+    if ($this->adapter instanceof AdapterFileAbstract) {
       $str = $this->cleanStoreKey($str);
     }
 
@@ -604,6 +657,8 @@ class Cache implements iCache
    * @param null|int|\DateInterval $ttl
    *
    * @return bool
+   *
+   * @throws InvalidArgumentException
    */
   public function setItem(string $key, $value, $ttl = 0): bool
   {

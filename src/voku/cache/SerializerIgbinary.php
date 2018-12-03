@@ -6,8 +6,6 @@ namespace voku\cache;
 
 /**
  * SerializerIgbinary: serialize / unserialize
- *
- * @package voku\cache
  */
 class SerializerIgbinary implements iSerializer
 {
@@ -36,11 +34,11 @@ class SerializerIgbinary implements iSerializer
   {
     if (self::$_exists_igbinary === true) {
       /** @noinspection PhpUndefinedFunctionInspection */
-      return igbinary_serialize($value);
+      return \igbinary_serialize($value);
     }
 
     // fallback
-    return serialize($value);
+    return \serialize($value);
   }
 
   /**
@@ -50,11 +48,11 @@ class SerializerIgbinary implements iSerializer
   {
     if (self::$_exists_igbinary === true) {
       /** @noinspection PhpUndefinedFunctionInspection */
-      return igbinary_unserialize($value);
+      return \igbinary_unserialize($value);
     }
 
     // fallback
-    return unserialize($value);
+    return \unserialize($value);
   }
 
 }

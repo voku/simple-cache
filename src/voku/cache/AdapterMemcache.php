@@ -8,8 +8,6 @@ use voku\cache\Exception\InvalidArgumentException;
 
 /**
  * AdapterMemcache: Memcache-adapter
- *
- * @package voku\cache
  */
 class AdapterMemcache implements iAdapter
 {
@@ -121,7 +119,7 @@ class AdapterMemcache implements iAdapter
    */
   private function getCompressedFlag(): int
   {
-    return $this->isCompressed() ? MEMCACHE_COMPRESSED : 0;
+    return $this->isCompressed() ? \MEMCACHE_COMPRESSED : 0;
   }
 
   /**

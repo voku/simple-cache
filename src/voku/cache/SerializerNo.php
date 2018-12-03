@@ -6,8 +6,6 @@ namespace voku\cache;
 
 /**
  * SerializerNo: no serialize / unserialize !!!
- *
- * @package voku\cache
  */
 class SerializerNo implements iSerializer
 {

@@ -8,8 +8,6 @@ use voku\cache\Exception\InvalidArgumentException;
 
 /**
  * AdapterMemcached: Memcached-adapter
- *
- * @package voku\cache
  */
 class AdapterMemcached implements iAdapter
 {

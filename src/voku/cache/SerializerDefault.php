@@ -6,8 +6,6 @@ namespace voku\cache;
 
 /**
  * SerializerDefault: simple serialize / unserialize
- *
- * @package voku\cache
  */
 class SerializerDefault implements iSerializer
 {
@@ -17,7 +15,7 @@ class SerializerDefault implements iSerializer
    */
   public function serialize($value)
   {
-    return serialize($value);
+    return \serialize($value);
   }
 
   /**
@@ -25,7 +23,7 @@ class SerializerDefault implements iSerializer
    */
   public function unserialize($value)
   {
-    return unserialize($value);
+    return \unserialize($value);
   }
 
 }

@@ -6,8 +6,6 @@ namespace voku\cache;
 
 /**
  * iSerializer: cache-serializer interface
- *
- * @package voku\cache
  */
 interface iSerializer
 {
