@@ -1,3 +1,10 @@
+# Changelog 3.2.0 (2018-12-03)
+
+- "AdapterOpCache" -> use "opcache_compile_file()"
+- add "AdapterFileSimple" + tests
+- "Cache" -> add the possibility to disable the cache behavior via constructor() -> "disableCacheGetParameter, useCheckForAdminSession, useCheckForServerIpIsClientIp, useCheckForDev"
+
+
 # Changelog 3.1.1 (2018-01-07)
 
 - "AdapterApcu" -> fixed php-warning from "apcu_clear_cache()"
