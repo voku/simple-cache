@@ -1,3 +1,8 @@
+# Changelog 3.2.1 (2018-12-20)
+
+- use phpcs fixer 
+
+
 # Changelog 3.2.0 (2018-12-03)
 
 - "AdapterOpCache" -> use "opcache_compile_file()"
