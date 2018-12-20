@@ -699,7 +699,7 @@ class Cache implements iCache
             &&
             \array_key_exists($storeKey, self::$STATIC_CACHE) === true
         ) {
-            unset(self::$STATIC_CACHE[$storeKey], self::$STATIC_CACHE_COUNTER[$storeKey], self::$STATIC_CACHE_EXPIRE[$storeKey]
+             unset(self::$STATIC_CACHE[$storeKey], self::$STATIC_CACHE_COUNTER[$storeKey], self::$STATIC_CACHE_EXPIRE[$storeKey]
             );
         }
 

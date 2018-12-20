@@ -41,10 +41,10 @@ class AdapterOpCache extends AdapterFileSimple
         $path = $this->getFileName($key);
 
         if (
-        \file_exists($path) === false
-        ||
-        \filesize($path) === 0
-    ) {
+            \file_exists($path) === false
+            ||
+            \filesize($path) === 0
+        ) {
             return null;
         }
 
@@ -83,24 +83,22 @@ class AdapterOpCache extends AdapterFileSimple
         ];
         $content = \var_export($item, true);
 
-        $content = '<?php 
-    return ' . $content . ';
-    ';
+        $content = '<?php return ' . $content . ';';
 
         $cacheFile = $this->getFileName($key);
 
         $result = (bool) \file_put_contents(
-        $cacheFile,
-        $content,
-        0,
-        $this->getContext()
-    );
+            $cacheFile,
+            $content,
+            0,
+            $this->getContext()
+        );
 
         if (
-        $result === true
-        &&
-        self::$hasCompileFileFunction === true
-    ) {
+            $result === true
+            &&
+            self::$hasCompileFileFunction === true
+        ) {
             // opcache will only compile and cache files older than the script execution start.
             // set a date before the script execution date, then opcache will compile and cache the generated file.
             /** @noinspection SummerTimeUnsafeTimeManipulationInspection */

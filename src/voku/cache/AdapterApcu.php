@@ -27,10 +27,10 @@ class AdapterApcu implements iAdapter
     public function __construct()
     {
         if (
-        \function_exists('apcu_store') === true
-        &&
-        \ini_get('apc.enabled')
-    ) {
+            \function_exists('apcu_store') === true
+            &&
+            \ini_get('apc.enabled')
+        ) {
             $this->installed = true;
         }
     }
@@ -69,8 +69,8 @@ class AdapterApcu implements iAdapter
     /**
      * Retrieves cached information from APCu's data store
      *
-     * @param bool $limited    - If $limited is TRUE, the return value will exclude the individual list of cache entries.
-     *                         This is useful when trying to optimize calls for statistics gathering
+     * @param bool $limited    - If $limited is TRUE, the return value will exclude the individual list of cache
+     *                         entries. This is useful when trying to optimize calls for statistics gathering
      *
      * @return array|bool <p>Array of cached data (and meta-data) or FALSE on failure.</p>
      */

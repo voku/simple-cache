@@ -17,12 +17,12 @@ class AdapterFileSimple extends AdapterFileAbstract
 
         if ($CONTEXT_CACHE === null) {
             $CONTEXT_CACHE = \stream_context_create(
-          [
-              'http' => [
-                  'timeout' => 2,
-              ],
-          ]
-      );
+                [
+                    'http' => [
+                        'timeout' => 2,
+                    ],
+                ]
+            );
         }
 
         return $CONTEXT_CACHE;
@@ -36,19 +36,19 @@ class AdapterFileSimple extends AdapterFileAbstract
         $path = $this->getFileName($key);
 
         if (
-        \file_exists($path) === false
-        ||
-        \filesize($path) === 0
-    ) {
+            \file_exists($path) === false
+            ||
+            \filesize($path) === 0
+        ) {
             return null;
         }
 
         // init
         $string = \file_get_contents(
-        $path,
-        false,
-        $this->getContext()
-    );
+            $path,
+            false,
+            $this->getContext()
+        );
 
         if (!$string) {
             return null;
@@ -75,15 +75,15 @@ class AdapterFileSimple extends AdapterFileAbstract
     public function setExpired(string $key, $value, int $ttl = 0): bool
     {
         return (bool) \file_put_contents(
-        $this->getFileName($key),
-        $this->serializer->serialize(
-            [
-                'value' => $value,
-                'ttl'   => $ttl ? $ttl + \time() : 0,
-            ]
-        ),
-        0,
-        $this->getContext()
-    );
+            $this->getFileName($key),
+            $this->serializer->serialize(
+                [
+                    'value' => $value,
+                    'ttl'   => $ttl ? $ttl + \time() : 0,
+                ]
+            ),
+            0,
+            $this->getContext()
+        );
     }
 }

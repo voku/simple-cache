@@ -20,10 +20,10 @@ class SerializerIgbinary implements iSerializer
     public function __construct()
     {
         self::$_exists_igbinary = (
-        \function_exists('igbinary_serialize')
-        &&
-        \function_exists('igbinary_unserialize')
-    );
+            \function_exists('igbinary_serialize')
+            &&
+            \function_exists('igbinary_unserialize')
+        );
     }
 
     /**

@@ -106,10 +106,10 @@ class AdapterArray implements iAdapter
     private function removeExpired($key): bool
     {
         if (
-        \array_key_exists($key, self::$expired) === false
-        ||
-        \array_key_exists($key, self::$values) === false
-    ) {
+            \array_key_exists($key, self::$expired) === false
+            ||
+            \array_key_exists($key, self::$values) === false
+        ) {
             return false;
         }
 

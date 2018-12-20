@@ -61,14 +61,14 @@ abstract class AdapterFileAbstract implements iAdapter
     protected function createCacheDirectory($path): bool
     {
         if (
-        !$path
-        ||
-        $path === '/'
-        ||
-        $path === '.'
-        ||
-        $path === '\\'
-    ) {
+            !$path
+            ||
+            $path === '/'
+            ||
+            $path === '.'
+            ||
+            $path === '\\'
+        ) {
             return false;
         }
 

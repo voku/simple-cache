@@ -17,10 +17,10 @@ class AdapterFile extends AdapterFileAbstract
         $path = $this->getFileName($key);
 
         if (
-        \file_exists($path) === false
-        ||
-        \filesize($path) === 0
-    ) {
+            \file_exists($path) === false
+            ||
+            \filesize($path) === 0
+        ) {
             return null;
         }
 
@@ -65,11 +65,11 @@ class AdapterFile extends AdapterFileAbstract
     public function setExpired(string $key, $value, int $ttl = 0): bool
     {
         $item = $this->serializer->serialize(
-        [
-            'value' => $value,
-            'ttl'   => $ttl ? $ttl + \time() : 0,
-        ]
-    );
+            [
+                'value' => $value,
+                'ttl'   => $ttl ? $ttl + \time() : 0,
+            ]
+        );
 
         // init
         $octetWritten = false;
