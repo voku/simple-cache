@@ -9,144 +9,144 @@ namespace voku\cache;
  */
 class CacheChain implements iCache
 {
+    /**
+     * @var array|iCache[]
+     */
+    private $caches = [];
 
-  /**
-   * @var array|iCache[]
-   */
-  private $caches = [];
-
-  /**
-   * __construct
-   *
-   * @param array $caches
-   */
-  public function __construct(array $caches = [])
-  {
-    array_map(
-        [
-            $this,
-            'addCache',
-        ], $caches
-    );
-  }
-
-  /**
-   * get caches
-   *
-   * @return array
-   */
-  public function getCaches(): array
-  {
-    return $this->caches;
-  }
-
-  /**
-   * add cache
-   *
-   * @param iCache $cache
-   * @param bool   $prepend
-   *
-   * @throws \InvalidArgumentException
-   */
-  public function addCache(iCache $cache, $prepend = true)
-  {
-    if ($this === $cache) {
-      throw new \InvalidArgumentException('loop-error, put into other cache');
+    /**
+     * __construct
+     *
+     * @param array $caches
+     */
+    public function __construct(array $caches = [])
+    {
+        \array_map(
+            [
+                $this,
+                'addCache',
+            ],
+            $caches
+        );
     }
 
-    if ($prepend) {
-      array_unshift($this->caches, $cache);
-    } else {
-      $this->caches[] = $cache;
-    }
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function getItem(string $key)
-  {
-    foreach ($this->caches as $cache) {
-      if ($cache->existsItem($key)) {
-        return $cache->getItem($key);
-      }
+    /**
+     * get caches
+     *
+     * @return array
+     */
+    public function getCaches(): array
+    {
+        return $this->caches;
     }
 
-    return null;
-  }
+    /**
+     * add cache
+     *
+     * @param iCache $cache
+     * @param bool   $prepend
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function addCache(iCache $cache, $prepend = true)
+    {
+        if ($this === $cache) {
+            throw new \InvalidArgumentException('loop-error, put into other cache');
+        }
 
-  /**
-   * @inheritdoc
-   */
-  public function setItem(string $key, $value, $ttl = null): bool
-  {
-    // init
-    $results = [];
-
-    foreach ($this->caches as $cache) {
-      $results[] = $cache->setItem($key, $value, $ttl);
+        if ($prepend) {
+            \array_unshift($this->caches, $cache);
+        } else {
+            $this->caches[] = $cache;
+        }
     }
 
-    return \in_array(false, $results, true) === false;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function getItem(string $key)
+    {
+        foreach ($this->caches as $cache) {
+            if ($cache->existsItem($key)) {
+                return $cache->getItem($key);
+            }
+        }
 
-  /**
-   * @inheritdoc
-   */
-  public function setItemToDate(string $key, $value, \DateTime $date): bool
-  {
-    // init
-    $results = [];
-
-    /* @var $cache iCache */
-    foreach ($this->caches as $cache) {
-      $results[] = $cache->setItemToDate($key, $value, $date);
+        return null;
     }
 
-    return \in_array(false, $results, true) === false;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function setItem(string $key, $value, $ttl = null): bool
+    {
+        // init
+        $results = [];
 
-  /**
-   * @inheritdoc
-   */
-  public function removeItem(string $key): bool
-  {
-    // init
-    $results = [];
+        foreach ($this->caches as $cache) {
+            $results[] = $cache->setItem($key, $value, $ttl);
+        }
 
-    foreach ($this->caches as $cache) {
-      $results[] = $cache->removeItem($key);
+        return \in_array(false, $results, true) === false;
     }
 
-    return \in_array(false, $results, true) === false;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function setItemToDate(string $key, $value, \DateTime $date): bool
+    {
+        // init
+        $results = [];
 
-  /**
-   * @inheritdoc
-   */
-  public function existsItem(string $key): bool
-  {
-    foreach ($this->caches as $cache) {
-      if ($cache->existsItem($key)) {
-        return true;
-      }
+        /* @var $cache iCache */
+        foreach ($this->caches as $cache) {
+            $results[] = $cache->setItemToDate($key, $value, $date);
+        }
+
+        return \in_array(false, $results, true) === false;
     }
 
-    return false;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function removeItem(string $key): bool
+    {
+        // init
+        $results = [];
 
-  /**
-   * @inheritdoc
-   */
-  public function removeAll(): bool
-  {
-    // init
-    $results = [];
+        foreach ($this->caches as $cache) {
+            $results[] = $cache->removeItem($key);
+        }
 
-    foreach ($this->caches as $cache) {
-      $results[] = $cache->removeAll();
+        return \in_array(false, $results, true) === false;
     }
 
-    return \in_array(false, $results, true) === false;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function existsItem(string $key): bool
+    {
+        foreach ($this->caches as $cache) {
+            if ($cache->existsItem($key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeAll(): bool
+    {
+        // init
+        $results = [];
+
+        foreach ($this->caches as $cache) {
+            $results[] = $cache->removeAll();
+        }
+
+        return \in_array(false, $results, true) === false;
+    }
 }

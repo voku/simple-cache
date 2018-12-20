@@ -8,144 +8,142 @@ use voku\cache\SerializerDefault;
 
 /**
  * MemcachedCacheTest
+ *
+ * @internal
  */
-class MemcachedCacheTest extends \PHPUnit\Framework\TestCase
+final class MemcachedCacheTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var iSerializer
+     */
+    public $serializer;
 
-  /**
-   * @var iSerializer
-   */
-  public $serializer;
+    /**
+     * @var iAdapter
+     */
+    public $adapter;
 
-  /**
-   * @var iAdapter
-   */
-  public $adapter;
+    /**
+     * @var Cache
+     */
+    public $cache;
 
-  /**
-   * @var Cache
-   */
-  public $cache;
+    protected $backupGlobalsBlacklist = [
+        '_SESSION',
+    ];
 
-  protected $backupGlobalsBlacklist = [
-      '_SESSION',
-  ];
+    public function testSetItem()
+    {
+        $return = $this->cache->setItem('foo', [1, 2, 3, 4]);
 
-  public function testSetItem()
-  {
-    $return = $this->cache->setItem('foo', [1, 2, 3, 4]);
-
-    self::assertSame(true, $return);
-  }
-
-  public function testGetItem()
-  {
-    $return = $this->cache->getItem('foo');
-
-    self::assertSame([1, 2, 3, 4], $return);
-  }
-
-  public function testExistsItem()
-  {
-    $return = $this->cache->existsItem('foo');
-
-    self::assertSame(true, $return);
-  }
-
-  public function testSetEmptyItem()
-  {
-    $return = $this->cache->setItem('foo_empty', '');
-
-    self::assertSame(true, $return);
-  }
-
-  public function testGetEmptyItem()
-  {
-    $return = $this->cache->getItem('foo_empty');
-
-    self::assertSame('', $return);
-  }
-
-  public function testExistsEmptyItem()
-  {
-    $return = $this->cache->existsItem('foo_empty');
-
-    self::assertSame(true, $return);
-  }
-
-  public function testGetCacheIsReady()
-  {
-    $return = $this->cache->getCacheIsReady();
-
-    self::assertSame(true, $return);
-  }
-
-  public function testSetGetItemWithPrefix()
-  {
-    $this->cache->setPrefix('bar');
-    $prefix = $this->cache->getPrefix();
-    self::assertSame('bar', $prefix);
-
-    $return = $this->cache->setItem('foo', [3, 2, 1]);
-    self::assertSame(true, $return);
-
-    $return = $this->cache->getItem('foo');
-    self::assertSame([3, 2, 1], $return);
-  }
-
-  public function testSetGetCacheWithEndDateTime()
-  {
-    $expireDate = new DateTime();
-    $interval = DateInterval::createFromDateString('+3 seconds');
-    $expireDate->add($interval);
-
-    $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', [3, 2, 1], $expireDate);
-    self::assertSame(true, $return);
-
-    $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
-    self::assertSame([3, 2, 1], $return);
-  }
-
-  /**
-   * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
-   */
-  protected function setUp()
-  {
-    $memcached = null;
-    $isMemcachedAvailable = false;
-    if (extension_loaded('memcached')) {
-      $memcached = new \Memcached();
-      $isMemcachedAvailable = $memcached->addServer('127.0.0.1', '11211');
+        static::assertTrue($return);
     }
 
-    if ($isMemcachedAvailable === false) {
-      $memcached = null;
+    public function testGetItem()
+    {
+        $return = $this->cache->getItem('foo');
+
+        static::assertSame([1, 2, 3, 4], $return);
     }
 
-    $this->adapter = new AdapterMemcached($memcached);
-    $this->serializer = new SerializerDefault();
+    public function testExistsItem()
+    {
+        $return = $this->cache->existsItem('foo');
 
-    if ($this->adapter->installed() === false) {
-      self::markTestSkipped(
+        static::assertTrue($return);
+    }
+
+    public function testSetEmptyItem()
+    {
+        $return = $this->cache->setItem('foo_empty', '');
+
+        static::assertTrue($return);
+    }
+
+    public function testGetEmptyItem()
+    {
+        $return = $this->cache->getItem('foo_empty');
+
+        static::assertSame('', $return);
+    }
+
+    public function testExistsEmptyItem()
+    {
+        $return = $this->cache->existsItem('foo_empty');
+
+        static::assertTrue($return);
+    }
+
+    public function testGetCacheIsReady()
+    {
+        $return = $this->cache->getCacheIsReady();
+
+        static::assertTrue($return);
+    }
+
+    public function testSetGetItemWithPrefix()
+    {
+        $this->cache->setPrefix('bar');
+        $prefix = $this->cache->getPrefix();
+        static::assertSame('bar', $prefix);
+
+        $return = $this->cache->setItem('foo', [3, 2, 1]);
+        static::assertTrue($return);
+
+        $return = $this->cache->getItem('foo');
+        static::assertSame([3, 2, 1], $return);
+    }
+
+    public function testSetGetCacheWithEndDateTime()
+    {
+        $expireDate = new DateTime();
+        $interval = DateInterval::createFromDateString('+3 seconds');
+        $expireDate->add($interval);
+
+        $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', [3, 2, 1], $expireDate);
+        static::assertTrue($return);
+
+        $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
+        static::assertSame([3, 2, 1], $return);
+    }
+
+    /**
+     * Sets up the fixture, for example, opens a network connection.
+     * This method is called before a test is executed.
+     */
+    protected function setUp()
+    {
+        $memcached = null;
+        $isMemcachedAvailable = false;
+        if (\extension_loaded('memcached')) {
+            $memcached = new \Memcached();
+            $isMemcachedAvailable = $memcached->addServer('127.0.0.1', '11211');
+        }
+
+        if ($isMemcachedAvailable === false) {
+            $memcached = null;
+        }
+
+        $this->adapter = new AdapterMemcached($memcached);
+        $this->serializer = new SerializerDefault();
+
+        if ($this->adapter->installed() === false) {
+            static::markTestSkipped(
           'The Memcached extension is not available.'
       );
+        }
+
+        $this->cache = new Cache($this->adapter, $this->serializer, false, true);
+
+        // reset default prefix
+        $this->cache->setPrefix('');
     }
 
-    $this->cache = new Cache($this->adapter, $this->serializer, false, true);
-
-    // reset default prefix
-    $this->cache->setPrefix('');
-
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   */
-  protected function tearDown()
-  {
-
-  }
-
+    /**
+     * Tears down the fixture, for example, closes a network connection.
+     * This method is called after a test is executed.
+     */
+    protected function tearDown()
+    {
+    }
 }

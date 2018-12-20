@@ -8,112 +8,110 @@ use voku\cache\SerializerDefault;
 
 /**
  * ApcCacheTest
+ *
+ * @internal
  */
-class ApcCacheTest extends \PHPUnit\Framework\TestCase
+final class ApcCacheTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var iSerializer
+     */
+    public $serializer;
 
-  /**
-   * @var iSerializer
-   */
-  public $serializer;
+    /**
+     * @var iAdapter
+     */
+    public $adapter;
 
-  /**
-   * @var iAdapter
-   */
-  public $adapter;
+    /**
+     * @var Cache
+     */
+    public $cache;
 
-  /**
-   * @var Cache
-   */
-  public $cache;
+    protected $backupGlobalsBlacklist = [
+        '_SESSION',
+    ];
 
-  protected $backupGlobalsBlacklist = [
-      '_SESSION',
-  ];
+    public function testSetItem()
+    {
+        $return = $this->cache->setItem('foo', [1, 2, 3, 4]);
 
-  public function testSetItem()
-  {
-    $return = $this->cache->setItem('foo', [1, 2, 3, 4]);
-
-    self::assertSame(true, $return);
-  }
-
-  public function testGetItem()
-  {
-    $return = $this->cache->getItem('foo');
-
-    self::assertSame([1, 2, 3, 4], $return);
-  }
-
-  public function testExistsItem()
-  {
-    $return = $this->cache->existsItem('foo');
-
-    self::assertSame(true, $return);
-  }
-
-  public function testGetCacheIsReady()
-  {
-    $return = $this->cache->getCacheIsReady();
-
-    self::assertSame(true, $return);
-  }
-
-  public function testSetGetItemWithPrefix()
-  {
-    $this->cache->setPrefix('bar');
-    $prefix = $this->cache->getPrefix();
-    self::assertSame('bar', $prefix);
-
-    $return = $this->cache->setItem('foo', [3, 2, 1]);
-    self::assertSame(true, $return);
-
-    $return = $this->cache->getItem('foo');
-    self::assertSame([3, 2, 1], $return);
-  }
-
-  public function testSetGetCacheWithEndDateTime()
-  {
-    $expireDate = new DateTime();
-    $interval = DateInterval::createFromDateString('+3 seconds');
-    $expireDate->add($interval);
-
-    $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', [3, 2, 1], $expireDate);
-    self::assertSame(true, $return);
-
-    $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
-    self::assertSame([3, 2, 1], $return);
-  }
-
-  /**
-   * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
-   */
-  protected function setUp()
-  {
-    $this->adapter = new AdapterApc();
-    $this->serializer = new SerializerDefault();
-
-    if ($this->adapter->installed() === false) {
-      self::markTestSkipped(
-          'The APC extension is not available.'
-      );
+        static::assertTrue($return);
     }
 
-    $this->cache = new Cache($this->adapter, $this->serializer, false, true);
+    public function testGetItem()
+    {
+        $return = $this->cache->getItem('foo');
 
-    // reset default prefix
-    $this->cache->setPrefix('');
+        static::assertSame([1, 2, 3, 4], $return);
+    }
 
-  }
+    public function testExistsItem()
+    {
+        $return = $this->cache->existsItem('foo');
 
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   */
-  protected function tearDown()
-  {
+        static::assertTrue($return);
+    }
 
-  }
+    public function testGetCacheIsReady()
+    {
+        $return = $this->cache->getCacheIsReady();
 
+        static::assertTrue($return);
+    }
+
+    public function testSetGetItemWithPrefix()
+    {
+        $this->cache->setPrefix('bar');
+        $prefix = $this->cache->getPrefix();
+        static::assertSame('bar', $prefix);
+
+        $return = $this->cache->setItem('foo', [3, 2, 1]);
+        static::assertTrue($return);
+
+        $return = $this->cache->getItem('foo');
+        static::assertSame([3, 2, 1], $return);
+    }
+
+    public function testSetGetCacheWithEndDateTime()
+    {
+        $expireDate = new DateTime();
+        $interval = DateInterval::createFromDateString('+3 seconds');
+        $expireDate->add($interval);
+
+        $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', [3, 2, 1], $expireDate);
+        static::assertTrue($return);
+
+        $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
+        static::assertSame([3, 2, 1], $return);
+    }
+
+    /**
+     * Sets up the fixture, for example, opens a network connection.
+     * This method is called before a test is executed.
+     */
+    protected function setUp()
+    {
+        $this->adapter = new AdapterApc();
+        $this->serializer = new SerializerDefault();
+
+        if ($this->adapter->installed() === false) {
+            static::markTestSkipped(
+          'The APC extension is not available.'
+      );
+        }
+
+        $this->cache = new Cache($this->adapter, $this->serializer, false, true);
+
+        // reset default prefix
+        $this->cache->setPrefix('');
+    }
+
+    /**
+     * Tears down the fixture, for example, closes a network connection.
+     * This method is called after a test is executed.
+     */
+    protected function tearDown()
+    {
+    }
 }

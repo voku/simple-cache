@@ -9,57 +9,58 @@ namespace voku\cache;
  */
 abstract class AdapterFileAbstract implements iAdapter
 {
-  const CACHE_FILE_PREFIX = '__';
-  const CACHE_FILE_SUBFIX = '.php.cache';
+    const CACHE_FILE_PREFIX = '__';
 
-  /**
-   * @var bool
-   */
-  public $installed = false;
+    const CACHE_FILE_SUBFIX = '.php.cache';
 
-  /**
-   * @var string
-   */
-  protected $cacheDir;
+    /**
+     * @var bool
+     */
+    public $installed = false;
 
-  /**
-   * @var iSerializer
-   */
-  protected $serializer;
+    /**
+     * @var string
+     */
+    protected $cacheDir;
 
-  /**
-   * @var string
-   */
-  protected $fileMode = '0755';
+    /**
+     * @var iSerializer
+     */
+    protected $serializer;
 
-  /**
-   * @param string|null $cacheDir
-   */
-  public function __construct($cacheDir = null)
-  {
-    $this->serializer = new SerializerIgbinary();
+    /**
+     * @var string
+     */
+    protected $fileMode = '0755';
 
-    if (!$cacheDir) {
-      $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache';
+    /**
+     * @param string|null $cacheDir
+     */
+    public function __construct($cacheDir = null)
+    {
+        $this->serializer = new SerializerIgbinary();
+
+        if (!$cacheDir) {
+            $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache';
+        }
+
+        $this->cacheDir = (string) $cacheDir;
+
+        if ($this->createCacheDirectory($cacheDir) === true) {
+            $this->installed = true;
+        }
     }
 
-    $this->cacheDir = (string)$cacheDir;
-
-    if ($this->createCacheDirectory($cacheDir) === true) {
-      $this->installed = true;
-    }
-  }
-
-  /**
-   * Recursively creates & chmod directories.
-   *
-   * @param string $path
-   *
-   * @return bool
-   */
-  protected function createCacheDirectory($path): bool
-  {
-    if (
+    /**
+     * Recursively creates & chmod directories.
+     *
+     * @param string $path
+     *
+     * @return bool
+     */
+    protected function createCacheDirectory($path): bool
+    {
+        if (
         !$path
         ||
         $path === '/'
@@ -68,174 +69,174 @@ abstract class AdapterFileAbstract implements iAdapter
         ||
         $path === '\\'
     ) {
-      return false;
+            return false;
+        }
+
+        // if the directory already exists, just return true
+        if (\is_dir($path) && \is_writable($path)) {
+            return true;
+        }
+
+        // if more than one level, try parent first
+        if (\dirname($path) !== '.') {
+            $return = $this->createCacheDirectory(\dirname($path));
+            // if creating parent fails, we can abort immediately
+            if (!$return) {
+                return false;
+            }
+        }
+
+        $mode_dec = \intval($this->fileMode, 8);
+        $old_umask = \umask(0);
+
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
+        if (!@\mkdir($path, $mode_dec) && !\is_dir($path)) {
+            $return = false;
+        } else {
+            $return = true;
+        }
+
+        if (\is_dir($path) && !\is_writable($path)) {
+            $return = \chmod($path, $mode_dec);
+        }
+
+        \umask($old_umask);
+
+        return $return;
     }
 
-    // if the directory already exists, just return true
-    if (\is_dir($path) && \is_writable($path)) {
-      return true;
-    }
+    /**
+     * @param $cacheFile
+     *
+     * @return bool
+     */
+    protected function deleteFile($cacheFile): bool
+    {
+        if (\is_file($cacheFile)) {
+            return \unlink($cacheFile);
+        }
 
-    // if more than one level, try parent first
-    if (\dirname($path) !== '.') {
-      $return = $this->createCacheDirectory(\dirname($path));
-      // if creating parent fails, we can abort immediately
-      if (!$return) {
         return false;
-      }
     }
 
-    $mode_dec = \intval($this->fileMode, 8);
-    $old_umask = \umask(0);
+    /**
+     * {@inheritdoc}
+     */
+    public function exists(string $key): bool
+    {
+        $value = $this->get($key);
 
-    /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    if (!@\mkdir($path, $mode_dec) && !\is_dir($path)) {
-      $return = false;
-    } else {
-      $return = true;
+        return $value !== null;
     }
 
-    if (\is_dir($path) && !\is_writable($path)) {
-      $return = \chmod($path, $mode_dec);
+    /**
+     * {@inheritdoc}
+     */
+    abstract public function get(string $key);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function installed(): bool
+    {
+        return $this->installed;
     }
 
-    \umask($old_umask);
+    /**
+     * {@inheritdoc}
+     */
+    public function remove(string $key): bool
+    {
+        $cacheFile = $this->getFileName($key);
 
-    return $return;
-  }
-
-  /**
-   * @param $cacheFile
-   *
-   * @return bool
-   */
-  protected function deleteFile($cacheFile): bool
-  {
-    if (\is_file($cacheFile)) {
-      return \unlink($cacheFile);
+        return $this->deleteFile($cacheFile);
     }
 
-    return false;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function removeAll(): bool
+    {
+        if (!$this->cacheDir) {
+            return false;
+        }
 
-  /**
-   * @inheritdoc
-   */
-  public function exists(string $key): bool
-  {
-    $value = $this->get($key);
+        $return = [];
+        foreach (new \DirectoryIterator($this->cacheDir) as $fileInfo) {
+            if (!$fileInfo->isDot()) {
+                $return[] = \unlink($fileInfo->getPathname());
+            }
+        }
 
-    return null !== $value;
-  }
-
-  /**
-   * @inheritdoc
-   */
-  abstract public function get(string $key);
-
-  /**
-   * @inheritdoc
-   */
-  public function installed(): bool
-  {
-    return $this->installed;
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function remove(string $key): bool
-  {
-    $cacheFile = $this->getFileName($key);
-
-    return $this->deleteFile($cacheFile);
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function removeAll(): bool
-  {
-    if (!$this->cacheDir) {
-      return false;
+        return \in_array(false, $return, true) === false;
     }
 
-    $return = [];
-    foreach (new \DirectoryIterator($this->cacheDir) as $fileInfo) {
-      if (!$fileInfo->isDot()) {
-        $return[] = \unlink($fileInfo->getPathname());
-      }
+    /**
+     * {@inheritdoc}
+     */
+    public function set(string $key, $value): bool
+    {
+        return $this->setExpired($key, $value);
     }
 
-    return \in_array(false, $return, true) === false;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    abstract public function setExpired(string $key, $value, int $ttl = 0): bool;
 
-  /**
-   * @inheritdoc
-   */
-  public function set(string $key, $value): bool
-  {
-    return $this->setExpired($key, $value);
-  }
-
-  /**
-   * @inheritdoc
-   */
-  abstract public function setExpired(string $key, $value, int $ttl = 0): bool;
-
-  /**
-   * @param string $key
-   *
-   * @return string
-   */
-  protected function getFileName(string $key): string
-  {
-    return $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_FILE_PREFIX . $key . self::CACHE_FILE_SUBFIX;
-  }
-
-  /**
-   * Set the file-mode for new cache-files.
-   *
-   * e.g. '0777', or '0755' ...
-   *
-   * @param $fileMode
-   */
-  public function setFileMode($fileMode)
-  {
-    $this->fileMode = $fileMode;
-  }
-
-  /**
-   * @param $ttl
-   *
-   * @return bool
-   */
-  protected function ttlHasExpired(int $ttl): bool
-  {
-    if ($ttl === 0) {
-      return false;
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
+    protected function getFileName(string $key): string
+    {
+        return $this->cacheDir . \DIRECTORY_SEPARATOR . self::CACHE_FILE_PREFIX . $key . self::CACHE_FILE_SUBFIX;
     }
 
-    return (\time() > $ttl);
-  }
-
-  /**
-   * @param mixed $data
-   *
-   * @return bool
-   */
-  protected function validateDataFromCache($data): bool
-  {
-    if (!\is_array($data)) {
-      return false;
+    /**
+     * Set the file-mode for new cache-files.
+     *
+     * e.g. '0777', or '0755' ...
+     *
+     * @param $fileMode
+     */
+    public function setFileMode($fileMode)
+    {
+        $this->fileMode = $fileMode;
     }
 
-    foreach (['value', 'ttl'] as $missing) {
-      if (!\array_key_exists($missing, $data)) {
-        return false;
-      }
+    /**
+     * @param $ttl
+     *
+     * @return bool
+     */
+    protected function ttlHasExpired(int $ttl): bool
+    {
+        if ($ttl === 0) {
+            return false;
+        }
+
+        return \time() > $ttl;
     }
 
-    return true;
-  }
+    /**
+     * @param mixed $data
+     *
+     * @return bool
+     */
+    protected function validateDataFromCache($data): bool
+    {
+        if (!\is_array($data)) {
+            return false;
+        }
+
+        foreach (['value', 'ttl'] as $missing) {
+            if (!\array_key_exists($missing, $data)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

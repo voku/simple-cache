@@ -8,119 +8,120 @@ use voku\cache\SerializerDefault;
 
 /**
  * RedisCacheTest
+ *
+ * @internal
  */
-class RedisCacheTest extends \PHPUnit\Framework\TestCase
+final class RedisCacheTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var iSerializer
+     */
+    public $serializer;
 
-  /**
-   * @var iSerializer
-   */
-  public $serializer;
+    /**
+     * @var iAdapter
+     */
+    public $adapter;
 
-  /**
-   * @var iAdapter
-   */
-  public $adapter;
+    /**
+     * @var Cache
+     */
+    public $cache;
 
-  /**
-   * @var Cache
-   */
-  public $cache;
+    protected $backupGlobalsBlacklist = [
+        '_SESSION',
+    ];
 
-  protected $backupGlobalsBlacklist = [
-      '_SESSION',
-  ];
+    public function testSetItem()
+    {
+        $return = $this->cache->setItem('foo', [1, 2, 3, 4]);
 
-  public function testSetItem()
-  {
-    $return = $this->cache->setItem('foo', [1, 2, 3, 4]);
+        static::assertTrue($return);
+    }
 
-    self::assertSame(true, $return);
-  }
+    public function testGetItem()
+    {
+        $return = $this->cache->getItem('foo');
 
-  public function testGetItem()
-  {
-    $return = $this->cache->getItem('foo');
+        static::assertSame([1, 2, 3, 4], $return);
+    }
 
-    self::assertSame([1, 2, 3, 4], $return);
-  }
+    public function testExistsItem()
+    {
+        $return = $this->cache->existsItem('foo');
 
-  public function testExistsItem()
-  {
-    $return = $this->cache->existsItem('foo');
+        static::assertTrue($return);
+    }
 
-    self::assertSame(true, $return);
-  }
+    public function testSetEmptyItem()
+    {
+        $return = $this->cache->setItem('foo_empty', '');
 
-  public function testSetEmptyItem()
-  {
-    $return = $this->cache->setItem('foo_empty', '');
+        static::assertTrue($return);
+    }
 
-    self::assertSame(true, $return);
-  }
+    public function testGetEmptyItem()
+    {
+        $return = $this->cache->getItem('foo_empty');
 
-  public function testGetEmptyItem()
-  {
-    $return = $this->cache->getItem('foo_empty');
+        static::assertSame('', $return);
+    }
 
-    self::assertSame('', $return);
-  }
+    public function testExistsEmptyItem()
+    {
+        $return = $this->cache->existsItem('foo_empty');
 
-  public function testExistsEmptyItem()
-  {
-    $return = $this->cache->existsItem('foo_empty');
+        static::assertTrue($return);
+    }
 
-    self::assertSame(true, $return);
-  }
+    public function testGetCacheIsReady()
+    {
+        $return = $this->cache->getCacheIsReady();
 
-  public function testGetCacheIsReady()
-  {
-    $return = $this->cache->getCacheIsReady();
+        static::assertTrue($return);
+    }
 
-    self::assertSame(true, $return);
-  }
+    public function testSetGetItemWithPrefix()
+    {
+        $this->cache->setPrefix('bar');
+        $prefix = $this->cache->getPrefix();
+        static::assertSame('bar', $prefix);
 
-  public function testSetGetItemWithPrefix()
-  {
-    $this->cache->setPrefix('bar');
-    $prefix = $this->cache->getPrefix();
-    self::assertSame('bar', $prefix);
+        $return = $this->cache->setItem('foo', [3, 2, 1]);
+        static::assertTrue($return);
 
-    $return = $this->cache->setItem('foo', [3, 2, 1]);
-    self::assertSame(true, $return);
+        $return = $this->cache->getItem('foo');
+        static::assertSame([3, 2, 1], $return);
+    }
 
-    $return = $this->cache->getItem('foo');
-    self::assertSame([3, 2, 1], $return);
-  }
+    public function testSetGetCacheWithEndDateTime()
+    {
+        $expireDate = new DateTime();
+        $interval = DateInterval::createFromDateString('+3 seconds');
+        $expireDate->add($interval);
 
-  public function testSetGetCacheWithEndDateTime()
-  {
-    $expireDate = new DateTime();
-    $interval = DateInterval::createFromDateString('+3 seconds');
-    $expireDate->add($interval);
+        $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', [3, 2, 1], $expireDate);
+        static::assertTrue($return);
 
-    $return = $this->cache->setItemToDate('testSetGetCacheWithEndDateTime', [3, 2, 1], $expireDate);
-    self::assertSame(true, $return);
+        $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
+        static::assertSame([3, 2, 1], $return);
+    }
 
-    $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
-    self::assertSame([3, 2, 1], $return);
-  }
-
-  /**
-   * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
-   */
-  protected function setUp()
-  {
-    $redis = null;
-    $isRedisAvailable = false;
-    if (
-        extension_loaded('redis')
+    /**
+     * Sets up the fixture, for example, opens a network connection.
+     * This method is called before a test is executed.
+     */
+    protected function setUp()
+    {
+        $redis = null;
+        $isRedisAvailable = false;
+        if (
+        \extension_loaded('redis')
         &&
-        class_exists('\Predis\Client')
+        \class_exists('\Predis\Client')
     ) {
-      /** @noinspection PhpUndefinedNamespaceInspection */
-      $redis = new \Predis\Client(
+            /** @noinspection PhpUndefinedNamespaceInspection */
+            $redis = new \Predis\Client(
           [
               'scheme'  => 'tcp',
               'host'    => '127.0.0.1',
@@ -128,41 +129,39 @@ class RedisCacheTest extends \PHPUnit\Framework\TestCase
               'timeout' => '2.0',
           ]
       );
-      try {
-        $redis->connect();
-        $isRedisAvailable = $redis->getConnection()->isConnected();
-      } catch (\Exception $e) {
-        // nothing
-      }
-    }
 
-    if ($isRedisAvailable === false) {
-      $redis = null;
-    }
+            try {
+                $redis->connect();
+                $isRedisAvailable = $redis->getConnection()->isConnected();
+            } catch (\Exception $e) {
+                // nothing
+            }
+        }
 
-    $this->adapter = new AdapterPredis($redis);
-    $this->serializer = new SerializerDefault();
+        if ($isRedisAvailable === false) {
+            $redis = null;
+        }
 
-    if ($this->adapter->installed() === false) {
-      self::markTestSkipped(
+        $this->adapter = new AdapterPredis($redis);
+        $this->serializer = new SerializerDefault();
+
+        if ($this->adapter->installed() === false) {
+            static::markTestSkipped(
           'Redis is not available.'
       );
+        }
+
+        $this->cache = new Cache($this->adapter, $this->serializer, false, true);
+
+        // reset default prefix
+        $this->cache->setPrefix('');
     }
 
-    $this->cache = new Cache($this->adapter, $this->serializer, false, true);
-
-    // reset default prefix
-    $this->cache->setPrefix('');
-
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   */
-  protected function tearDown()
-  {
-
-  }
-
+    /**
+     * Tears down the fixture, for example, closes a network connection.
+     * This method is called after a test is executed.
+     */
+    protected function tearDown()
+    {
+    }
 }
