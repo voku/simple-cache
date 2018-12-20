@@ -3,14 +3,12 @@
 [![Coverage Status](https://coveralls.io/repos/github/voku/simple-cache/badge.svg?branch=master)](https://coveralls.io/github/voku/simple-cache?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/voku/simple-cache/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/voku/simple-cache/?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5846d2a46599486486b3956c0ce11a18)](https://www.codacy.com/app/voku/simple-cache)
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/4926981d-ecb1-482b-a15c-447954b9bd66/mini.png)](https://insight.sensiolabs.com/projects/4926981d-ecb1-482b-a15c-447954b9bd66)
 [![Latest Stable Version](https://poser.pugx.org/voku/simple-cache/v/stable)](https://packagist.org/packages/voku/simple-cache) 
 [![Total Downloads](https://poser.pugx.org/voku/simple-cache/downloads)](https://packagist.org/packages/voku/simple-cache) 
-[![Latest Unstable Version](https://poser.pugx.org/voku/simple-cache/v/unstable)](https://packagist.org/packages/voku/simple-cache)
 [![License](https://poser.pugx.org/voku/simple-cache/license)](https://packagist.org/packages/voku/simple-cache)
 
 
-Simple Cache Class
+:zap: Simple Cache Class
 ===================
 
 This is a simple Cache Abstraction Layer for PHP >= 7.0 that provides a simple interaction 
