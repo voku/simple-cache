@@ -1,3 +1,8 @@
+# Changelog 3.2.2 (2018-12-21)
+
+- fix APC(u) detection for CLI usage
+
+
 # Changelog 3.2.1 (2018-12-20)
 
 - use phpcs fixer 
