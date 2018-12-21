@@ -27,9 +27,21 @@ class AdapterApc implements iAdapter
     public function __construct()
     {
         if (
+            \PHP_SAPI !== 'cli'
+            &&
             \function_exists('apc_store') === true
             &&
             \ini_get('apc.enabled')
+        ) {
+            $this->installed = true;
+        }
+
+        if (
+            \PHP_SAPI === 'cli'
+            &&
+            \function_exists('apc_store') === true
+            &&
+            \ini_get('apc.enable_cli')
         ) {
             $this->installed = true;
         }
