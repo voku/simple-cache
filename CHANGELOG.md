@@ -1,3 +1,10 @@
+# Changelog 4.0.0 (2019-02-24)
+
+- add "CacheAdapterAutoManager"
+- fix typos in "CachePsr16" 
+- "iCache->setItemToDate()" now accepts DateTimeInterface instead of DateTime
+
+
 # Changelog 3.2.2 (2018-12-21)
 
 - fix APC(u) detection for CLI usage

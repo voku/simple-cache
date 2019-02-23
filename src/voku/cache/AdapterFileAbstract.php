@@ -106,14 +106,14 @@ abstract class AdapterFileAbstract implements iAdapter
     }
 
     /**
-     * @param $cacheFile
+     * @param string $cacheFileWithPath
      *
      * @return bool
      */
-    protected function deleteFile($cacheFile): bool
+    protected function deleteFile($cacheFileWithPath): bool
     {
-        if (\is_file($cacheFile)) {
-            return \unlink($cacheFile);
+        if (\is_file($cacheFileWithPath)) {
+            return \unlink($cacheFileWithPath);
         }
 
         return false;
@@ -199,7 +199,7 @@ abstract class AdapterFileAbstract implements iAdapter
      *
      * e.g. '0777', or '0755' ...
      *
-     * @param $fileMode
+     * @param string $fileMode
      */
     public function setFileMode($fileMode)
     {
@@ -207,7 +207,7 @@ abstract class AdapterFileAbstract implements iAdapter
     }
 
     /**
-     * @param $ttl
+     * @param int $ttl
      *
      * @return bool
      */
