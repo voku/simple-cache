@@ -27,7 +27,7 @@ You can download it from here, or require it using [composer](https://packagist.
 ```json
 {
   "require": {
-    "voku/simple-cache": "3.*"
+    "voku/simple-cache": "4.*"
   }
 }
 ```
@@ -37,7 +37,6 @@ You can download it from here, or require it using [composer](https://packagist.
 
 ```shell
 composer require voku/simple-cache
-composer require predis/predis # if you will use redis as cache, then add predis
 ```
 
 
@@ -99,6 +98,29 @@ this behavior via $cache->setStaticCacheHitCounter(INT).
 If you use the parameter "$checkForUser" (=== true) in the constructor, then the cache isn't used for the admin-session.
 
 -> You can also overwrite the check for the user, if you add a global function named "checkForDev()".
+
+## Overwrite the auto-connection option
+
+You can implement you own cache auto-detect via "CacheAdapterAutoManager" and the 
+"$cacheAdapterManagerForAutoConnect" option in the "Cache"-constructor.
+
+```php
+use voku\cache\Cache;
+
+$cacheManager = new CacheAdapterAutoManager();
+
+$cacheManager->addAdapter(
+    AdapterOpCache::class,
+    function () {
+        $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache_v2';
+
+        return $cacheDir;
+    }
+);
+
+$cacheManager->addAdapter(
+    AdapterArray::class
+);
 
 ### Support
 
