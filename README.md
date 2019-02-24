@@ -101,8 +101,10 @@ If you use the parameter "$checkForUser" (=== true) in the constructor, then the
 
 ## Overwrite the auto-connection option
 
-You can implement you own cache auto-detect via "CacheAdapterAutoManager" and the 
-"$cacheAdapterManagerForAutoConnect" option in the "Cache"-constructor.
+You can overwrite the cache auto-detect via "CacheAdapterAutoManager" and the 
+"$cacheAdapterManagerForAutoConnect" option in the "Cache"-constructor. Additional you can also 
+activate the "$cacheAdapterManagerForAutoConnectOverwrite" option in the "Cache"-constructor, so that 
+you can implmemt your own cache auto-detect logic.
 
 ```php
 use voku\cache\Cache;
@@ -121,6 +123,7 @@ $cacheManager->addAdapter(
 $cacheManager->addAdapter(
     AdapterArray::class
 );
+```
 
 ### Support
 
