@@ -36,7 +36,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
 
         $item = $this->cache->getItem('lall');
 
-        static::assertNull( $item);
+        static::assertNull($item);
     }
 
     public function testGetNotExists()
@@ -55,7 +55,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->cache->setItem($key, $value, 10);
 
-        self::assertTrue($result);
+        static::assertTrue($result);
     }
 
     /**
@@ -65,7 +65,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
     {
         $item = $this->cache->getItem('some:test:key');
 
-        static::assertNotNull( $item);
+        static::assertNotNull($item);
     }
 
     public function testSetWithTtl()
@@ -76,7 +76,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->cache->setItem($key, $value, $ttl);
 
-        self::assertTrue($result);
+        static::assertTrue($result);
     }
 
     public function testSetToDate()
@@ -87,7 +87,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->cache->setItemToDate($key, $value, $date);
 
-        self::assertTrue($result);
+        static::assertTrue($result);
     }
 
     public function testSetWrongDate()
@@ -108,7 +108,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->cache->removeItem($key);
 
-        self::assertTrue($result);
+        static::assertTrue($result);
     }
 
     /**
@@ -120,7 +120,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->cache->existsItem($key);
 
-        self::assertFalse($result);
+        static::assertFalse($result);
     }
 
     /**
@@ -133,10 +133,8 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
         /** @noinspection PhpUnhandledExceptionInspection */
         $cacheManager->addAdapter(
             \voku\cache\AdapterOpCache::class,
-            function () {
-                $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache_v2';
-
-                return $cacheDir;
+            static function () {
+                return \realpath(\sys_get_temp_dir()) . '/simple_php_cache_v2';
             }
         );
         /** @noinspection PhpUnhandledExceptionInspection */

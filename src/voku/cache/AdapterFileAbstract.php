@@ -45,7 +45,7 @@ abstract class AdapterFileAbstract implements iAdapter
         }
 
         if (\is_callable($cacheDir)) {
-            $this->cacheDir = (string) call_user_func($cacheDir);
+            $this->cacheDir = (string) \call_user_func($cacheDir);
         } else {
             $this->cacheDir = (string) $cacheDir;
         }

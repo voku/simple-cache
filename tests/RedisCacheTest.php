@@ -122,13 +122,13 @@ final class RedisCacheTest extends \PHPUnit\Framework\TestCase
     ) {
             /** @noinspection PhpUndefinedNamespaceInspection */
             $redis = new \Predis\Client(
-          [
-              'scheme'  => 'tcp',
-              'host'    => '127.0.0.1',
-              'port'    => 6379,
-              'timeout' => '2.0',
-          ]
-      );
+                [
+                    'scheme'  => 'tcp',
+                    'host'    => '127.0.0.1',
+                    'port'    => 6379,
+                    'timeout' => '2.0',
+                ]
+            );
 
             try {
                 $redis->connect();
@@ -146,9 +146,7 @@ final class RedisCacheTest extends \PHPUnit\Framework\TestCase
         $this->serializer = new SerializerDefault();
 
         if ($this->adapter->installed() === false) {
-            static::markTestSkipped(
-          'Redis is not available.'
-      );
+            static::markTestSkipped('Redis is not available.');
         }
 
         $this->cache = new Cache($this->adapter, $this->serializer, false, true);

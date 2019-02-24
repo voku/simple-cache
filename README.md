@@ -111,8 +111,8 @@ $cacheManager = new CacheAdapterAutoManager();
 
 $cacheManager->addAdapter(
     AdapterOpCache::class,
-    function () {
-        $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache_v2';
+    static function () {
+        $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache_new';
 
         return $cacheDir;
     }

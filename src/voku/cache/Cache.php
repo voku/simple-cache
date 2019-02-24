@@ -35,12 +35,12 @@ class Cache implements iCache
     protected static $STATIC_CACHE_COUNTER = [];
 
     /**
-     * @var null|iAdapter
+     * @var iAdapter|null
      */
     protected $adapter;
 
     /**
-     * @var null|iSerializer
+     * @var iSerializer|null
      */
     protected $serializer;
 
@@ -126,8 +126,7 @@ class Cache implements iCache
         string $disableCacheGetParameter = 'testWithoutCache',
         CacheAdapterAutoManager $cacheAdapterManagerForAutoConnect = null,
         bool $cacheAdapterManagerForAutoConnectOverwrite = false
-    )
-    {
+    ) {
         $this->isAdminSession = $isAdminSession;
 
         $this->useCheckForDev = $useCheckForDev;
@@ -195,8 +194,7 @@ class Cache implements iCache
     protected function autoConnectToAvailableCacheSystem(
         CacheAdapterAutoManager $cacheAdapterManagerForAutoConnect = null,
         bool $cacheAdapterManagerForAutoConnectOverwrite = false
-    ): iAdapter
-    {
+    ): iAdapter {
         static $AUTO_ADAPTER_STATIC_CACHE = null;
 
         if (

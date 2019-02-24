@@ -98,10 +98,10 @@ final class FileCacheTest extends \PHPUnit\Framework\TestCase
         $expireDate->add($interval);
 
         $return = $this->cache->setItemToDate(
-        'testSetGetCacheWithEndDateTime',
-        [3, 2, 1],
-        $expireDate
-    );
+            'testSetGetCacheWithEndDateTime',
+            [3, 2, 1],
+            $expireDate
+        );
         static::assertTrue($return);
 
         $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
@@ -165,10 +165,10 @@ final class FileCacheTest extends \PHPUnit\Framework\TestCase
         $expireDate->add($interval);
 
         $return = $this->cache->setItemToDate(
-        'testSetGetCacheWithEndDateTime',
-        [3, 2, 1],
-        $expireDate
-    );
+            'testSetGetCacheWithEndDateTime',
+            [3, 2, 1],
+            $expireDate
+        );
         static::assertTrue($return);
 
         for ($i = 0; $i <= 20; $i++) {
@@ -189,10 +189,10 @@ final class FileCacheTest extends \PHPUnit\Framework\TestCase
         $expireDate->add($interval);
 
         $return = $this->cache->setItemToDate(
-        'testSetGetCacheWithEndDateTime',
-        [3, 2, 1],
-        $expireDate
-    );
+            'testSetGetCacheWithEndDateTime',
+            [3, 2, 1],
+            $expireDate
+        );
         static::assertTrue($return);
 
         for ($i = 0; $i <= 4; $i++) {

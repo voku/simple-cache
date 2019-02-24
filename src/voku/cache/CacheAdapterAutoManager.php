@@ -20,11 +20,11 @@ class CacheAdapterAutoManager
 
     /**
      * @param string        $adapter
-     * @param null|callable $callableFunction
-     *
-     * @return $this
+     * @param callable|null $callableFunction
      *
      * @throws InvalidArgumentException
+     *
+     * @return $this
      */
     public function addAdapter(
         string $adapter,
@@ -51,16 +51,15 @@ class CacheAdapterAutoManager
     }
 
     /**
-     * @param CacheAdapterAutoManager $adapterManager
-     *
-     * @return CacheAdapterAutoManager
+     * @param self $adapterManager
      *
      * @throws InvalidArgumentException
+     *
+     * @return CacheAdapterAutoManager
      */
-    public function merge(CacheAdapterAutoManager $adapterManager): self
+    public function merge(self $adapterManager): self
     {
         foreach ($adapterManager->getAdapters() as $adapterTmp => $callableFunctionTmp) {
-
             $this->validateAdapter($adapterTmp);
             $this->validateCallable($callableFunctionTmp);
 
@@ -87,8 +86,8 @@ class CacheAdapterAutoManager
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $interfaces = (new \ReflectionClass($replaceAdapter))->getInterfaces();
-        if (!array_key_exists(iAdapter::class, $interfaces)) {
-            throw new InvalidArgumentException('"' . $replaceAdapter . '" did not implement the "iAdapter"-interface [' . print_r($interfaces, true) . ']');
+        if (!\array_key_exists(iAdapter::class, $interfaces)) {
+            throw new InvalidArgumentException('"' . $replaceAdapter . '" did not implement the "iAdapter"-interface [' . \print_r($interfaces, true) . ']');
         }
     }
 
@@ -118,7 +117,7 @@ class CacheAdapterAutoManager
         /** @noinspection PhpUnhandledExceptionInspection */
         $cacheAdapterManager->addAdapter(
             AdapterMemcached::class,
-            function () {
+            static function () {
                 $memcached = null;
                 $isMemcachedAvailable = false;
                 if (\extension_loaded('memcached')) {
@@ -139,7 +138,7 @@ class CacheAdapterAutoManager
         /** @noinspection PhpUnhandledExceptionInspection */
         $cacheAdapterManager->addAdapter(
             AdapterMemcache::class,
-            function () {
+            static function () {
                 $memcache = null;
                 $isMemcacheAvailable = false;
                 /** @noinspection ClassConstantCanBeUsedInspection */
@@ -161,7 +160,7 @@ class CacheAdapterAutoManager
         /** @noinspection PhpUnhandledExceptionInspection */
         $cacheAdapterManager->addAdapter(
             AdapterPredis::class,
-            function () {
+            static function () {
                 $redis = null;
                 $isRedisAvailable = false;
                 if (
@@ -216,10 +215,8 @@ class CacheAdapterAutoManager
         /** @noinspection PhpUnhandledExceptionInspection */
         $cacheAdapterManager->addAdapter(
             AdapterOpCache::class,
-            function () {
-                $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache';
-
-                return $cacheDir;
+            static function () {
+                return \realpath(\sys_get_temp_dir()) . '/simple_php_cache';
             }
         );
 

@@ -206,7 +206,7 @@ return PhpCsFixer\Config::create()
                                 'space_after_semicolon'                         => true,
                                 'standardize_increment'                         => false, // maybe better for readability, so keep it ...
                                 'standardize_not_equals'                        => true,
-                                'static_lambda'                                 => false,
+                                'static_lambda'                                 => true,
                                 'strict_comparison'                             => true,
                                 'strict_param'                                  => true,
                                 'string_line_ending'                            => true,

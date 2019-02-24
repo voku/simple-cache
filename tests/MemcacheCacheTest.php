@@ -118,9 +118,7 @@ final class MemcacheCacheTest extends \PHPUnit\Framework\TestCase
         $this->serializer = new SerializerNo();
 
         if ($this->adapter->installed() === false) {
-            static::markTestSkipped(
-          'The Memcache extension is not available.'
-      );
+            static::markTestSkipped('The Memcache extension is not available.');
         }
 
         $this->cache = new Cache($this->adapter, $this->serializer, false, true);
