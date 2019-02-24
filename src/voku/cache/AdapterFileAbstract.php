@@ -34,7 +34,7 @@ abstract class AdapterFileAbstract implements iAdapter
     protected $fileMode = '0755';
 
     /**
-     * @param string|null $cacheDir
+     * @param \callable|string|null $cacheDir
      */
     public function __construct($cacheDir = null)
     {
@@ -44,9 +44,13 @@ abstract class AdapterFileAbstract implements iAdapter
             $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache';
         }
 
-        $this->cacheDir = (string) $cacheDir;
+        if (\is_callable($cacheDir)) {
+            $this->cacheDir = (string) call_user_func($cacheDir);
+        } else {
+            $this->cacheDir = (string) $cacheDir;
+        }
 
-        if ($this->createCacheDirectory($cacheDir) === true) {
+        if ($this->createCacheDirectory($this->cacheDir) === true) {
             $this->installed = true;
         }
     }

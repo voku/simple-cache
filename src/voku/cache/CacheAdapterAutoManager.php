@@ -64,7 +64,7 @@ class CacheAdapterAutoManager
             $this->validateAdapter($adapterTmp);
             $this->validateCallable($callableFunctionTmp);
 
-            $key = array_search($adapterTmp, $this->adapter, true);
+            $key = \array_search($adapterTmp, $this->adapter, true);
 
             if ($key) {
                 $this->adapter[$key] = $adapterTmp;
@@ -102,7 +102,7 @@ class CacheAdapterAutoManager
         if (
             $callableFunction !== null
             &&
-            !is_callable($callableFunction)
+            !\is_callable($callableFunction)
         ) {
             throw new InvalidArgumentException('$callableFunction is not callable');
         }
