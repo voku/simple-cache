@@ -107,12 +107,17 @@ activate the "$cacheAdapterManagerForAutoConnectOverwrite" option in the "Cache"
 you can implement your own cache auto-detect logic.
 
 ```php
-use voku\cache\Cache;
 
-$cacheManager = new CacheAdapterAutoManager();
+$cacheManager = new \voku\cache\CacheAdapterAutoManager();
 
+// 1. check for "APCu" support first
 $cacheManager->addAdapter(
-    AdapterOpCache::class,
+    \voku\cache\AdapterApcu::class
+);
+
+// 2. try "File"-Cache + OpCache
+$cacheManager->addAdapter(
+    \voku\cache\AdapterOpCache::class,
     static function () {
         $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache_new';
 
@@ -120,8 +125,23 @@ $cacheManager->addAdapter(
     }
 );
 
+// 3. use Memory Cache as final fallback
 $cacheManager->addAdapter(
-    AdapterArray::class
+    \voku\cache\AdapterArray::class
+);
+
+$cache = new \voku\cache\CachePsr16(
+    null, // use auto-detection
+    null, // use auto-detection
+    false, // do not check for usage
+    true, // enable the cache
+    false, // do not check for admin session
+    false, // do not check for dev
+    false, // do not check for admin session
+    false, // do not check for server vs. client ip
+    '', // do not use "_GET"-parameter for disabling
+    $cacheManager, // new auto-detection logic
+    true // overwrite the auto-detection logic
 );
 ```
 
