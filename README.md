@@ -115,17 +115,33 @@ $cacheManager->addAdapter(
     \voku\cache\AdapterApcu::class
 );
 
-// 2. try "File"-Cache + OpCache
+// 2. check for "APC" support
+$cacheManager->addAdapter(
+    \voku\cache\AdapterApcu::class
+);
+
+// 3. try "OpCache"-Cache
 $cacheManager->addAdapter(
     \voku\cache\AdapterOpCache::class,
     static function () {
-        $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache_new';
+        $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache_opcache';
 
         return $cacheDir;
     }
 );
 
-// 3. use Memory Cache as final fallback
+// 4. try "File"-Cache
+$cacheManager->addAdapter(
+    \voku\cache\AdapterFileSimple::class,
+    static function () {
+        $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache_file';
+
+        return $cacheDir;
+    }
+);
+
+
+// 5. use Memory Cache as final fallback
 $cacheManager->addAdapter(
     \voku\cache\AdapterArray::class
 );
