@@ -1,3 +1,8 @@
+# Changelog 4.0.1 (2019-03-03)
+
+- hide "warning" about Zend OPcache API is restricted by "restrict_api"
+
+
 # Changelog 4.0.0 (2019-02-24)
 
 - add "CacheAdapterAutoManager"
