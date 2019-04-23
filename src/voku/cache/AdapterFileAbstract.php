@@ -34,7 +34,7 @@ abstract class AdapterFileAbstract implements iAdapter
     protected $fileMode = '0755';
 
     /**
-     * @param \callable|string|null $cacheDir
+     * @param callable|string|null $cacheDir
      */
     public function __construct($cacheDir = null)
     {

@@ -1,0 +1,14 @@
+parameters:
+    reportUnmatchedIgnoredErrors: false
+    excludes_analyse:
+        - %rootDir%/vendor/*
+        - %rootDir%/tests/*
+    autoload_files:
+        - %rootDir%/vendor/autoload.php
+    ignoreErrors:
+        - '/PHPDoc tag @return with type array\|false is not subtype of native type array\./'
+        - '/Result of \&\& is always false\./'
+        - '/Predis\\Client/'
+        - '/Memcache(d)*/'
+        - '/MEMCACHE_COMPRESSED/'
+        - '/Function checkForDev not found\./'

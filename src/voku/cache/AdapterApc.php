@@ -43,6 +43,8 @@ class AdapterApc implements iAdapter
             &&
             \ini_get('apc.enable_cli')
         ) {
+            \ini_set('apc.use_request_time', '0');
+
             $this->installed = true;
         }
     }

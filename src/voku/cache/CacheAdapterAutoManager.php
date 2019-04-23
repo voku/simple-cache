@@ -29,8 +29,7 @@ class CacheAdapterAutoManager
     public function addAdapter(
         string $adapter,
         callable $callableFunction = null
-    ): self
-    {
+    ): self {
         $this->validateAdapter($adapter);
         $this->validateCallable($callableFunction);
 
@@ -55,7 +54,7 @@ class CacheAdapterAutoManager
      *
      * @throws InvalidArgumentException
      *
-     * @return CacheAdapterAutoManager
+     * @return self
      */
     public function merge(self $adapterManager): self
     {
@@ -170,6 +169,7 @@ class CacheAdapterAutoManager
                 ) {
                     /** @noinspection PhpUndefinedNamespaceInspection */
                     /** @noinspection PhpUndefinedClassInspection */
+                    /** @noinspection PhpFullyQualifiedNameUsageInspection */
                     $redis = new \Predis\Client(
                         [
                             'scheme'  => 'tcp',

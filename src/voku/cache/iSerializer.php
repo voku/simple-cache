@@ -22,4 +22,11 @@ interface iSerializer
      * @param string $value
      */
     public function unserialize($value);
+
+    /**
+     * @param array $options
+     *
+     * @return void
+     */
+    public function setUnserializeOptions(array $options);
 }

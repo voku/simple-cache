@@ -171,13 +171,8 @@ final class CacheTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        if (\method_exists($this, 'createMock')) {
-            $this->adapter = $this->createMock('voku\cache\AdapterApc');
-            $this->serializer = $this->createMock('voku\cache\SerializerDefault');
-        } else {
-            $this->adapter = $this->createMock('voku\cache\AdapterApc');
-            $this->serializer = $this->createMock('voku\cache\SerializerDefault');
-        }
+        $this->adapter = $this->createMock('voku\cache\AdapterApc');
+        $this->serializer = $this->createMock('voku\cache\SerializerDefault');
 
         $this->cache = new Cache($this->adapter, $this->serializer, false, true);
 

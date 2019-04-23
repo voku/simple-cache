@@ -45,6 +45,11 @@ class Cache implements iCache
     protected $serializer;
 
     /**
+     * @var array
+     */
+    protected $unserialize_options = ['allowed_classes' => true];
+
+    /**
      * @var string
      */
     protected $prefix = '';
@@ -92,27 +97,30 @@ class Cache implements iCache
     /**
      * __construct
      *
-     * @param iAdapter|null       $adapter
-     * @param iSerializer|null    $serializer
-     * @param bool                $checkForUsage                              <p>check for admin-session && check for
-     *                                                                        server-ip == client-ip
-     *                                                                        && check for dev</p>
-     * @param bool                $cacheEnabled                               <p>false === disable the cache (use it
-     *                                                                        e.g. for global settings)</p>
-     * @param bool                $isAdminSession                             <p>true === disable cache for this user
-     *                                                                        (use it e.g. for admin user settings)
-     * @param bool                $useCheckForAdminSession                    <p>use $isAdminSession flag or not</p>
-     * @param bool                $useCheckForDev                             <p>use checkForDev() or not</p>
-     * @param bool                $useCheckForServerIpIsClientIp              <p>use check for server-ip == client-ip
-     *                                                                        or
-     *                                                                        not</p>
-     * @param string                  $disableCacheGetParameter               <p>set the _GET parameter for disabling
-     *                                                                        the cache, disable this check via empty
-     *                                                                        string</p>
-     * @param CacheAdapterAutoManager $cacheAdapterManagerForAutoConnect      <p>Overwrite some Adapters for the
-     *                                                                        auto-connect-function.</p>
-     * @param bool                    $cacheAdapterManagerForAutoConnectOverwrite <p>true === Use only Adapters from your
-     *                                                                        "CacheAdapterManager".</p>
+     * @param iAdapter|null           $adapter
+     * @param iSerializer|null        $serializer
+     * @param bool                    $checkForUsage                              <p>check for admin-session && check
+     *                                                                            for server-ip == client-ip
+     *                                                                            && check for dev</p>
+     * @param bool                    $cacheEnabled                               <p>false === disable the cache (use
+     *                                                                            it
+     *                                                                            e.g. for global settings)</p>
+     * @param bool                    $isAdminSession                             <p>true === disable cache for this
+     *                                                                            user
+     *                                                                            (use it e.g. for admin user settings)
+     * @param bool                    $useCheckForAdminSession                    <p>use $isAdminSession flag or
+     *                                                                            not</p>
+     * @param bool                    $useCheckForDev                             <p>use checkForDev() or not</p>
+     * @param bool                    $useCheckForServerIpIsClientIp              <p>use check for server-ip ==
+     *                                                                            client-ip or not</p>
+     * @param string                  $disableCacheGetParameter                   <p>set the _GET parameter for
+     *                                                                            disabling the cache, disable this
+     *                                                                            check via empty string</p>
+     * @param CacheAdapterAutoManager $cacheAdapterManagerForAutoConnect          <p>Overwrite some Adapters for the
+     *                                                                            auto-connect-function.</p>
+     * @param bool                    $cacheAdapterManagerForAutoConnectOverwrite <p>true === Use only Adapters from
+     *                                                                            your
+     *                                                                            "CacheAdapterManager".</p>
      */
     public function __construct(
         iAdapter $adapter = null,
@@ -177,17 +185,29 @@ class Cache implements iCache
             $this->setCacheIsReady(true);
 
             $this->adapter = $adapter;
+
             $this->serializer = $serializer;
+
+            $this->serializer->setUnserializeOptions($this->unserialize_options);
         }
+    }
+
+    /**
+     * @param array $array
+     */
+    public function setUnserializeOptions(array $array = [])
+    {
+        $this->unserialize_options = $array;
     }
 
     /**
      * Auto-connect to the available cache-system on the server.
      *
      * @param CacheAdapterAutoManager $cacheAdapterManagerForAutoConnect          <p>Overwrite some Adapters for the
-     *                                                                        auto-connect-function.</p>
-     * @param bool                    $cacheAdapterManagerForAutoConnectOverwrite <p>true === Use only Adapters from your
-     *                                                                        "CacheAdapterManager".</p>
+     *                                                                            auto-connect-function.</p>
+     * @param bool                    $cacheAdapterManagerForAutoConnectOverwrite <p>true === Use only Adapters from
+     *                                                                            your
+     *                                                                            "CacheAdapterManager".</p>
      *
      * @return iAdapter
      */
@@ -468,7 +488,7 @@ class Cache implements iCache
      * @param mixed                  $value
      * @param \DateInterval|int|null $ttl
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      *
      * @return bool
      */

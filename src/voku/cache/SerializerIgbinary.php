@@ -15,15 +15,22 @@ class SerializerIgbinary implements iSerializer
     public static $_exists_igbinary;
 
     /**
+     * @var array
+     */
+    private $unserialize_options;
+
+    /**
      * SerializerIgbinary constructor.
      */
     public function __construct()
     {
-        self::$_exists_igbinary = (
-            \function_exists('igbinary_serialize')
-            &&
-            \function_exists('igbinary_unserialize')
-        );
+        if (self::$_exists_igbinary === null) {
+            self::$_exists_igbinary = (
+                \function_exists('igbinary_serialize')
+                &&
+                \function_exists('igbinary_unserialize')
+            );
+        }
     }
 
     /**
@@ -33,6 +40,7 @@ class SerializerIgbinary implements iSerializer
     {
         if (self::$_exists_igbinary === true) {
             /** @noinspection PhpUndefinedFunctionInspection */
+            /** @noinspection PhpComposerExtensionStubsInspection */
             return \igbinary_serialize($value);
         }
 
@@ -47,10 +55,19 @@ class SerializerIgbinary implements iSerializer
     {
         if (self::$_exists_igbinary === true) {
             /** @noinspection PhpUndefinedFunctionInspection */
+            /** @noinspection PhpComposerExtensionStubsInspection */
             return \igbinary_unserialize($value);
         }
 
         // fallback
-        return \unserialize($value);
+        return \unserialize($value, $this->unserialize_options);
+    }
+
+    /**
+     * @param array $options
+     */
+    public function setUnserializeOptions(array $options)
+    {
+        $this->unserialize_options = $options;
     }
 }

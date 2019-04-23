@@ -24,4 +24,14 @@ class SerializerNo implements iSerializer
     {
         return $value;
     }
+
+    /**
+     * @param array $options
+     *
+     * @return void
+     */
+    public function setUnserializeOptions(array $options)
+    {
+        // nothing to do here
+    }
 }

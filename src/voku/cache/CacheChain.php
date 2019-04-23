@@ -7,7 +7,7 @@ namespace voku\cache;
 class CacheChain implements iCache
 {
     /**
-     * @var array|iCache[]
+     * @var Cache[]
      */
     private $caches = [];
 
@@ -40,17 +40,11 @@ class CacheChain implements iCache
     /**
      * add cache
      *
-     * @param iCache $cache
-     * @param bool   $prepend
-     *
-     * @throws \InvalidArgumentException
+     * @param Cache $cache
+     * @param bool  $prepend
      */
-    public function addCache(iCache $cache, $prepend = true)
+    public function addCache(Cache $cache, $prepend = true)
     {
-        if ($this === $cache) {
-            throw new \InvalidArgumentException('loop-error, put into other cache');
-        }
-
         if ($prepend) {
             \array_unshift($this->caches, $cache);
         } else {
@@ -70,6 +64,22 @@ class CacheChain implements iCache
         }
 
         return null;
+    }
+
+    /**
+     * Get the "isReady" state.
+     *
+     * @return bool
+     */
+    public function getCacheIsReady(): bool
+    {
+        foreach ($this->caches as $cache) {
+            if (!$cache->getCacheIsReady()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -95,12 +105,25 @@ class CacheChain implements iCache
         // init
         $results = [];
 
-        /* @var $cache iCache */
         foreach ($this->caches as $cache) {
             $results[] = $cache->setItemToDate($key, $value, $date);
         }
 
         return !\in_array(false, $results, true);
+    }
+
+    /**
+     * !!! Set the prefix. !!!
+     *
+     * WARNING: Do not use if you don't know what you do. Because this will overwrite the default prefix.
+     *
+     * @param string $prefix
+     */
+    public function setPrefix(string $prefix)
+    {
+        foreach ($this->caches as $cache) {
+            $cache->setPrefix($prefix);
+        }
     }
 
     /**
