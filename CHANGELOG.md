@@ -1,3 +1,10 @@
+# Changelog 4.0.2 (2019-04-23)
+
+- fix errors reported by phpstan (level 7)
+- fix for APC(u) + CLI usage
+- fix & new tests for "CacheChain" -> now accepts Cache objects instead of "iCache"
+
+
 # Changelog 4.0.1 (2019-03-03)
 
 - hide "warning" about Zend OPcache API is restricted by "restrict_api"
