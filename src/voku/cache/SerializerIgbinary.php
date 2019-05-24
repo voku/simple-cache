@@ -17,7 +17,7 @@ class SerializerIgbinary implements iSerializer
     /**
      * @var array
      */
-    private $unserialize_options;
+    private $unserialize_options = [];
 
     /**
      * SerializerIgbinary constructor.
