@@ -15,9 +15,9 @@ class SerializerIgbinary implements iSerializer
     public static $_exists_igbinary;
 
     /**
-     * @var array
+     * @var null|array
      */
-    private $unserialize_options = [];
+    private $unserialize_options;
 
     /**
      * SerializerIgbinary constructor.
@@ -60,7 +60,12 @@ class SerializerIgbinary implements iSerializer
         }
 
         // fallback
-        return \unserialize($value, $this->unserialize_options);
+        if ($this->unserialize_options !== null) {
+            return \unserialize($value, $this->unserialize_options);
+        }
+
+        /** @noinspection UnserializeExploitsInspection */
+        return \unserialize($value);
     }
 
     /**

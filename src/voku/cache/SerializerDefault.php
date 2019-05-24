@@ -10,7 +10,7 @@ namespace voku\cache;
 class SerializerDefault implements iSerializer
 {
     /**
-     * @var array
+     * @var null|array
      */
     private $unserialize_options;
 
@@ -27,7 +27,12 @@ class SerializerDefault implements iSerializer
      */
     public function unserialize($value)
     {
-        return \unserialize($value, $this->unserialize_options);
+        if ($this->unserialize_options !== null) {
+            return \unserialize($value, $this->unserialize_options);
+        }
+
+        /** @noinspection UnserializeExploitsInspection */
+        return \unserialize($value);
     }
 
     /**
