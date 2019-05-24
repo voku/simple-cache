@@ -121,8 +121,7 @@ final class CacheChainTest extends \PHPUnit\Framework\TestCase
 
         // -- remove all
 
-        $return = $this->cache->removeAll();
-        static::assertTrue($return);
+        $this->cache->removeAll();
 
         // -- remove all - tests
 
@@ -174,7 +173,7 @@ final class CacheChainTest extends \PHPUnit\Framework\TestCase
         static::assertTrue($return);
 
         for ($i = 0; $i <= 4; $i++) {
-            $return = $this->cache->getItem('testSetGetCacheWithEndDateTime', 2);
+            $return = $this->cache->getItem('testSetGetCacheWithEndDateTime');
             static::assertSame([3, 2, 1], $return);
         }
 
@@ -191,7 +190,7 @@ final class CacheChainTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $cacheApc = new Cache(
-            new \voku\cache\AdapterApcu(),
+            new \voku\cache\AdapterApc(),
             new \voku\cache\SerializerIgbinary(),
             false,
             true
