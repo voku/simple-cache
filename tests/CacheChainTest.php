@@ -121,7 +121,8 @@ final class CacheChainTest extends \PHPUnit\Framework\TestCase
 
         // -- remove all
 
-        $this->cache->removeAll();
+        $return = $this->cache->removeAll();
+        static::assertTrue($return);
 
         // -- remove all - tests
 
@@ -190,7 +191,7 @@ final class CacheChainTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $cacheApc = new Cache(
-            new \voku\cache\AdapterApc(),
+            new \voku\cache\AdapterApcu(),
             new \voku\cache\SerializerIgbinary(),
             false,
             true
