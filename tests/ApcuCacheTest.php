@@ -4,7 +4,7 @@ use voku\cache\AdapterApcu;
 use voku\cache\Cache;
 use voku\cache\iAdapter;
 use voku\cache\iSerializer;
-use voku\cache\SerializerDefault;
+use voku\cache\SerializerMsgpack;
 
 /**
  * ApcuCacheTest
@@ -96,7 +96,7 @@ final class ApcuCacheTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->adapter = new AdapterApcu();
-        $this->serializer = new SerializerDefault();
+        $this->serializer = new SerializerMsgpack();
 
         if ($this->adapter->installed() === false) {
             static::markTestSkipped('The APCu extension is not available.');

@@ -112,12 +112,16 @@ class AdapterMemcached implements iAdapter
 
     /**
      * Set the MemCached settings.
+     *
+     * @noinspection PhpUndefinedClassConstantInspection -> MSGPACK is not added into phpstorm stubs
      */
     private function setSettings()
     {
         // Use faster compression if available
         if (Memcached::HAVE_IGBINARY) {
             $this->memcached->setOption(Memcached::OPT_SERIALIZER, Memcached::SERIALIZER_IGBINARY);
+        } elseif (defined('Memcached::HAVE_MSGPACK') && Memcached::HAVE_MSGPACK) {
+            $this->memcached->setOption(Memcached::OPT_SERIALIZER, Memcached::SERIALIZER_MSGPACK);
         }
         $this->memcached->setOption(Memcached::OPT_DISTRIBUTION, Memcached::DISTRIBUTION_CONSISTENT);
         $this->memcached->setOption(Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
