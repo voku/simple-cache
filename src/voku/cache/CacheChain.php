@@ -94,7 +94,7 @@ class CacheChain implements iCache
             $results[] = $cache->setItem($key, $value, $ttl);
         }
 
-        return !\in_array(false, $results, true);
+        return \in_array(true, $results, true);
     }
 
     /**
@@ -109,7 +109,7 @@ class CacheChain implements iCache
             $results[] = $cache->setItemToDate($key, $value, $date);
         }
 
-        return !\in_array(false, $results, true);
+        return \in_array(true, $results, true);
     }
 
     /**
@@ -138,7 +138,7 @@ class CacheChain implements iCache
             $results[] = $cache->removeItem($key);
         }
 
-        return !\in_array(false, $results, true);
+        return \in_array(true, $results, true);
     }
 
     /**
@@ -167,6 +167,6 @@ class CacheChain implements iCache
             $results[] = $cache->removeAll();
         }
 
-        return !\in_array(false, $results, true);
+        return \in_array(true, $results, true);
     }
 }

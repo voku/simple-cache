@@ -15,9 +15,14 @@ class SerializerMsgpack implements iSerializer
     public static $_exists_msgpack;
 
     /**
-     * @var null|array
+     * @var array|null
      */
     private $unserialize_options;
+
+    /**
+     * @var string
+     */
+    private $name = '';
 
     /**
      * SerializerIgbinary constructor.
@@ -31,6 +36,20 @@ class SerializerMsgpack implements iSerializer
                 \function_exists('msgpack_unpack')
             );
         }
+
+        if (self::$_exists_msgpack) {
+            $this->name = 'msgpack';
+        } else {
+            $this->name = 'default';
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**
@@ -40,7 +59,6 @@ class SerializerMsgpack implements iSerializer
     {
         if (self::$_exists_msgpack === true) {
             /** @noinspection PhpUndefinedFunctionInspection */
-            /** @noinspection PhpComposerExtensionStubsInspection */
             return \msgpack_pack($value);
         }
 
@@ -55,7 +73,6 @@ class SerializerMsgpack implements iSerializer
     {
         if (self::$_exists_msgpack === true) {
             /** @noinspection PhpUndefinedFunctionInspection */
-            /** @noinspection PhpComposerExtensionStubsInspection */
             return \msgpack_unpack($value);
         }
 

@@ -620,7 +620,9 @@ class Cache implements iCache
                ($_SERVER['THEME'] ?? '') . '_' .
                ($_SERVER['STAGE'] ?? '') . '_' .
                ($_SESSION['language'] ?? '') . '_' .
-               ($_SESSION['language_extra'] ?? '');
+               ($_SESSION['language_extra'] ?? '') . '_' .
+               \PHP_VERSION_ID . '_' .
+               ($this->serializer ? $this->serializer->getName() : '');
     }
 
     /**

@@ -10,15 +10,11 @@ namespace voku\cache;
 interface iSerializer
 {
     /**
-     * serialize
-     *
      * @param mixed $value
      */
     public function serialize($value);
 
     /**
-     * unserialize
-     *
      * @param string $value
      */
     public function unserialize($value);
@@ -29,4 +25,9 @@ interface iSerializer
      * @return void
      */
     public function setUnserializeOptions(array $options);
+
+    /**
+     * @return string
+     */
+    public function getName(): string;
 }

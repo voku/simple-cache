@@ -15,9 +15,14 @@ class SerializerIgbinary implements iSerializer
     public static $_exists_igbinary;
 
     /**
-     * @var null|array
+     * @var array|null
      */
     private $unserialize_options;
+
+    /**
+     * @var string
+     */
+    private $name = '';
 
     /**
      * SerializerIgbinary constructor.
@@ -31,6 +36,20 @@ class SerializerIgbinary implements iSerializer
                 \function_exists('igbinary_unserialize')
             );
         }
+
+        if (self::$_exists_igbinary) {
+            $this->name = 'igbinary';
+        } else {
+            $this->name = 'default';
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**

@@ -10,7 +10,7 @@ namespace voku\cache;
 class SerializerDefault implements iSerializer
 {
     /**
-     * @var null|array
+     * @var array|null
      */
     private $unserialize_options;
 
@@ -20,6 +20,14 @@ class SerializerDefault implements iSerializer
     public function serialize($value)
     {
         return \serialize($value);
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return 'default';
     }
 
     /**

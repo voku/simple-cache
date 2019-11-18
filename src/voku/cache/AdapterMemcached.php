@@ -120,7 +120,7 @@ class AdapterMemcached implements iAdapter
         // Use faster compression if available
         if (Memcached::HAVE_IGBINARY) {
             $this->memcached->setOption(Memcached::OPT_SERIALIZER, Memcached::SERIALIZER_IGBINARY);
-        } elseif (defined('Memcached::HAVE_MSGPACK') && Memcached::HAVE_MSGPACK) {
+        } elseif (\defined('Memcached::HAVE_MSGPACK') && Memcached::HAVE_MSGPACK) {
             $this->memcached->setOption(Memcached::OPT_SERIALIZER, Memcached::SERIALIZER_MSGPACK);
         }
         $this->memcached->setOption(Memcached::OPT_DISTRIBUTION, Memcached::DISTRIBUTION_CONSISTENT);

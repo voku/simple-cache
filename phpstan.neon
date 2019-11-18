@@ -12,3 +12,5 @@ parameters:
         - '/Memcache(d)*/'
         - '/MEMCACHE_COMPRESSED/'
         - '/Function checkForDev not found\./'
+        - '/Function msgpack/'
+        - '/function unserialize expects array/'

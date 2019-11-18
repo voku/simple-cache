@@ -26,6 +26,14 @@ class SerializerNo implements iSerializer
     }
 
     /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return 'no';
+    }
+
+    /**
      * @param array $options
      *
      * @return void

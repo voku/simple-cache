@@ -92,11 +92,9 @@ class AdapterOpCache extends AdapterFileSimple
 
         $cacheFile = $this->getFileName($key);
 
-        $result = (bool) \file_put_contents(
+        $result = $this->writeFile(
             $cacheFile,
-            $content,
-            0,
-            $this->getContext()
+            $content
         );
 
         if (
