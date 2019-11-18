@@ -1,3 +1,10 @@
+# Changelog 4.0.3 (2019-11-18)
+
+- "iSerializer" -> add "getName()"
+- fix usage of "file_put_contents"
+- fix errors from php 7.4
+
+
 # Changelog 4.0.2 (2019-04-23)
 
 - fix errors reported by phpstan (level 7)
