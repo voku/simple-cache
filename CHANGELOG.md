@@ -3,6 +3,7 @@
 - "iSerializer" -> add "getName()"
 - fix usage of "file_put_contents"
 - fix errors from php 7.4
+- fix return of "CacheChain" (return true, if one cache-instance was successfully)
 
 
 # Changelog 4.0.2 (2019-04-23)
