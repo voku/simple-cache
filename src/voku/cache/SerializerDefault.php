@@ -45,6 +45,8 @@ class SerializerDefault implements iSerializer
 
     /**
      * @param array $options
+     *
+     * @return void
      */
     public function setUnserializeOptions(array $options)
     {

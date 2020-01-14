@@ -204,6 +204,8 @@ abstract class AdapterFileAbstract implements iAdapter
      * e.g. '0777', or '0755' ...
      *
      * @param string $fileMode
+     *
+     * @return void
      */
     public function setFileMode($fileMode)
     {

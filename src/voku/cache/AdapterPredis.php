@@ -33,6 +33,8 @@ class AdapterPredis implements iAdapter
 
     /**
      * @param Client $client
+     *
+     * @return void
      */
     public function setPredisClient(Client $client)
     {

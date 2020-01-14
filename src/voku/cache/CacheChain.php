@@ -42,6 +42,8 @@ class CacheChain implements iCache
      *
      * @param Cache $cache
      * @param bool  $prepend
+     *
+     * @return void
      */
     public function addCache(Cache $cache, $prepend = true)
     {
@@ -118,6 +120,8 @@ class CacheChain implements iCache
      * WARNING: Do not use if you don't know what you do. Because this will overwrite the default prefix.
      *
      * @param string $prefix
+     *
+     * @return void
      */
     public function setPrefix(string $prefix)
     {

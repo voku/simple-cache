@@ -27,7 +27,7 @@ matrix:
     - php: 7.1
     - php: 7.2
     - php: 7.3
-    - php: 7.4snapshot
+    - php: 7.4
     - php: nightly
 
 before_script:
@@ -46,12 +46,14 @@ before_script:
   - travis_retry composer self-update
   - travis_retry composer require satooshi/php-coveralls:1.0.0
   - travis_retry composer require predis/predis
+  - if [ "${TRAVIS_PHP_VERSION:0:3}" != 7.0 ]; then travis_retry composer require phpstan/phpstan; fi
   - travis_retry composer install --no-interaction --prefer-source
   - composer dump-autoload -o
 
 script:
   - mkdir -p build/logs
   - php vendor/bin/phpunit -c phpunit.xml
+  - if [ "${TRAVIS_PHP_VERSION:0:3}" != 7.0 ]; then vendor/bin/phpstan analyse; fi
 
 after_script:
   - php vendor/bin/coveralls -v

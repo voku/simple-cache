@@ -11,6 +11,9 @@ class AdapterFileSimple extends AdapterFileAbstract
 {
     const CACHE_FILE_PREFIX = '__simple_';
 
+    /**
+     * @return resource
+     */
     protected function getContext()
     {
         static $CONTEXT_CACHE = null;

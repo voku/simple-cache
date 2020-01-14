@@ -86,7 +86,7 @@ class AdapterOpCache extends AdapterFileSimple
             'value' => $value,
             'ttl'   => $ttl ? $ttl + \time() : 0,
         ];
-        $content = \var_export($item, true);
+        $content = \Symfony\Component\VarExporter\VarExporter::export($item);
 
         $content = '<?php return ' . $content . ';';
 

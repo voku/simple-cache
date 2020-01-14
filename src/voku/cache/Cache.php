@@ -161,13 +161,16 @@ class Cache implements iCache
                 $adapter = $this->autoConnectToAvailableCacheSystem($cacheAdapterManagerForAutoConnect, $cacheAdapterManagerForAutoConnectOverwrite);
             }
 
-            // INFO: Memcache(d) has his own "serializer", so don't use it twice
             if (!\is_object($serializer) && $serializer === null) {
                 if (
                     $adapter instanceof AdapterMemcached
                     ||
                     $adapter instanceof AdapterMemcache
                 ) {
+                    // INFO: Memcache(d) has his own "serializer", so don't use it twice
+                    $serializer = new SerializerNo();
+                } elseif ($adapter instanceof AdapterOpCache) {
+                    // INFO: opcache + Symfony-VarExporter don't need any "serializer"
                     $serializer = new SerializerNo();
                 } else {
                     // set default serializer
@@ -194,6 +197,8 @@ class Cache implements iCache
 
     /**
      * @param array $array
+     *
+     * @return void
      */
     public function setUnserializeOptions(array $array = [])
     {
@@ -513,7 +518,6 @@ class Cache implements iCache
         if ($ttl) {
             if ($ttl instanceof \DateInterval) {
                 // Converting to a TTL in seconds
-                /** @noinspection PhpUnhandledExceptionInspection */
                 $ttl = (new \DateTimeImmutable('now'))->add($ttl)->getTimestamp() - \time();
             }
 
@@ -613,6 +617,8 @@ class Cache implements iCache
 
     /**
      * Set the default-prefix via "SERVER"-var + "SESSION"-language.
+     *
+     * @return string
      */
     protected function getTheDefaultPrefix(): string
     {
@@ -629,11 +635,12 @@ class Cache implements iCache
      * Get the current adapter class-name.
      *
      * @return string
+     *
+     * @psalm-return class-string|string
      */
     public function getUsedAdapterClassName(): string
     {
         if ($this->adapter) {
-            /** @noinspection GetClassUsageInspection */
             return \get_class($this->adapter);
         }
 
@@ -644,11 +651,12 @@ class Cache implements iCache
      * Get the current serializer class-name.
      *
      * @return string
+     *
+     * @psalm-return class-string|string
      */
     public function getUsedSerializerClassName(): string
     {
         if ($this->serializer) {
-            /** @noinspection GetClassUsageInspection */
             return \get_class($this->serializer);
         }
 
@@ -662,6 +670,7 @@ class Cache implements iCache
      */
     public function isCacheActiveForTheCurrentUser(): bool
     {
+        // init
         $active = true;
 
         // test the cache, with this GET-parameter
@@ -707,6 +716,8 @@ class Cache implements iCache
      * enable / disable the cache
      *
      * @param bool $isActive
+     *
+     * @return void
      */
     public function setActive(bool $isActive)
     {
@@ -717,6 +728,8 @@ class Cache implements iCache
      * Set "isReady" state.
      *
      * @param bool $isReady
+     *
+     * @return void
      */
     protected function setCacheIsReady(bool $isReady)
     {
@@ -729,6 +742,8 @@ class Cache implements iCache
      * WARNING: Do not use if you don't know what you do. Because this will overwrite the default prefix.
      *
      * @param string $prefix
+     *
+     * @return void
      */
     public function setPrefix(string $prefix)
     {
@@ -739,6 +754,8 @@ class Cache implements iCache
      * Set the static-hit-counter: Who often do we hit the cache, before we use static cache?
      *
      * @param int $staticCacheHitCounter
+     *
+     * @return void
      */
     public function setStaticCacheHitCounter(int $staticCacheHitCounter)
     {
