@@ -410,7 +410,11 @@ class Cache implements iCache
         }
 
         $serialized = $this->adapter->get($storeKey);
-        $value = $serialized && $this->serializer ? $this->serializer->unserialize($serialized) : null;
+        if ($this->serializer && $this->serializer instanceof SerializerNo) {
+            $value = $serialized;
+        } else {
+            $value = $serialized && $this->serializer ? $this->serializer->unserialize($serialized) : null;
+        }
 
         self::$STATIC_CACHE_COUNTER[$storeKey]++;
 
