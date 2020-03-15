@@ -1,3 +1,9 @@
+# Changelog 4.0.4 (2020-03-15)
+
+- use "symfony/var-exporter" for OpCache
+   -> better performance, because we don't need to serialize the data
+   -> but it's optional, because it required PHP >= 7.1 
+
 # Changelog 4.0.3 (2019-11-18)
 
 - "iSerializer" -> add "getName()"
