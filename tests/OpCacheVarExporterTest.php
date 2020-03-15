@@ -212,7 +212,11 @@ final class OpCacheVarExporterTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUsedSerializerClassName()
     {
-        static::assertSame('voku\cache\SerializerNo', $this->cache->getUsedSerializerClassName());
+        if (\class_exists('\Symfony\Component\VarExporter\VarExporter')) {
+            static::assertSame('voku\cache\SerializerNo', $this->cache->getUsedSerializerClassName());
+        } else {
+            static::assertSame('voku\cache\SerializerDefault', $this->cache->getUsedSerializerClassName());
+        }
     }
 
     /**

@@ -10,17 +10,8 @@ parameters:
     autoload_files:
         - %currentWorkingDirectory%/vendor/autoload.php
     ignoreErrors:
-        -
-            message: ~If condition is always true~
-            path: %currentWorkingDirectory%/src/voku/cache/AdapterMemcached.php
-        -
-            message: ~If condition is always false~
-            path: %currentWorkingDirectory%/src/voku/cache/AdapterMemcached.php
-        -
-            message: ~Right side of && is always true~
-            path: %currentWorkingDirectory%/src/voku/cache/AdapterMemcached.php
-        - '/PHPDoc tag @return with type array\|false is not subtype of native type array\./'
-        - '/Result of \&\& is always false\./'
+        - '/always false/'
+        - '/always true/'
         - '/Predis\\Client/'
         - '/Symfony\\Component\\VarExporter/'
         - '/Memcache(d)*/'
