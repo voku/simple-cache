@@ -47,7 +47,7 @@ class AdapterPredis implements iAdapter
      */
     public function exists(string $key): bool
     {
-        return $this->client->exists($key);
+        return (bool) $this->client->exists($key);
     }
 
     /**
@@ -71,7 +71,7 @@ class AdapterPredis implements iAdapter
      */
     public function remove(string $key): bool
     {
-        return $this->client->del($key);
+        return (bool) $this->client->del($key);
     }
 
     /**
@@ -95,6 +95,6 @@ class AdapterPredis implements iAdapter
      */
     public function setExpired(string $key, $value, int $ttl = 0): bool
     {
-        return $this->client->setex($key, $ttl, $value);
+        return (bool) $this->client->setex($key, $ttl, $value);
     }
 }

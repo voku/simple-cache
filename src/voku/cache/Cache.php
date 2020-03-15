@@ -169,7 +169,11 @@ class Cache implements iCache
                 ) {
                     // INFO: Memcache(d) has his own "serializer", so don't use it twice
                     $serializer = new SerializerNo();
-                } elseif ($adapter instanceof AdapterOpCache) {
+                } elseif (
+                    $adapter instanceof AdapterOpCache
+                    &&
+                    \class_exists('\Symfony\Component\VarExporter\VarExporter')
+                ) {
                     // INFO: opcache + Symfony-VarExporter don't need any "serializer"
                     $serializer = new SerializerNo();
                 } else {

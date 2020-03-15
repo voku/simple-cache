@@ -83,9 +83,9 @@ class CacheAdapterAutoManager
      *
      * @psalm-param class-string $replaceAdapter
      *
-     * @return void
-     *
      * @throws InvalidArgumentException
+     *
+     * @return void
      */
     private function validateAdapter(string $replaceAdapter)
     {
@@ -99,9 +99,9 @@ class CacheAdapterAutoManager
     /**
      * @param callable $callableFunction
      *
-     * @return void
-     *
      * @throws InvalidArgumentException
+     *
+     * @return void
      */
     private function validateCallable(callable $callableFunction = null)
     {

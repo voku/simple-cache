@@ -14,11 +14,15 @@ parameters:
             message: ~If condition is always true~
             path: %currentWorkingDirectory%/src/voku/cache/AdapterMemcached.php
         -
+            message: ~If condition is always false~
+            path: %currentWorkingDirectory%/src/voku/cache/AdapterMemcached.php
+        -
             message: ~Right side of && is always true~
             path: %currentWorkingDirectory%/src/voku/cache/AdapterMemcached.php
         - '/PHPDoc tag @return with type array\|false is not subtype of native type array\./'
         - '/Result of \&\& is always false\./'
         - '/Predis\\Client/'
+        - '/Symfony\\Component\\VarExporter/'
         - '/Memcache(d)*/'
         - '/MEMCACHE_COMPRESSED/'
         - '/Function checkForDev not found\./'

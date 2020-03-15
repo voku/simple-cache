@@ -88,6 +88,20 @@ final class OpCacheVarExporterTest extends \PHPUnit\Framework\TestCase
         static::assertSame([3, 2, 1], $return);
     }
 
+    public function testSetGetSimpleItemWithoutPrefix()
+    {
+        $this->cache->setPrefix('');
+        $prefix = $this->cache->getPrefix();
+        static::assertSame('', $prefix);
+
+        // https://github.com/symfony/var-exporter/blob/master/Internal/Exporter.php#L188
+        $return = $this->cache->setItem('lalll', false);
+        static::assertTrue($return);
+
+        $return = $this->cache->getItem('lalll');
+        static::assertFalse($return);
+    }
+
     public function testSetGetCacheWithEndDateTime()
     {
         $expireDate = new DateTime();
@@ -208,7 +222,12 @@ final class OpCacheVarExporterTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->adapter = new AdapterOpCache();
-        $this->serializer = new \voku\cache\SerializerNo();
+
+        if (\class_exists('\Symfony\Component\VarExporter\VarExporter')) {
+            $this->serializer = new \voku\cache\SerializerNo();
+        } else {
+            $this->serializer = new \voku\cache\SerializerDefault();
+        }
 
         $this->cache = new Cache($this->adapter, $this->serializer, false, true);
 
