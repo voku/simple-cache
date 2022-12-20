@@ -110,6 +110,30 @@ final class ArrayCacheTest extends \PHPUnit\Framework\TestCase
         static::assertSame([3, 2, 1], $return);
     }
 
+    public function testGetStaticValues()
+    {
+        $return = $this->cache->setItem('foo', [3, 2, 1]);
+        static::assertTrue($return);
+
+        $return = $this->cache->getItem('foo');
+        static::assertSame([3, 2, 1], $return);
+
+        assert($this->cache->getAdapter() instanceof AdapterArray);
+        static::assertSame(['foo' => 'a:3:{i:0;i:3;i:1;i:2;i:2;i:1;}'], $this->cache->getAdapter()->getStaticValues());
+    }
+
+    public function testGetStaticKeys()
+    {
+        $return = $this->cache->setItem('foo', [3, 2, 1]);
+        static::assertTrue($return);
+
+        $return = $this->cache->getItem('foo');
+        static::assertSame([3, 2, 1], $return);
+
+        assert($this->cache->getAdapter() instanceof AdapterArray);
+        static::assertSame(['foo'], $this->cache->getAdapter()->getStaticKeys());
+    }
+
     public function testSetGetCacheWithEndDateTime()
     {
         $expireDate = new DateTime();
@@ -129,10 +153,9 @@ final class ArrayCacheTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
+     * @before
      */
-    protected function setUp()
+    protected function setUpThanksForNothing()
     {
         $this->adapter = new AdapterArray();
         $this->serializer = new SerializerDefault();
@@ -143,11 +166,4 @@ final class ArrayCacheTest extends \PHPUnit\Framework\TestCase
         $this->cache->setPrefix('');
     }
 
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
-    }
 }

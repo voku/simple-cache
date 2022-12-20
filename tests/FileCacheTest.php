@@ -217,10 +217,9 @@ final class FileCacheTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
+     * @before
      */
-    protected function setUp()
+    protected function setUpThanksForNothing()
     {
         $this->adapter = new AdapterFile();
         $this->serializer = new SerializerDefault();
@@ -229,13 +228,5 @@ final class FileCacheTest extends \PHPUnit\Framework\TestCase
 
         // reset default prefix
         $this->cache->setPrefix('');
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
     }
 }
