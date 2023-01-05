@@ -1,8 +1,8 @@
 <?php
 
-use voku\cache\Cache;
-use voku\cache\iAdapter;
-use voku\cache\iSerializer;
+use Voku\Cache\Cache;
+use Voku\Cache\iAdapter;
+use Voku\Cache\iSerializer;
 
 /**
  * CacheAutoInitTest
@@ -94,7 +94,7 @@ final class CacheAutoInitTest extends \PHPUnit\Framework\TestCase
 
     public function testSetWrongDate()
     {
-        $this->expectException(\voku\cache\Exception\InvalidArgumentException::class);
+        $this->expectException(\Voku\Cache\Exception\InvalidArgumentException::class);
 
         $key = 'some:test:key';
         $value = \uniqid(\time(), true);

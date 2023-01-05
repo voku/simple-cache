@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace voku\cache;
+namespace Voku\Cache;
 
 /**
  * iAdapter: cache-adapter interface

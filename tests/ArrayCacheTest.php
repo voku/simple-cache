@@ -1,10 +1,10 @@
 <?php
 
-use voku\cache\AdapterArray;
-use voku\cache\Cache;
-use voku\cache\iAdapter;
-use voku\cache\iSerializer;
-use voku\cache\SerializerDefault;
+use Voku\Cache\AdapterArray;
+use Voku\Cache\Cache;
+use Voku\Cache\iAdapter;
+use Voku\Cache\iSerializer;
+use Voku\Cache\SerializerDefault;
 
 /**
  * ArrayCacheTest

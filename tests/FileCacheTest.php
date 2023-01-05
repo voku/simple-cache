@@ -1,10 +1,10 @@
 <?php
 
-use voku\cache\AdapterFile;
-use voku\cache\Cache;
-use voku\cache\iAdapter;
-use voku\cache\iSerializer;
-use voku\cache\SerializerDefault;
+use Voku\Cache\AdapterFile;
+use Voku\Cache\Cache;
+use Voku\Cache\iAdapter;
+use Voku\Cache\iSerializer;
+use Voku\Cache\SerializerDefault;
 
 /**
  * FileCacheTest
@@ -208,12 +208,12 @@ final class FileCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUsedAdapterClassName()
     {
-        static::assertSame('voku\cache\AdapterFile', $this->cache->getUsedAdapterClassName());
+        static::assertSame('Voku\Cache\AdapterFile', $this->cache->getUsedAdapterClassName());
     }
 
     public function testGetUsedSerializerClassName()
     {
-        static::assertSame('voku\cache\SerializerDefault', $this->cache->getUsedSerializerClassName());
+        static::assertSame('Voku\Cache\SerializerDefault', $this->cache->getUsedSerializerClassName());
     }
 
     /**

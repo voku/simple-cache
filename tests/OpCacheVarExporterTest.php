@@ -1,9 +1,9 @@
 <?php
 
-use voku\cache\AdapterOpCache;
-use voku\cache\Cache;
-use voku\cache\iAdapter;
-use voku\cache\iSerializer;
+use Voku\Cache\AdapterOpCache;
+use Voku\Cache\Cache;
+use Voku\Cache\iAdapter;
+use Voku\Cache\iSerializer;
 
 /**
  * @internal
@@ -207,15 +207,15 @@ final class OpCacheVarExporterTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUsedAdapterClassName()
     {
-        static::assertSame('voku\cache\AdapterOpCache', $this->cache->getUsedAdapterClassName());
+        static::assertSame('Voku\Cache\AdapterOpCache', $this->cache->getUsedAdapterClassName());
     }
 
     public function testGetUsedSerializerClassName()
     {
         if (\class_exists('\Symfony\Component\VarExporter\VarExporter')) {
-            static::assertSame('voku\cache\SerializerNo', $this->cache->getUsedSerializerClassName());
+            static::assertSame('Voku\Cache\SerializerNo', $this->cache->getUsedSerializerClassName());
         } else {
-            static::assertSame('voku\cache\SerializerDefault', $this->cache->getUsedSerializerClassName());
+            static::assertSame('Voku\Cache\SerializerDefault', $this->cache->getUsedSerializerClassName());
         }
     }
 
@@ -227,9 +227,9 @@ final class OpCacheVarExporterTest extends \PHPUnit\Framework\TestCase
         $this->adapter = new AdapterOpCache();
 
         if (\class_exists('\Symfony\Component\VarExporter\VarExporter')) {
-            $this->serializer = new \voku\cache\SerializerNo();
+            $this->serializer = new \Voku\Cache\SerializerNo();
         } else {
-            $this->serializer = new \voku\cache\SerializerDefault();
+            $this->serializer = new \Voku\Cache\SerializerDefault();
         }
 
         $this->cache = new Cache($this->adapter, $this->serializer, false, true);

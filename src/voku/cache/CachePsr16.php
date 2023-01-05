@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace voku\cache;
+namespace Voku\Cache;
 
 use Psr\SimpleCache\CacheInterface;
-use voku\cache\Exception\InvalidArgumentException;
+use Voku\Cache\Exception\InvalidArgumentException;
 
 class CachePsr16 extends Cache implements CacheInterface
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace voku\cache\Exception;
+namespace Voku\Cache\Exception;
 
 class InvalidArgumentException extends \Exception implements \Psr\SimpleCache\InvalidArgumentException
 {

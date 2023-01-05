@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace voku\cache;
+namespace Voku\Cache;
 
 use Memcache;
-use voku\cache\Exception\InvalidArgumentException;
+use Voku\Cache\Exception\InvalidArgumentException;
 
 /**
  * AdapterMemcache: Memcache-adapter

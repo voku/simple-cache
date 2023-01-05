@@ -1,10 +1,10 @@
 <?php
 
-use voku\cache\AdapterMemcache;
-use voku\cache\Cache;
-use voku\cache\iAdapter;
-use voku\cache\iSerializer;
-use voku\cache\SerializerNo;
+use Voku\Cache\AdapterMemcache;
+use Voku\Cache\Cache;
+use Voku\Cache\iAdapter;
+use Voku\Cache\iSerializer;
+use Voku\Cache\SerializerNo;
 
 /**
  * MemcacheCacheTest
@@ -75,12 +75,12 @@ final class MemcacheCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUsedAdapterClassName()
     {
-        static::assertSame('voku\cache\AdapterMemcache', $this->cache->getUsedAdapterClassName());
+        static::assertSame('Voku\Cache\AdapterMemcache', $this->cache->getUsedAdapterClassName());
     }
 
     public function testGetUsedSerializerClassName()
     {
-        static::assertSame('voku\cache\SerializerNo', $this->cache->getUsedSerializerClassName());
+        static::assertSame('Voku\Cache\SerializerNo', $this->cache->getUsedSerializerClassName());
     }
 
     public function testSetGetCacheWithEndDateTime()

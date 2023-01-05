@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace voku\cache;
+namespace Voku\Cache;
 
 /**
  * AdapterApc: a APC-Cache adapter

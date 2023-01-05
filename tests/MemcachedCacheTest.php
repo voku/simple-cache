@@ -1,10 +1,10 @@
 <?php
 
-use voku\cache\AdapterMemcached;
-use voku\cache\Cache;
-use voku\cache\iAdapter;
-use voku\cache\iSerializer;
-use voku\cache\SerializerDefault;
+use Voku\Cache\AdapterMemcached;
+use Voku\Cache\Cache;
+use Voku\Cache\iAdapter;
+use Voku\Cache\iSerializer;
+use Voku\Cache\SerializerDefault;
 
 /**
  * MemcachedCacheTest
@@ -125,7 +125,7 @@ final class MemcachedCacheTest extends \PHPUnit\Framework\TestCase
         }
 
         $this->adapter = new AdapterMemcached($memcached);
-        $this->serializer = new \voku\cache\SerializerNo();
+        $this->serializer = new \Voku\Cache\SerializerNo();
 
         if ($this->adapter->installed() === false) {
             static::markTestSkipped('The Memcached extension is not available.');

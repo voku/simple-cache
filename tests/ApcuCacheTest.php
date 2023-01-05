@@ -1,10 +1,10 @@
 <?php
 
-use voku\cache\AdapterApcu;
-use voku\cache\Cache;
-use voku\cache\iAdapter;
-use voku\cache\iSerializer;
-use voku\cache\SerializerMsgpack;
+use Voku\Cache\AdapterApcu;
+use Voku\Cache\Cache;
+use Voku\Cache\iAdapter;
+use Voku\Cache\iSerializer;
+use Voku\Cache\SerializerMsgpack;
 
 /**
  * ApcuCacheTest

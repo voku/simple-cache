@@ -1,8 +1,8 @@
 <?php
 
-use voku\cache\Cache;
-use voku\cache\iAdapter;
-use voku\cache\iSerializer;
+use Voku\Cache\Cache;
+use Voku\Cache\iAdapter;
+use Voku\Cache\iSerializer;
 
 /**
  * CacheTest
@@ -133,7 +133,7 @@ final class CacheTest extends \PHPUnit\Framework\TestCase
 
     public function testSetWrongDate()
     {
-        $this->expectException(\voku\cache\Exception\InvalidArgumentException::class);
+        $this->expectException(\Voku\Cache\Exception\InvalidArgumentException::class);
 
         $key = 'some:test:key';
         $value = \uniqid(\time(), true);
@@ -170,8 +170,8 @@ final class CacheTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUpThanksForNothing()
     {
-        $this->adapter = $this->createMock('voku\cache\AdapterApc');
-        $this->serializer = $this->createMock('voku\cache\SerializerDefault');
+        $this->adapter = $this->createMock('Voku\Cache\AdapterApc');
+        $this->serializer = $this->createMock('Voku\Cache\SerializerDefault');
 
         $this->cache = new Cache($this->adapter, $this->serializer, false, true);
 

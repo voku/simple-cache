@@ -1,8 +1,8 @@
 <?php
 
-use voku\cache\CachePsr16;
-use voku\cache\iAdapter;
-use voku\cache\iSerializer;
+use Voku\Cache\CachePsr16;
+use Voku\Cache\iAdapter;
+use Voku\Cache\iSerializer;
 
 /**
  * CachePsr16Test
@@ -147,11 +147,11 @@ final class CachePsr16Test extends \PHPUnit\Framework\TestCase
     protected function setUpThanksForNothing()
     {
         if (\method_exists($this, 'createMock')) {
-            $this->adapter = $this->createMock('voku\cache\AdapterArray');
-            $this->serializer = $this->createMock('voku\cache\SerializerDefault');
+            $this->adapter = $this->createMock('Voku\Cache\AdapterArray');
+            $this->serializer = $this->createMock('Voku\Cache\SerializerDefault');
         } else {
-            $this->adapter = $this->createMock('voku\cache\AdapterArray');
-            $this->serializer = $this->createMock('voku\cache\SerializerDefault');
+            $this->adapter = $this->createMock('Voku\Cache\AdapterArray');
+            $this->serializer = $this->createMock('Voku\Cache\SerializerDefault');
         }
 
         $this->cache = new CachePsr16($this->adapter, $this->serializer, false, true);

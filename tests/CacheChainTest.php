@@ -1,6 +1,6 @@
 <?php
 
-use voku\cache\Cache;
+use Voku\Cache\Cache;
 
 /**
  * @internal
@@ -8,7 +8,7 @@ use voku\cache\Cache;
 final class CacheChainTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \voku\cache\CacheChain
+     * @var \Voku\Cache\CacheChain
      */
     private $cache;
 
@@ -190,8 +190,8 @@ final class CacheChainTest extends \PHPUnit\Framework\TestCase
     protected function setUpThanksForNothing()
     {
         $cacheApc = new Cache(
-            new \voku\cache\AdapterApcu(),
-            new \voku\cache\SerializerIgbinary(),
+            new \Voku\Cache\AdapterApcu(),
+            new \Voku\Cache\SerializerIgbinary(),
             false,
             true
         );
@@ -199,15 +199,15 @@ final class CacheChainTest extends \PHPUnit\Framework\TestCase
         $cacheApc->setPrefix('');
 
         $cacheArray = new Cache(
-            new \voku\cache\AdapterArray(),
-            new \voku\cache\SerializerIgbinary(),
+            new \Voku\Cache\AdapterArray(),
+            new \Voku\Cache\SerializerIgbinary(),
             false,
             true
         );
         // reset default prefix
         $cacheArray->setPrefix('');
 
-        $this->cache = new \voku\cache\CacheChain([$cacheApc]);
+        $this->cache = new \Voku\Cache\CacheChain([$cacheApc]);
         $this->cache->addCache($cacheArray);
     }
 }

@@ -43,7 +43,7 @@ composer require voku/simple-cache
 ### Quick Start
 
 ```php
-use voku\cache\Cache;
+use Voku\Cache\Cache;
 
 require_once 'composer/autoload.php';
 
@@ -57,7 +57,7 @@ $bar = $cache->getItem('foo');
 ### Usage 
 
 ```php
-use voku\cache\Cache;
+use Voku\Cache\Cache;
 
 $cache = new Cache();
   
@@ -74,7 +74,7 @@ If you have an heavy task e.g. a really-big-loop, then you can also use static-c
 But keep in mind, that this will be stored into PHP (it needs more memory).
 
 ```php
-use voku\cache\Cache;
+use Voku\Cache\Cache;
 
 $cache = new Cache();
   
@@ -108,21 +108,21 @@ you can implement your own cache auto-detect logic.
 
 ```php
 
-$cacheManager = new \voku\cache\CacheAdapterAutoManager();
+$cacheManager = new \Voku\Cache\CacheAdapterAutoManager();
 
 // 1. check for "APCu" support first
 $cacheManager->addAdapter(
-    \voku\cache\AdapterApcu::class
+    \Voku\Cache\AdapterApcu::class
 );
 
 // 2. check for "APC" support
 $cacheManager->addAdapter(
-    \voku\cache\AdapterApcu::class
+    \Voku\Cache\AdapterApcu::class
 );
 
 // 3. try "OpCache"-Cache
 $cacheManager->addAdapter(
-    \voku\cache\AdapterOpCache::class,
+    \Voku\Cache\AdapterOpCache::class,
     static function () {
         $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache_opcache';
 
@@ -132,7 +132,7 @@ $cacheManager->addAdapter(
 
 // 4. try "File"-Cache
 $cacheManager->addAdapter(
-    \voku\cache\AdapterFileSimple::class,
+    \Voku\Cache\AdapterFileSimple::class,
     static function () {
         $cacheDir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache_file';
 
@@ -143,10 +143,10 @@ $cacheManager->addAdapter(
 
 // 5. use Memory Cache as final fallback
 $cacheManager->addAdapter(
-    \voku\cache\AdapterArray::class
+    \Voku\Cache\AdapterArray::class
 );
 
-$cache = new \voku\cache\CachePsr16(
+$cache = new \Voku\Cache\CachePsr16(
     null, // use auto-detection
     null, // use auto-detection
     false, // do not check for usage

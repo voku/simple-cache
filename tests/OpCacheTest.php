@@ -1,10 +1,10 @@
 <?php
 
-use voku\cache\AdapterOpCache;
-use voku\cache\Cache;
-use voku\cache\iAdapter;
-use voku\cache\iSerializer;
-use voku\cache\SerializerIgbinary;
+use Voku\Cache\AdapterOpCache;
+use Voku\Cache\Cache;
+use Voku\Cache\iAdapter;
+use Voku\Cache\iSerializer;
+use Voku\Cache\SerializerIgbinary;
 
 /**
  * OpCacheTest
@@ -196,12 +196,12 @@ final class OpCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUsedAdapterClassName()
     {
-        static::assertSame('voku\cache\AdapterOpCache', $this->cache->getUsedAdapterClassName());
+        static::assertSame('Voku\Cache\AdapterOpCache', $this->cache->getUsedAdapterClassName());
     }
 
     public function testGetUsedSerializerClassName()
     {
-        static::assertSame('voku\cache\SerializerIgbinary', $this->cache->getUsedSerializerClassName());
+        static::assertSame('Voku\Cache\SerializerIgbinary', $this->cache->getUsedSerializerClassName());
     }
 
     /**

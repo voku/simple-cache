@@ -1,8 +1,8 @@
 <?php
 
-use voku\cache\Cache;
-use voku\cache\iAdapter;
-use voku\cache\iSerializer;
+use Voku\Cache\Cache;
+use Voku\Cache\iAdapter;
+use Voku\Cache\iSerializer;
 
 /**
  * @internal
@@ -92,7 +92,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
 
     public function testSetWrongDate()
     {
-        $this->expectException(\voku\cache\Exception\InvalidArgumentException::class);
+        $this->expectException(\Voku\Cache\Exception\InvalidArgumentException::class);
 
         $key = 'some:test:key';
         $value = \uniqid(\time(), true);
@@ -128,17 +128,17 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUpThanksForNothing()
     {
-        $cacheManager = new \voku\cache\CacheAdapterAutoManager();
+        $cacheManager = new \Voku\Cache\CacheAdapterAutoManager();
         /** @noinspection PhpUnhandledExceptionInspection */
         $cacheManager->addAdapter(
-            \voku\cache\AdapterOpCache::class,
+            \Voku\Cache\AdapterOpCache::class,
             static function () {
                 return \realpath(\sys_get_temp_dir()) . '/simple_php_cache_v2';
             }
         );
         /** @noinspection PhpUnhandledExceptionInspection */
         $cacheManager->addAdapter(
-            \voku\cache\AdapterArray::class
+            \Voku\Cache\AdapterArray::class
         );
 
         $this->cache = new Cache(

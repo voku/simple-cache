@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace voku\cache\Exception;
+namespace Voku\Cache\Exception;
 
 final class ChmodException extends \RuntimeException implements FileErrorExceptionInterface
 {
