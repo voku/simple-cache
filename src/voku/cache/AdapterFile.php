@@ -90,6 +90,8 @@ class AdapterFile extends AdapterFileAbstract
             \fclose($fp);
         }
 
+        chmod($cacheFile, 0666);
+
         return $octetWritten !== false;
     }
 }
