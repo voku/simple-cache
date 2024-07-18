@@ -108,16 +108,16 @@ final class MemcachedCacheTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
+     * @before
      */
-    protected function setUp()
+    protected function setUpThanksForNothing()
     {
-        $memcached = null;
-        $isMemcachedAvailable = false;
         if (\extension_loaded('memcached')) {
             $memcached = new \Memcached();
             $isMemcachedAvailable = $memcached->addServer('127.0.0.1', '11211');
+        } else {
+            $memcached = null;
+            $isMemcachedAvailable = false;
         }
 
         if ($isMemcachedAvailable === false) {
@@ -125,7 +125,7 @@ final class MemcachedCacheTest extends \PHPUnit\Framework\TestCase
         }
 
         $this->adapter = new AdapterMemcached($memcached);
-        $this->serializer = new SerializerDefault();
+        $this->serializer = new \voku\cache\SerializerNo();
 
         if ($this->adapter->installed() === false) {
             static::markTestSkipped('The Memcached extension is not available.');
@@ -135,13 +135,5 @@ final class MemcachedCacheTest extends \PHPUnit\Framework\TestCase
 
         // reset default prefix
         $this->cache->setPrefix('');
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
     }
 }
