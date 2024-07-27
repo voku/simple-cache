@@ -41,13 +41,13 @@ class AdapterFileSimple extends AdapterFileAbstract
         if (
             \file_exists($path) === false
             ||
-            \filesize($path) === 0
+            @\filesize($path) === 0
         ) {
             return null;
         }
 
         // init
-        $string = \file_get_contents(
+        $string = @\file_get_contents(
             $path,
             false,
             $this->getContext()

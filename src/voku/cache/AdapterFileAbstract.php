@@ -117,7 +117,7 @@ abstract class AdapterFileAbstract implements iAdapter
     protected function deleteFile($cacheFileWithPath): bool
     {
         if (\is_file($cacheFileWithPath)) {
-            return \unlink($cacheFileWithPath);
+            return @\unlink($cacheFileWithPath);
         }
 
         return false;
