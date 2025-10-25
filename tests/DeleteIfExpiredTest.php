@@ -109,7 +109,7 @@ final class DeleteIfExpiredTest extends \PHPUnit\Framework\TestCase
 
         // reset default prefix
         $this->cache->setPrefix('');
-        
+
         // Clear all cache to ensure clean state
         $this->adapter->removeAll();
     }

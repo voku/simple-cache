@@ -111,6 +111,9 @@ class AdapterApcu implements iAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * Note: APCu automatically handles expiration at the storage level.
+     * The $deleteIfExpired parameter has no effect for this adapter.
      */
     public function get(string $key, bool $deleteIfExpired = true)
     {
