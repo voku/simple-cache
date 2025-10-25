@@ -136,7 +136,7 @@ abstract class AdapterFileAbstract implements iAdapter
     /**
      * {@inheritdoc}
      */
-    abstract public function get(string $key);
+    abstract public function get(string $key, bool $deleteIfExpired = true);
 
     /**
      * {@inheritdoc}

@@ -53,7 +53,7 @@ class AdapterPredis implements iAdapter
     /**
      * {@inheritdoc}
      */
-    public function get(string $key)
+    public function get(string $key, bool $deleteIfExpired = true)
     {
         return $this->client->get($key);
     }

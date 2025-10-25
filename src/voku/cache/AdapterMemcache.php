@@ -59,7 +59,7 @@ class AdapterMemcache implements iAdapter
     /**
      * {@inheritdoc}
      */
-    public function get(string $key)
+    public function get(string $key, bool $deleteIfExpired = true)
     {
         return $this->memcache->get($key);
     }

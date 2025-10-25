@@ -34,7 +34,7 @@ class AdapterFileSimple extends AdapterFileAbstract
     /**
      * {@inheritdoc}
      */
-    public function get(string $key)
+    public function get(string $key, bool $deleteIfExpired = true)
     {
         $path = $this->getFileName($key);
 
@@ -64,7 +64,9 @@ class AdapterFileSimple extends AdapterFileAbstract
         }
 
         if ($this->ttlHasExpired($data['ttl']) === true) {
-            $this->remove($key);
+            if ($deleteIfExpired) {
+                $this->remove($key);
+            }
 
             return null;
         }

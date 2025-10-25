@@ -35,7 +35,7 @@ class AdapterXcache implements iAdapter
     /**
      * {@inheritdoc}
      */
-    public function get(string $key)
+    public function get(string $key, bool $deleteIfExpired = true)
     {
         return \xcache_get($key);
     }

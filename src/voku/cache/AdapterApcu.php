@@ -112,7 +112,7 @@ class AdapterApcu implements iAdapter
     /**
      * {@inheritdoc}
      */
-    public function get(string $key)
+    public function get(string $key, bool $deleteIfExpired = true)
     {
         if ($this->exists($key)) {
             return \apcu_fetch($key);
