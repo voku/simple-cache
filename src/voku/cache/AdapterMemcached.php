@@ -55,8 +55,11 @@ class AdapterMemcached implements iAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * Note: Memcached automatically handles expiration at the storage level.
+     * The $deleteIfExpired parameter has no effect for this adapter.
      */
-    public function get(string $key)
+    public function get(string $key, bool $deleteIfExpired = true)
     {
         return $this->memcached->get($key);
     }

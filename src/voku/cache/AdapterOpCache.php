@@ -41,7 +41,7 @@ class AdapterOpCache extends AdapterFileSimple
     /**
      * {@inheritdoc}
      */
-    public function get(string $key)
+    public function get(string $key, bool $deleteIfExpired = true)
     {
         $path = $this->getFileName($key);
 
@@ -61,7 +61,9 @@ class AdapterOpCache extends AdapterFileSimple
         }
 
         if ($this->ttlHasExpired($data['ttl']) === true) {
-            $this->remove($key);
+            if ($deleteIfExpired) {
+                $this->remove($key);
+            }
 
             return null;
         }
