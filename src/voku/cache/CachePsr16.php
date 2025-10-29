@@ -28,12 +28,8 @@ class CachePsr16 extends Cache implements CacheInterface
      *
      * @return bool True if the item was successfully removed. False if there was an error.
      */
-    public function delete($key): bool
+    public function delete(string $key): bool
     {
-        if (!\is_string($key)) {
-            throw new InvalidArgumentException('$key is not a string:' . \print_r($key, true));
-        }
-
         return $this->removeItem($key);
     }
 
@@ -46,16 +42,8 @@ class CachePsr16 extends Cache implements CacheInterface
      *
      * @return bool True if the items were successfully removed. False if there was an error.
      */
-    public function deleteMultiple($keys): bool
+    public function deleteMultiple(iterable $keys): bool
     {
-        if (
-            !\is_array($keys)
-            &&
-            !($keys instanceof \Traversable)
-        ) {
-            throw new InvalidArgumentException('$keys is not iterable:' . \print_r($keys, true));
-        }
-
         $results = [];
         foreach ((array) $keys as $key) {
             $results[] = $this->delete($key);
@@ -74,7 +62,7 @@ class CachePsr16 extends Cache implements CacheInterface
      *
      * @return mixed the value of the item from the cache, or $default in case of cache miss
      */
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         if ($this->has($key)) {
             return $this->getItem($key);
@@ -94,16 +82,8 @@ class CachePsr16 extends Cache implements CacheInterface
      * @return iterable<string,mixed> A list of key => value pairs. Cache keys that do not exist or are stale will have $default as
      *                                value.
      */
-    public function getMultiple($keys, $default = null)
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
-        if (
-            !\is_array($keys)
-            &&
-            !($keys instanceof \Traversable)
-        ) {
-            throw new InvalidArgumentException('$keys is not iterable:' . \print_r($keys, true));
-        }
-
         $result = [];
         foreach ((array) $keys as $key) {
             $result[$key] = $this->has($key) ? $this->get($key) : $default;
@@ -126,12 +106,8 @@ class CachePsr16 extends Cache implements CacheInterface
      *
      * @return bool
      */
-    public function has($key): bool
+    public function has(string $key): bool
     {
-        if (!\is_string($key)) {
-            throw new InvalidArgumentException('$key is not a string:' . \print_r($key, true));
-        }
-
         return $this->existsItem($key);
     }
 
@@ -148,12 +124,8 @@ class CachePsr16 extends Cache implements CacheInterface
      *
      * @return bool true on success and false on failure
      */
-    public function set($key, $value, $ttl = null): bool
+    public function set(string $key, mixed $value, null|int|\DateInterval $ttl = null): bool
     {
-        if (!\is_string($key)) {
-            throw new InvalidArgumentException('$key is not a string:' . \print_r($key, true));
-        }
-
         return $this->setItem($key, $value, $ttl);
     }
 
@@ -169,16 +141,8 @@ class CachePsr16 extends Cache implements CacheInterface
      *
      * @return bool true on success and false on failure
      */
-    public function setMultiple($values, $ttl = null): bool
+    public function setMultiple(iterable $values, null|int|\DateInterval $ttl = null): bool
     {
-        if (
-            !\is_array($values)
-            &&
-            !($values instanceof \Traversable)
-        ) {
-            throw new InvalidArgumentException('$values is not iterable:' . \print_r($values, true));
-        }
-
         $results = [];
         foreach ((array) $values as $key => $value) {
             $results[] = $this->set($key, $value, $ttl);
