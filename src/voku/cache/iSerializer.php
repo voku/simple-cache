@@ -24,7 +24,7 @@ interface iSerializer
     public function unserialize($value);
 
     /**
-     * @param array $options
+     * @param array<array-key,mixed> $options
      *
      * @return void
      */

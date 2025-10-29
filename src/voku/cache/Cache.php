@@ -20,17 +20,17 @@ use voku\cache\Exception\InvalidArgumentException;
 class Cache implements iCache
 {
     /**
-     * @var array
+     * @var array<string,mixed>
      */
     protected static $STATIC_CACHE = [];
 
     /**
-     * @var array
+     * @var array<string,int>
      */
     protected static $STATIC_CACHE_EXPIRE = [];
 
     /**
-     * @var array
+     * @var array<string,int>
      */
     protected static $STATIC_CACHE_COUNTER = [];
 
@@ -45,7 +45,7 @@ class Cache implements iCache
     protected $serializer;
 
     /**
-     * @var array
+     * @var array<array-key,mixed>
      */
     protected $unserialize_options = ['allowed_classes' => true];
 
@@ -123,8 +123,8 @@ class Cache implements iCache
      *                                                                            "CacheAdapterManager".</p>
      */
     public function __construct(
-        iAdapter $adapter = null,
-        iSerializer $serializer = null,
+        ?iAdapter $adapter = null,
+        ?iSerializer $serializer = null,
         bool $checkForUsage = true,
         bool $cacheEnabled = true,
         bool $isAdminSession = false,
@@ -132,7 +132,7 @@ class Cache implements iCache
         bool $useCheckForAdminSession = true,
         bool $useCheckForServerIpIsClientIp = true,
         string $disableCacheGetParameter = 'testWithoutCache',
-        CacheAdapterAutoManager $cacheAdapterManagerForAutoConnect = null,
+        ?CacheAdapterAutoManager $cacheAdapterManagerForAutoConnect = null,
         bool $cacheAdapterManagerForAutoConnectOverwrite = false
     ) {
         $this->isAdminSession = $isAdminSession;
@@ -214,7 +214,7 @@ class Cache implements iCache
     }
 
     /**
-     * @param array $array
+     * @param array<array-key,mixed> $array
      *
      * @return void
      */
@@ -235,7 +235,7 @@ class Cache implements iCache
      * @return iAdapter
      */
     protected function autoConnectToAvailableCacheSystem(
-        CacheAdapterAutoManager $cacheAdapterManagerForAutoConnect = null,
+        ?CacheAdapterAutoManager $cacheAdapterManagerForAutoConnect = null,
         bool $cacheAdapterManagerForAutoConnectOverwrite = false
     ): iAdapter {
         /** @var null|iAdapter $AUTO_ADAPTER_STATIC_CACHE */

@@ -3,12 +3,9 @@ parameters:
     paths:
         - %currentWorkingDirectory%/src/
     reportUnmatchedIgnoredErrors: false
-    checkMissingIterableValueType: false
-    excludes_analyse:
-        - %currentWorkingDirectory%/vendor/*
-        - %currentWorkingDirectory%/tests/*
     ignoreErrors:
         - '/always false/'
+        - '/always evaluate to true/'
         - '/always true/'
         - '/Predis\\Client/'
         - '/Symfony\\Component\\VarExporter/'

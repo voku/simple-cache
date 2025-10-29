@@ -34,7 +34,7 @@ class SerializerNo implements iSerializer
     }
 
     /**
-     * @param array $options
+     * @param array<array-key,mixed> $options
      *
      * @return void
      */

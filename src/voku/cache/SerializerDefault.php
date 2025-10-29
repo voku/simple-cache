@@ -10,7 +10,7 @@ namespace voku\cache;
 class SerializerDefault implements iSerializer
 {
     /**
-     * @var array|null
+     * @var array<array-key,mixed>|null
      */
     private $unserialize_options;
 
@@ -44,7 +44,7 @@ class SerializerDefault implements iSerializer
     }
 
     /**
-     * @param array $options
+     * @param array<array-key,mixed> $options
      *
      * @return void
      */

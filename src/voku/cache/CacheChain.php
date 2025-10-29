@@ -14,7 +14,7 @@ class CacheChain implements iCache
     /**
      * __construct
      *
-     * @param array $caches
+     * @param list<Cache> $caches
      */
     public function __construct(array $caches = [])
     {
@@ -30,7 +30,7 @@ class CacheChain implements iCache
     /**
      * get caches
      *
-     * @return array
+     * @return array<array-key,mixed>
      */
     public function getCaches(): array
     {

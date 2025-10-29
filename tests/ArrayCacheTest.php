@@ -119,7 +119,12 @@ final class ArrayCacheTest extends \PHPUnit\Framework\TestCase
         static::assertSame([3, 2, 1], $return);
 
         assert($this->cache->getAdapter() instanceof AdapterArray);
-        static::assertSame(['foo' => 'a:3:{i:0;i:3;i:1;i:2;i:2;i:1;}'], $this->cache->getAdapter()->getStaticValues());
+        static::assertSame([
+            'foo_null' => 'N;',
+            'foo' => 'a:3:{i:0;i:3;i:1;i:2;i:2;i:1;}',
+            'ao' => 'O:11:"ArrayObject":4:{i:0;i:0;i:1;a:1:{s:3:"arr";s:10:"array data";}i:2;a:1:{s:4:"prop";s:9:"prop data";}i:3;N;}',
+            'barfoo' => 'a:3:{i:0;i:3;i:1;i:2;i:2;i:1;}'
+        ], $this->cache->getAdapter()->getStaticValues());
     }
 
     public function testGetStaticKeys()
@@ -131,8 +136,7 @@ final class ArrayCacheTest extends \PHPUnit\Framework\TestCase
         static::assertSame([3, 2, 1], $return);
 
         assert($this->cache->getAdapter() instanceof AdapterArray);
-        static::assertSame(['foo'], $this->cache->getAdapter()->getStaticKeys());
-    }
+        static::assertSame(['foo_null', 'foo', 'ao', 'barfoo'], $this->cache->getAdapter()->getStaticKeys());}
 
     public function testSetGetCacheWithEndDateTime()
     {

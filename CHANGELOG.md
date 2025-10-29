@@ -1,3 +1,7 @@
+# Changelog 5.0.0 (2025-10-29)
+
+- fix php 8.4 deprecation warnings from parameters with default null values 
+
 # Changelog 4.1.0 (2020-03-15)
 
 - "Cache" -> add "getAdapter()" & "getSerializer()"

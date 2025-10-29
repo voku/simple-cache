@@ -40,7 +40,7 @@ class CachePsr16 extends Cache implements CacheInterface
     /**
      * Deletes multiple cache items in a single operation.
      *
-     * @param iterable $keys a list of string-based keys to be deleted
+     * @param iterable<array-key,string> $keys a list of string-based keys to be deleted
      *
      * @throws InvalidArgumentException
      *
@@ -86,13 +86,13 @@ class CachePsr16 extends Cache implements CacheInterface
     /**
      * Obtains multiple cache items by their unique keys.
      *
-     * @param iterable $keys    a list of keys that can obtained in a single operation
-     * @param mixed    $default default value to return for keys that do not exist
+     * @param iterable<array-key,string> $keys    a list of keys that can obtained in a single operation
+     * @param mixed                      $default default value to return for keys that do not exist
      *
      * @throws InvalidArgumentException
      *
-     * @return iterable A list of key => value pairs. Cache keys that do not exist or are stale will have $default as
-     *                  value.
+     * @return iterable<string,mixed> A list of key => value pairs. Cache keys that do not exist or are stale will have $default as
+     *                                value.
      */
     public function getMultiple($keys, $default = null)
     {
@@ -160,7 +160,7 @@ class CachePsr16 extends Cache implements CacheInterface
     /**
      * Persists a set of key => value pairs in the cache, with an optional TTL.
      *
-     * @param iterable               $values a list of key => value pairs for a multiple-set operation
+     * @param iterable<string,mixed> $values a list of key => value pairs for a multiple-set operation
      * @param \DateInterval|int|null $ttl    Optional. The TTL value of this item. If no value is sent and
      *                                       the driver supports TTL then the library may set a default value
      *                                       for it or let the driver take care of that.

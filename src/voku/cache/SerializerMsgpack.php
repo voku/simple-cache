@@ -15,7 +15,7 @@ class SerializerMsgpack implements iSerializer
     public static $_exists_msgpack;
 
     /**
-     * @var array|null
+     * @var array<array-key,mixed>|null
      */
     private $unserialize_options;
 
@@ -86,7 +86,7 @@ class SerializerMsgpack implements iSerializer
     }
 
     /**
-     * @param array $options
+     * @param array<array-key,mixed> $options
      *
      * @return void
      */
