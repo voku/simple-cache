@@ -33,7 +33,7 @@ class AdapterOpCache extends AdapterFileSimple
             self::$hasCompileFileFunction = (
                 \function_exists('opcache_compile_file')
                 &&
-                !empty(@\opcache_get_status())
+                !empty(@\opcache_get_configuration())
             );
         }
     }
