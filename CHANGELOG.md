@@ -1,3 +1,7 @@
+# Changelog 6.0.0 (2026-04-21)
+
+- add support for "psr/simple-cache" v3
+
 # Changelog 5.0.0 (2025-10-29)
 
 - fix php 8.4 deprecation warnings from parameters with default null values 
