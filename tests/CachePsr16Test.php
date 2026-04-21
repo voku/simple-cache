@@ -141,6 +141,20 @@ final class CachePsr16Test extends \PHPUnit\Framework\TestCase
         $this->cache->has($key);
     }
 
+    public function testGetMixedReturnType()
+    {
+        $method = new ReflectionMethod(CachePsr16::class, 'get');
+
+        static::assertSame('mixed', (string) $method->getReturnType());
+    }
+
+    public function testGetMultipleIterableReturnType()
+    {
+        $method = new ReflectionMethod(CachePsr16::class, 'getMultiple');
+
+        static::assertSame('iterable', (string) $method->getReturnType());
+    }
+
     /**
      * @before
      */

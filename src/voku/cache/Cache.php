@@ -202,14 +202,16 @@ class Cache implements iCache
     /**
      * @return iAdapter|null
      */
-    public function getAdapter() {
+    public function getAdapter()
+    {
         return $this->adapter;
     }
 
     /**
      * @return iSerializer|null
      */
-    public function getSerializer() {
+    public function getSerializer()
+    {
         return $this->serializer;
     }
 
@@ -264,7 +266,6 @@ class Cache implements iCache
         }
 
         foreach ($cacheAdapterManagerDefault->getAdapters() as $adapterTmp => $callableFunctionTmp) {
-
             if ($callableFunctionTmp !== null) {
                 $adapterTest = new $adapterTmp($callableFunctionTmp);
             } else {
@@ -317,7 +318,6 @@ class Cache implements iCache
         if (\function_exists('checkForDev')) {
             $return = checkForDev();
         } else {
-
             // for testing with dev-address
             $noDev = isset($_GET['noDev']) ? (int) $_GET['noDev'] : 0;
             $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? 'NO_REMOTE_ADDR';

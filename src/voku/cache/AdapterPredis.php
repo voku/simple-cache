@@ -79,7 +79,7 @@ class AdapterPredis implements iAdapter
      */
     public function removeAll(): bool
     {
-        return $this->client->flushall();
+        return (bool) $this->client->flushall();
     }
 
     /**
@@ -87,7 +87,7 @@ class AdapterPredis implements iAdapter
      */
     public function set(string $key, $value): bool
     {
-        return $this->client->set($key, $value);
+        return (bool) $this->client->set($key, $value);
     }
 
     /**

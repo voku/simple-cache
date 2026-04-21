@@ -23,11 +23,10 @@ matrix:
   allow_failures:
     - php: nightly
   include:
-    - php: 7.0
-    - php: 7.1
-    - php: 7.2
-    - php: 7.3
-    - php: 7.4
+    - php: 8.0
+    - php: 8.1
+    - php: 8.2
+    - php: 8.3
     - php: nightly
 
 before_script:
@@ -46,15 +45,15 @@ before_script:
   - travis_retry composer self-update
   - travis_retry composer require satooshi/php-coveralls:1.0.0
   - travis_retry composer require predis/predis
-  - if [ "$(phpenv version-name)" == 7.3 ]; then travis_retry composer require phpstan/phpstan; fi
-  - if [ "$(phpenv version-name)" == 7.3 ]; then travis_retry composer require symfony/var-exporter; fi
+  - if [ "$(phpenv version-name)" == 8.2 ]; then travis_retry composer require phpstan/phpstan; fi
+  - if [ "$(phpenv version-name)" == 8.2 ]; then travis_retry composer require symfony/var-exporter; fi
   - travis_retry composer install --no-interaction --prefer-source
   - composer dump-autoload -o
 
 script:
   - mkdir -p build/logs
   - php vendor/bin/phpunit -c phpunit.xml
-  - if [ "$(phpenv version-name)" == 7.3 ]; then vendor/bin/phpstan analyse; fi
+  - if [ "$(phpenv version-name)" == 8.2 ]; then vendor/bin/phpstan analyse; fi
 
 after_script:
   - php vendor/bin/coveralls -v

@@ -4,7 +4,6 @@ use voku\cache\AdapterMemcached;
 use voku\cache\Cache;
 use voku\cache\iAdapter;
 use voku\cache\iSerializer;
-use voku\cache\SerializerDefault;
 
 /**
  * MemcachedCacheTest
