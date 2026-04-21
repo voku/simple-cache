@@ -74,7 +74,7 @@ class CachePsr16 extends Cache implements CacheInterface
      *
      * @return mixed the value of the item from the cache, or $default in case of cache miss
      */
-    public function get($key, $default = null)
+    public function get($key, $default = null): mixed
     {
         if ($this->has($key)) {
             return $this->getItem($key);
@@ -94,7 +94,7 @@ class CachePsr16 extends Cache implements CacheInterface
      * @return iterable<string,mixed> A list of key => value pairs. Cache keys that do not exist or are stale will have $default as
      *                                value.
      */
-    public function getMultiple($keys, $default = null)
+    public function getMultiple($keys, $default = null): iterable
     {
         if (
             !\is_array($keys)

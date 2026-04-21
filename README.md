@@ -11,7 +11,7 @@
 
 # :zap: Simple Cache Class
 
-This is a simple Cache Abstraction Layer for PHP >= 7.0 that provides a simple interaction 
+This is a simple Cache Abstraction Layer for PHP >= 8.0 that provides a simple interaction 
 with your cache-server. You can define the Adapter / Serializer in the "constructor" or the class will auto-detect you server-cache in this order:
 
 1. Memcached / Memcache
