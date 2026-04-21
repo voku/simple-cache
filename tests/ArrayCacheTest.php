@@ -136,7 +136,8 @@ final class ArrayCacheTest extends \PHPUnit\Framework\TestCase
         static::assertSame([3, 2, 1], $return);
 
         assert($this->cache->getAdapter() instanceof AdapterArray);
-        static::assertSame(['foo_null', 'foo', 'ao', 'barfoo'], $this->cache->getAdapter()->getStaticKeys());}
+        static::assertSame(['foo_null', 'foo', 'ao', 'barfoo'], $this->cache->getAdapter()->getStaticKeys());
+    }
 
     public function testSetGetCacheWithEndDateTime()
     {
@@ -169,5 +170,4 @@ final class ArrayCacheTest extends \PHPUnit\Framework\TestCase
         // reset default prefix
         $this->cache->setPrefix('');
     }
-
 }
