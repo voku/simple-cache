@@ -115,10 +115,10 @@ final class RedisCacheTest extends \PHPUnit\Framework\TestCase
         $redis = null;
         $isRedisAvailable = false;
         if (
-        \extension_loaded('redis')
-        &&
-        \class_exists('\Predis\Client')
-    ) {
+            \extension_loaded('redis')
+            &&
+            \class_exists('\Predis\Client')
+        ) {
             /** @noinspection PhpUndefinedNamespaceInspection */
             $redis = new \Predis\Client(
                 [

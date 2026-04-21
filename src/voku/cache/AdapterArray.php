@@ -22,14 +22,16 @@ class AdapterArray implements iAdapter
     /**
      * @return array<string, mixed>
      */
-    public function getStaticValues() {
+    public function getStaticValues()
+    {
         return self::$values;
     }
 
     /**
      * @return string[]
      */
-    public function getStaticKeys() {
+    public function getStaticKeys()
+    {
         return \array_keys(self::$values);
     }
 
