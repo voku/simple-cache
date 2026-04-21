@@ -33,7 +33,9 @@ class AdapterOpCache extends AdapterFileSimple
             self::$hasCompileFileFunction = (
                 \function_exists('opcache_compile_file')
                 &&
-                !empty(@\opcache_get_configuration())
+                \function_exists('opcache_get_status')
+                &&
+                @\opcache_get_status() !== false
             );
         }
     }
@@ -120,7 +122,7 @@ class AdapterOpCache extends AdapterFileSimple
             \touch($cacheFile, \time() - 86400);
 
             /** @noinspection PhpComposerExtensionStubsInspection */
-            \opcache_invalidate($cacheFile);
+            \opcache_invalidate($cacheFile, true);
             /** @noinspection PhpComposerExtensionStubsInspection */
             \opcache_compile_file($cacheFile);
         }

@@ -92,6 +92,7 @@ class AdapterApcu implements iAdapter
     public function cacheInfo(bool $limited = false): array
     {
         $return = \apcu_cache_info($limited);
+        /* @phpstan-ignore identical.alwaysFalse */
         if ($return === false) {
             return [];
         }
