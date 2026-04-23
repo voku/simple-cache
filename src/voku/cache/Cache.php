@@ -463,9 +463,7 @@ class Cache implements iCache
     private function removeKeyFromIndex(string $key): void
     {
         $keys = $this->getKeysFromIndex();
-        $filtered = \array_values(\array_filter($keys, static function (string $k) use ($key): bool {
-            return $k !== $key;
-        }));
+        $filtered = \array_values(\array_diff($keys, [$key]));
         if (\count($filtered) !== \count($keys)) {
             $this->saveKeysToIndex($filtered);
         }

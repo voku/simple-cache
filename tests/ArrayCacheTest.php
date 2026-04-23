@@ -121,10 +121,15 @@ final class ArrayCacheTest extends \PHPUnit\Framework\TestCase
         assert($this->cache->getAdapter() instanceof AdapterArray);
         $values = $this->cache->getAdapter()->getStaticValues();
 
+        // User-set values are present with the expected serialized content.
         static::assertSame('N;', $values['foo_null']);
         static::assertSame('a:3:{i:0;i:3;i:1;i:2;i:2;i:1;}', $values['foo']);
         static::assertSame('O:11:"ArrayObject":4:{i:0;i:0;i:1;a:1:{s:3:"arr";s:10:"array data";}i:2;a:1:{s:4:"prop";s:9:"prop data";}i:3;N;}', $values['ao']);
         static::assertSame('a:3:{i:0;i:3;i:1;i:2;i:2;i:1;}', $values['barfoo']);
+
+        // The adapter also holds key-registry entries (one per prefix used so far).
+        static::assertArrayHasKey('__simple_cache_keys_index__', $values);
+        static::assertArrayHasKey('bar__simple_cache_keys_index__', $values);
     }
 
     public function testGetStaticKeys()
@@ -138,10 +143,15 @@ final class ArrayCacheTest extends \PHPUnit\Framework\TestCase
         assert($this->cache->getAdapter() instanceof AdapterArray);
         $keys = $this->cache->getAdapter()->getStaticKeys();
 
+        // All user-set keys are present.
         static::assertContains('foo_null', $keys);
         static::assertContains('foo', $keys);
         static::assertContains('ao', $keys);
         static::assertContains('barfoo', $keys);
+
+        // The adapter also holds key-registry entries (one per prefix used so far).
+        static::assertContains('__simple_cache_keys_index__', $keys);
+        static::assertContains('bar__simple_cache_keys_index__', $keys);
     }
 
     public function testRemoveItems()
