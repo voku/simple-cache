@@ -391,20 +391,22 @@ class Cache implements iCache
      */
     private function getKeysFromIndex(): array
     {
-        if (!$this->adapter instanceof iAdapter || !$this->serializer instanceof iSerializer) {
+        if (!$this->adapter instanceof iAdapter) {
             return [];
         }
 
         $stored = $this->adapter->get($this->getKeysIndexStoreKey());
-        if ($stored === null) {
+        if ($stored === null || !\is_string($stored)) {
             return [];
         }
 
-        if ($this->serializer instanceof SerializerNo) {
-            $keys = $stored;
-        } else {
-            $keys = $this->serializer->unserialize($stored);
-        }
+        // Use PHP's native unserialize so the registry format is independent of
+        // whatever $this->serializer is configured to use.  This prevents
+        // cross-serializer corruption when a shared backend (static AdapterArray,
+        // APCu) is accessed by different Cache instances that use different
+        // serializers (e.g. SerializerDefault in ArrayCacheTest vs
+        // SerializerIgbinary in CacheChainTest).
+        $keys = @\unserialize($stored, ['allowed_classes' => false]);
 
         return \is_array($keys) ? $keys : [];
     }
@@ -418,7 +420,7 @@ class Cache implements iCache
      */
     private function saveKeysToIndex(array $keys): void
     {
-        if (!$this->adapter instanceof iAdapter || !$this->serializer instanceof iSerializer) {
+        if (!$this->adapter instanceof iAdapter) {
             return;
         }
 
@@ -430,11 +432,10 @@ class Cache implements iCache
             return;
         }
 
-        if ($this->serializer instanceof SerializerNo) {
-            $this->adapter->set($indexKey, \array_values($keys));
-        } else {
-            $this->adapter->set($indexKey, $this->serializer->serialize(\array_values($keys)));
-        }
+        // Always use PHP's native serialize so the registry format is independent
+        // of $this->serializer and can be safely read by any Cache instance that
+        // targets the same backend, regardless of its configured serializer.
+        $this->adapter->set($indexKey, \serialize(\array_values($keys)));
     }
 
     /**
