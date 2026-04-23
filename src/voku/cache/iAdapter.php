@@ -71,4 +71,12 @@ interface iAdapter
      * @return bool
      */
     public function installed(): bool;
+
+    /**
+     * Get all stored keys.
+     *
+     * @return string[]
+     *                  <p>Returns an empty array if the adapter does not support listing keys.</p>
+     */
+    public function getAllKeys(): array;
 }

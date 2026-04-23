@@ -91,6 +91,14 @@ class AdapterArray implements iAdapter
     /**
      * {@inheritdoc}
      */
+    public function getAllKeys(): array
+    {
+        return \array_keys(self::$values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function set(string $key, $value): bool
     {
         self::$values[$key] = $value;

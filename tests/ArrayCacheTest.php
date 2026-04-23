@@ -139,6 +139,81 @@ final class ArrayCacheTest extends \PHPUnit\Framework\TestCase
         static::assertSame(['foo_null', 'foo', 'ao', 'barfoo'], $this->cache->getAdapter()->getStaticKeys());
     }
 
+    public function testRemoveItems()
+    {
+        $return = $this->cache->setItem('imagecache_foo', [1, 2, 3]);
+        static::assertTrue($return);
+
+        $return = $this->cache->setItem('imagecache_bar', [4, 5, 6]);
+        static::assertTrue($return);
+
+        $return = $this->cache->setItem('other_item', [7, 8, 9]);
+        static::assertTrue($return);
+
+        // -- verify items exist
+
+        static::assertSame([1, 2, 3], $this->cache->getItem('imagecache_foo'));
+        static::assertSame([4, 5, 6], $this->cache->getItem('imagecache_bar'));
+        static::assertSame([7, 8, 9], $this->cache->getItem('other_item'));
+
+        // -- remove items matching pattern
+
+        $return = $this->cache->removeItems('/^imagecache_/');
+        static::assertTrue($return);
+
+        // -- verify matching items are removed
+
+        static::assertNull($this->cache->getItem('imagecache_foo'));
+        static::assertNull($this->cache->getItem('imagecache_bar'));
+
+        // -- verify non-matching item is still present
+
+        static::assertSame([7, 8, 9], $this->cache->getItem('other_item'));
+    }
+
+    public function testRemoveItemsWithPrefix()
+    {
+        $this->cache->setPrefix('myapp_');
+
+        $return = $this->cache->setItem('imagecache_foo', [1, 2, 3]);
+        static::assertTrue($return);
+
+        $return = $this->cache->setItem('imagecache_bar', [4, 5, 6]);
+        static::assertTrue($return);
+
+        $return = $this->cache->setItem('other_item', [7, 8, 9]);
+        static::assertTrue($return);
+
+        // -- remove items matching pattern (pattern matches raw key, not prefixed store key)
+
+        $return = $this->cache->removeItems('/^imagecache_/');
+        static::assertTrue($return);
+
+        // -- verify matching items are removed
+
+        static::assertNull($this->cache->getItem('imagecache_foo'));
+        static::assertNull($this->cache->getItem('imagecache_bar'));
+
+        // -- verify non-matching item is still present
+
+        static::assertSame([7, 8, 9], $this->cache->getItem('other_item'));
+    }
+
+    public function testRemoveItemsNoMatch()
+    {
+        $return = $this->cache->setItem('foo', [1, 2, 3]);
+        static::assertTrue($return);
+
+        // -- no items match, should return true
+
+        $return = $this->cache->removeItems('/^nonexistent_/');
+        static::assertTrue($return);
+
+        // -- item is still present
+
+        static::assertSame([1, 2, 3], $this->cache->getItem('foo'));
+    }
+
     public function testSetGetCacheWithEndDateTime()
     {
         $expireDate = new DateTime();

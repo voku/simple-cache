@@ -85,6 +85,14 @@ class AdapterPredis implements iAdapter
     /**
      * {@inheritdoc}
      */
+    public function getAllKeys(): array
+    {
+        return (array) $this->client->keys('*');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function set(string $key, $value): bool
     {
         return (bool) $this->client->set($key, $value);

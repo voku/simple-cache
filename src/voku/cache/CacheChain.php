@@ -148,6 +148,21 @@ class CacheChain implements iCache
     /**
      * {@inheritdoc}
      */
+    public function removeItems(string $pattern): bool
+    {
+        // init
+        $results = [];
+
+        foreach ($this->caches as $cache) {
+            $results[] = $cache->removeItems($pattern);
+        }
+
+        return \in_array(true, $results, true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function existsItem(string $key): bool
     {
         foreach ($this->caches as $cache) {

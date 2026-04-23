@@ -512,6 +512,63 @@ class Cache implements iCache
     }
 
     /**
+     * Remove all cached-items whose keys match a given regular expression.
+     *
+     * @param string $pattern A valid PHP regular expression (e.g. '/^imagecache_/').
+     *
+     * @return bool
+     *              <p>Returns true on success or when no items matched the pattern.
+     *              Returns false if the adapter does not support key listing or a removal failed.</p>
+     */
+    public function removeItems(string $pattern): bool
+    {
+        if (!$this->adapter instanceof iAdapter) {
+            return false;
+        }
+
+        $allKeys = $this->adapter->getAllKeys();
+        if (empty($allKeys)) {
+            return true;
+        }
+
+        $prefix = $this->getPrefix();
+        $results = [];
+
+        foreach ($allKeys as $storedKey) {
+            // Only consider keys that belong to this cache instance (matching prefix).
+            if ($prefix !== '') {
+                if (\strpos($storedKey, $prefix) !== 0) {
+                    continue;
+                }
+                $rawKey = \substr($storedKey, \strlen($prefix));
+            } else {
+                $rawKey = $storedKey;
+            }
+
+            if (\preg_match($pattern, $rawKey) !== 1) {
+                continue;
+            }
+
+            // Remove from static-cache
+            if (
+                !empty(self::$STATIC_CACHE)
+                &&
+                \array_key_exists($storedKey, self::$STATIC_CACHE)
+            ) {
+                unset(
+                    self::$STATIC_CACHE[$storedKey],
+                    self::$STATIC_CACHE_COUNTER[$storedKey],
+                    self::$STATIC_CACHE_EXPIRE[$storedKey]
+                );
+            }
+
+            $results[] = $this->adapter->remove($storedKey);
+        }
+
+        return \in_array(false, $results, true) === false;
+    }
+
+    /**
      * Set cache-item by key => value + ttl.
      *
      * @param string                 $key

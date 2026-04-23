@@ -90,6 +90,16 @@ class AdapterMemcache implements iAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * <p>Always returns an empty array because Memcache does not provide a reliable API to list all keys.</p>
+     */
+    public function getAllKeys(): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function set(string $key, $value): bool
     {

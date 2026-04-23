@@ -147,6 +147,26 @@ class AdapterApcu implements iAdapter
     /**
      * {@inheritdoc}
      */
+    public function getAllKeys(): array
+    {
+        $info = $this->cacheInfo();
+        if (empty($info['cache_list'])) {
+            return [];
+        }
+
+        $keys = [];
+        foreach ($info['cache_list'] as $entry) {
+            if (isset($entry['key'])) {
+                $keys[] = (string) $entry['key'];
+            }
+        }
+
+        return $keys;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function set(string $key, $value): bool
     {
         return (bool) \apcu_store($key, $value);

@@ -152,6 +152,26 @@ class AdapterApc implements iAdapter
     /**
      * {@inheritdoc}
      */
+    public function getAllKeys(): array
+    {
+        $info = $this->cacheInfo('user');
+        if (empty($info['cache_list'])) {
+            return [];
+        }
+
+        $keys = [];
+        foreach ($info['cache_list'] as $entry) {
+            if (isset($entry['info'])) {
+                $keys[] = (string) $entry['info'];
+            }
+        }
+
+        return $keys;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function set(string $key, $value): bool
     {
         return (bool) \apc_store($key, $value);

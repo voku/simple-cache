@@ -177,6 +177,17 @@ abstract class AdapterFileAbstract implements iAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * <p>Always returns an empty array for file-based adapters because cache keys are stored
+     * as MD5 hashes on disk and cannot be reversed to their original values.</p>
+     */
+    public function getAllKeys(): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function set(string $key, $value): bool
     {
