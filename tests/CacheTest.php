@@ -165,6 +165,126 @@ final class CacheTest extends \PHPUnit\Framework\TestCase
         $this->cache->existsItem($key);
     }
 
+    public function testRemoveAll()
+    {
+        $this->adapter->expects(static::once())
+                  ->method('removeAll')
+                  ->willReturn(true);
+
+        $result = $this->cache->removeAll();
+
+        static::assertTrue($result);
+    }
+
+    public function testGetAdapter()
+    {
+        static::assertSame($this->adapter, $this->cache->getAdapter());
+    }
+
+    public function testGetSerializer()
+    {
+        static::assertSame($this->serializer, $this->cache->getSerializer());
+    }
+
+    public function testGetStaticCacheHitCounterDefault()
+    {
+        static::assertSame(10, $this->cache->getStaticCacheHitCounter());
+    }
+
+    public function testSetStaticCacheHitCounter()
+    {
+        $this->cache->setStaticCacheHitCounter(3);
+
+        static::assertSame(3, $this->cache->getStaticCacheHitCounter());
+    }
+
+    public function testGetUsedAdapterClassName()
+    {
+        $className = $this->cache->getUsedAdapterClassName();
+
+        // The mock wraps AdapterApc, so the class name contains it.
+        static::assertStringContainsString('AdapterApc', $className);
+    }
+
+    public function testGetUsedSerializerClassName()
+    {
+        $className = $this->cache->getUsedSerializerClassName();
+
+        // The mock wraps SerializerDefault, so the class name contains it.
+        static::assertStringContainsString('SerializerDefault', $className);
+    }
+
+    public function testGetAndSetPrefix()
+    {
+        $this->cache->setPrefix('myprefix_');
+
+        static::assertSame('myprefix_', $this->cache->getPrefix());
+    }
+
+    public function testUsedAdapterClassNameEmptyWhenNoAdapter()
+    {
+        // A disabled cache has no adapter.
+        $cache = new Cache(null, null, false, false);
+
+        static::assertSame('', $cache->getUsedAdapterClassName());
+    }
+
+    public function testUsedSerializerClassNameEmptyWhenNoSerializer()
+    {
+        $cache = new Cache(null, null, false, false);
+
+        static::assertSame('', $cache->getUsedSerializerClassName());
+    }
+
+    public function testCacheIsNotReadyWhenDisabled()
+    {
+        $cache = new Cache(null, null, false, false);
+
+        static::assertFalse($cache->getCacheIsReady());
+    }
+
+    public function testSetItemReturnsFalseWhenDisabled()
+    {
+        $cache = new Cache(null, null, false, false);
+
+        static::assertFalse($cache->setItem('key', 'value'));
+    }
+
+    public function testGetItemReturnsNullWhenDisabled()
+    {
+        $cache = new Cache(null, null, false, false);
+
+        static::assertNull($cache->getItem('key'));
+    }
+
+    public function testRemoveItemReturnsFalseWhenDisabled()
+    {
+        $cache = new Cache(null, null, false, false);
+
+        static::assertFalse($cache->removeItem('key'));
+    }
+
+    public function testExistsItemReturnsFalseWhenDisabled()
+    {
+        $cache = new Cache(null, null, false, false);
+
+        static::assertFalse($cache->existsItem('key'));
+    }
+
+    public function testRemoveAllReturnsFalseWhenDisabled()
+    {
+        $cache = new Cache(null, null, false, false);
+
+        static::assertFalse($cache->removeAll());
+    }
+
+    public function testRemoveItemsReturnsFalseWhenDisabled()
+    {
+        $cache = new Cache(null, null, false, false);
+
+        static::assertFalse($cache->removeItems('/^foo/'));
+    }
+
     /**
      * @before
      */
