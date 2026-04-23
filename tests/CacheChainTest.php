@@ -1,7 +1,6 @@
 <?php
 
 use voku\cache\Cache;
-use voku\cache\SerializerDefault;
 
 /**
  * @internal

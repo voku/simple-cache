@@ -52,7 +52,9 @@ final class CacheAdapterAutoManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAdaptersYieldsCallableWhenProvided()
     {
-        $callable = static function () { return null; };
+        $callable = static function () {
+            return null;
+        };
 
         $manager = new CacheAdapterAutoManager();
         $manager->addAdapter(AdapterArray::class, $callable);
@@ -109,7 +111,9 @@ final class CacheAdapterAutoManagerTest extends \PHPUnit\Framework\TestCase
         $manager1->addAdapter(AdapterFile::class);
         $manager1->addAdapter(AdapterArray::class);
 
-        $callable = static function () { return null; };
+        $callable = static function () {
+            return null;
+        };
 
         $manager2 = new CacheAdapterAutoManager();
         $manager2->addAdapter(AdapterArray::class, $callable);
