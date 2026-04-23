@@ -129,4 +129,48 @@ class AdapterOpCache extends AdapterFileSimple
 
         return $result;
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * <p>Overrides the base implementation because {@link AdapterOpCache} stores files with a
+     * <code>.php</code> extension instead of the <code>.php.cache</code> extension used by
+     * the other file-based adapters.</p>
+     */
+    public function getAllKeys(): array
+    {
+        if (!$this->cacheDir || !\is_dir($this->cacheDir)) {
+            return [];
+        }
+
+        $prefix = static::CACHE_FILE_PREFIX;
+        $suffix = '.php';
+        $prefixLen = \strlen($prefix);
+        $suffixLen = \strlen($suffix);
+        $keys = [];
+
+        foreach (new \DirectoryIterator($this->cacheDir) as $fileInfo) {
+            if ($fileInfo->isDot() || !$fileInfo->isFile()) {
+                continue;
+            }
+
+            $filename = $fileInfo->getFilename();
+
+            // Match __simple_KEY.php but not __simple_KEY.php.cache
+            if (
+                \str_starts_with($filename, $prefix)
+                &&
+                \str_ends_with($filename, $suffix)
+                &&
+                !\str_ends_with($filename, '.php.cache')
+            ) {
+                $key = \substr($filename, $prefixLen, -$suffixLen);
+                if ($key !== '') {
+                    $keys[] = $key;
+                }
+            }
+        }
+
+        return $keys;
+    }
 }

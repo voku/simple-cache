@@ -240,6 +240,34 @@ final class FileSimpleCacheTest extends \PHPUnit\Framework\TestCase
         static::assertSame([7, 8, 9], $this->cache->getItem('other_item'));
     }
 
+    public function testAdapterGetAllKeys()
+    {
+        $dir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache_test_filesimple_keys';
+        $adapter = new \voku\cache\AdapterFileSimple($dir);
+        $adapter->removeAll();
+
+        // Empty at start.
+        static::assertSame([], $adapter->getAllKeys());
+
+        // Keys appear after set().
+        $adapter->set('alpha', 'aaa');
+        $adapter->set('beta', 'bbb');
+
+        $keys = $adapter->getAllKeys();
+        \sort($keys);
+        static::assertSame(['alpha', 'beta'], $keys);
+
+        // Key disappears after remove().
+        $adapter->remove('alpha');
+        $keys = $adapter->getAllKeys();
+        static::assertNotContains('alpha', $keys);
+        static::assertContains('beta', $keys);
+
+        // All keys gone after removeAll().
+        $adapter->removeAll();
+        static::assertSame([], $adapter->getAllKeys());
+    }
+
     public function testGetUsedAdapterClassName()
     {
         static::assertSame('voku\cache\AdapterFileSimple', $this->cache->getUsedAdapterClassName());

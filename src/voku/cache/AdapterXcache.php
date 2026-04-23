@@ -10,6 +10,12 @@ namespace voku\cache;
 class AdapterXcache implements iAdapter
 {
     /**
+     * Internal key used to persist the key registry inside Xcache.
+     * Not intended for use by application code.
+     */
+    private const KEYS_REGISTRY_KEY = '__xcache_adapter_keys__';
+
+    /**
      * @var bool
      */
     public $installed = false;
@@ -53,11 +59,23 @@ class AdapterXcache implements iAdapter
      */
     public function remove(string $key): bool
     {
-        return \xcache_unset($key);
+        $result = \xcache_unset($key);
+
+        $keys = $this->getKeysRegistry();
+        $filtered = \array_values(\array_diff($keys, [$key]));
+        if (\count($filtered) !== \count($keys)) {
+            $this->saveKeysRegistry($filtered);
+        }
+
+        return $result;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * <p>xcache_clear_cache() wipes the entire Xcache variable store, which includes
+     * the key registry stored under {@link KEYS_REGISTRY_KEY}. The registry is therefore
+     * implicitly empty after this call, consistent with the contract of getAllKeys().</p>
      */
     public function removeAll(): bool
     {
@@ -76,11 +94,13 @@ class AdapterXcache implements iAdapter
     /**
      * {@inheritdoc}
      *
-     * <p>Always returns an empty array because Xcache does not provide a reliable API to list all keys.</p>
+     * <p>Returns the list of keys that have been stored through this adapter instance.
+     * The registry is maintained inside Xcache under an internal key and is updated
+     * on every {@link set()}, {@link setExpired()}, and {@link remove()} call.</p>
      */
     public function getAllKeys(): array
     {
-        return [];
+        return $this->getKeysRegistry();
     }
 
     /**
@@ -88,7 +108,17 @@ class AdapterXcache implements iAdapter
      */
     public function set(string $key, $value): bool
     {
-        return \xcache_set($key, $value);
+        $result = \xcache_set($key, $value);
+
+        if ($result) {
+            $keys = $this->getKeysRegistry();
+            if (!\in_array($key, $keys, true)) {
+                $keys[] = $key;
+                $this->saveKeysRegistry($keys);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -96,6 +126,55 @@ class AdapterXcache implements iAdapter
      */
     public function setExpired(string $key, $value, int $ttl = 0): bool
     {
-        return \xcache_set($key, $value, $ttl);
+        $result = \xcache_set($key, $value, $ttl);
+
+        if ($result) {
+            $keys = $this->getKeysRegistry();
+            if (!\in_array($key, $keys, true)) {
+                $keys[] = $key;
+                $this->saveKeysRegistry($keys);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Read the key registry stored inside Xcache.
+     *
+     * @return string[]
+     */
+    private function getKeysRegistry(): array
+    {
+        if (!\xcache_isset(self::KEYS_REGISTRY_KEY)) {
+            return [];
+        }
+
+        $stored = \xcache_get(self::KEYS_REGISTRY_KEY);
+        if (!\is_string($stored)) {
+            return [];
+        }
+
+        $keys = @\unserialize($stored, ['allowed_classes' => false]);
+
+        return \is_array($keys) ? $keys : [];
+    }
+
+    /**
+     * Persist the key registry into Xcache (no TTL so it survives as long as the server allows).
+     *
+     * @param string[] $keys
+     *
+     * @return void
+     */
+    private function saveKeysRegistry(array $keys): void
+    {
+        if (empty($keys)) {
+            \xcache_unset(self::KEYS_REGISTRY_KEY);
+
+            return;
+        }
+
+        \xcache_set(self::KEYS_REGISTRY_KEY, \serialize(\array_values($keys)));
     }
 }
