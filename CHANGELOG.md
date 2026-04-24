@@ -1,3 +1,8 @@
+# Changelog 6.1.0 (2026-04-24)
+
+- add `removeItems(pattern)` for regex-based granular cache invalidation
+- fix `getAllKeys()` for `AdapterFileAbstract`, `AdapterOpCache`, `AdapterMemcache`, and `AdapterXcache`
+
 # Changelog 6.0.0 (2026-04-21)
 
 - add support for "psr/simple-cache" v3
