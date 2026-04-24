@@ -52,6 +52,17 @@ interface iCache
     public function removeItem(string $key): bool;
 
     /**
+     * Remove all items whose keys match a given regular expression.
+     *
+     * @param string $pattern A valid PHP regular expression (e.g. '/^imagecache_/').
+     *
+     * @return bool
+     *              <p>Returns true on success or when no items matched the pattern.
+     *              Returns false if the adapter does not support key listing or a removal failed.</p>
+     */
+    public function removeItems(string $pattern): bool;
+
+    /**
      * remove all items
      *
      * @return bool

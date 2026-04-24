@@ -58,6 +58,52 @@ final class CacheChainTest extends \PHPUnit\Framework\TestCase
         static::assertTrue($return);
     }
 
+    public function testGetCaches()
+    {
+        $caches = $this->cache->getCaches();
+
+        static::assertIsArray($caches);
+        // setUp adds cacheApc (prepend via constructor) then cacheArray (prepend via addCache),
+        // so there are 2 entries in the chain.
+        static::assertCount(2, $caches);
+    }
+
+    public function testAddCacheWithAppendPutsItLast()
+    {
+        $extraCache = new Cache(
+            new \voku\cache\AdapterArray(),
+            new \voku\cache\SerializerDefault(),
+            false,
+            true
+        );
+        $extraCache->setPrefix('chain_append_test_');
+
+        $before = \count($this->cache->getCaches());
+
+        $this->cache->addCache($extraCache, false); // false = append, not prepend
+
+        $after = $this->cache->getCaches();
+
+        static::assertCount($before + 1, $after);
+        static::assertSame($extraCache, \end($after));
+    }
+
+    public function testRemoveItems()
+    {
+        $this->cache->removeAll();
+
+        $this->cache->setItem('chain_pattern_a', [10]);
+        $this->cache->setItem('chain_pattern_b', [20]);
+        $this->cache->setItem('chain_keep', [30]);
+
+        $result = $this->cache->removeItems('/^chain_pattern_/');
+        static::assertTrue($result);
+
+        static::assertNull($this->cache->getItem('chain_pattern_a'));
+        static::assertNull($this->cache->getItem('chain_pattern_b'));
+        static::assertSame([30], $this->cache->getItem('chain_keep'));
+    }
+
     public function testSetGetItemWithPrefix()
     {
         $this->cache->setPrefix('bar');

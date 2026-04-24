@@ -177,6 +177,48 @@ abstract class AdapterFileAbstract implements iAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * <p>Scans the cache directory and returns the store keys of all currently cached files
+     * by stripping CACHE_FILE_PREFIX and CACHE_FILE_SUBFIX from each filename.
+     * When used through the {@link Cache} class the keys will be MD5 hashes because
+     * {@link Cache::calculateStoreKey()} hashes the raw key for file-based adapters.</p>
+     */
+    public function getAllKeys(): array
+    {
+        if (!$this->cacheDir || !\is_dir($this->cacheDir)) {
+            return [];
+        }
+
+        $prefix = self::CACHE_FILE_PREFIX;
+        $suffix = self::CACHE_FILE_SUBFIX;
+        $prefixLen = \strlen($prefix);
+        $suffixLen = \strlen($suffix);
+        $keys = [];
+
+        foreach (new \DirectoryIterator($this->cacheDir) as $fileInfo) {
+            if ($fileInfo->isDot() || !$fileInfo->isFile()) {
+                continue;
+            }
+
+            $filename = $fileInfo->getFilename();
+
+            if (
+                \str_starts_with($filename, $prefix)
+                &&
+                \str_ends_with($filename, $suffix)
+            ) {
+                $key = \substr($filename, $prefixLen, -$suffixLen);
+                if ($key !== '') {
+                    $keys[] = $key;
+                }
+            }
+        }
+
+        return $keys;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function set(string $key, $value): bool
     {

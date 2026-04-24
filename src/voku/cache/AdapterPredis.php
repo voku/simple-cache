@@ -84,6 +84,17 @@ class AdapterPredis implements iAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * <p>Uses the Redis <code>KEYS *</code> command, which scans the entire keyspace.
+     * This may have performance implications on large Redis datasets.</p>
+     */
+    public function getAllKeys(): array
+    {
+        return (array) $this->client->keys('*');
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function set(string $key, $value): bool
     {

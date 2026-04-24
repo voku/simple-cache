@@ -155,6 +155,65 @@ final class CachePsr16Test extends \PHPUnit\Framework\TestCase
         static::assertSame('iterable', (string) $method->getReturnType());
     }
 
+    public function testClear()
+    {
+        $this->adapter->expects(static::once())
+                      ->method('removeAll')
+                      ->willReturn(true);
+
+        $result = $this->cache->clear();
+
+        static::assertTrue($result);
+    }
+
+    public function testDeleteWithNonStringKey()
+    {
+        $this->expectException(\voku\cache\Exception\InvalidArgumentException::class);
+
+        // @phpstan-ignore-next-line
+        $this->cache->delete(42);
+    }
+
+    public function testHasWithNonStringKey()
+    {
+        $this->expectException(\voku\cache\Exception\InvalidArgumentException::class);
+
+        // @phpstan-ignore-next-line
+        $this->cache->has(42);
+    }
+
+    public function testSetWithNonStringKey()
+    {
+        $this->expectException(\voku\cache\Exception\InvalidArgumentException::class);
+
+        // @phpstan-ignore-next-line
+        $this->cache->set(42, 'value');
+    }
+
+    public function testSetMultipleWithNonIterable()
+    {
+        $this->expectException(\voku\cache\Exception\InvalidArgumentException::class);
+
+        // @phpstan-ignore-next-line
+        $this->cache->setMultiple('not_an_array');
+    }
+
+    public function testGetMultipleWithNonIterable()
+    {
+        $this->expectException(\voku\cache\Exception\InvalidArgumentException::class);
+
+        // @phpstan-ignore-next-line
+        $this->cache->getMultiple('not_an_array');
+    }
+
+    public function testDeleteMultipleWithNonIterable()
+    {
+        $this->expectException(\voku\cache\Exception\InvalidArgumentException::class);
+
+        // @phpstan-ignore-next-line
+        $this->cache->deleteMultiple('not_an_array');
+    }
+
     /**
      * @before
      */

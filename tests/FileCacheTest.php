@@ -206,6 +206,69 @@ final class FileCacheTest extends \PHPUnit\Framework\TestCase
         static::assertNull($return);
     }
 
+    public function testRemoveItems()
+    {
+        $this->cache->removeAll();
+
+        $return = $this->cache->setItem('filecache_foo', [1, 2, 3]);
+        static::assertTrue($return);
+
+        $return = $this->cache->setItem('filecache_bar', [4, 5, 6]);
+        static::assertTrue($return);
+
+        $return = $this->cache->setItem('other_item', [7, 8, 9]);
+        static::assertTrue($return);
+
+        // -- verify items exist
+
+        static::assertSame([1, 2, 3], $this->cache->getItem('filecache_foo'));
+        static::assertSame([4, 5, 6], $this->cache->getItem('filecache_bar'));
+        static::assertSame([7, 8, 9], $this->cache->getItem('other_item'));
+
+        // -- remove items matching pattern
+
+        $return = $this->cache->removeItems('/^filecache_/');
+        static::assertTrue($return);
+
+        // -- verify matching items are removed
+
+        static::assertNull($this->cache->getItem('filecache_foo'));
+        static::assertNull($this->cache->getItem('filecache_bar'));
+
+        // -- verify non-matching item is still present
+
+        static::assertSame([7, 8, 9], $this->cache->getItem('other_item'));
+    }
+
+    public function testAdapterGetAllKeys()
+    {
+        // Use a dedicated directory so we start with a clean slate.
+        $dir = \realpath(\sys_get_temp_dir()) . '/simple_php_cache_test_file_keys';
+        $adapter = new \voku\cache\AdapterFile($dir);
+        $adapter->removeAll();
+
+        // Empty at start.
+        static::assertSame([], $adapter->getAllKeys());
+
+        // Keys appear after set().
+        $adapter->set('alpha', 'aaa');
+        $adapter->set('beta', 'bbb');
+
+        $keys = $adapter->getAllKeys();
+        \sort($keys);
+        static::assertSame(['alpha', 'beta'], $keys);
+
+        // Key disappears after remove().
+        $adapter->remove('alpha');
+        $keys = $adapter->getAllKeys();
+        static::assertNotContains('alpha', $keys);
+        static::assertContains('beta', $keys);
+
+        // All keys gone after removeAll().
+        $adapter->removeAll();
+        static::assertSame([], $adapter->getAllKeys());
+    }
+
     public function testGetUsedAdapterClassName()
     {
         static::assertSame('voku\cache\AdapterFile', $this->cache->getUsedAdapterClassName());

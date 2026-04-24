@@ -96,6 +96,35 @@ final class MemcacheCacheTest extends \PHPUnit\Framework\TestCase
         static::assertSame([3, 2, 1], $return);
     }
 
+    public function testAdapterGetAllKeys()
+    {
+        // setUp already marks this skipped when Memcache is unavailable.
+        assert($this->adapter instanceof \voku\cache\AdapterMemcache);
+
+        $this->adapter->removeAll();
+
+        // Empty at start.
+        static::assertSame([], $this->adapter->getAllKeys());
+
+        // Keys appear after set().
+        $this->adapter->set('fruit1', 'apple');
+        $this->adapter->set('fruit2', 'banana');
+
+        $keys = $this->adapter->getAllKeys();
+        \sort($keys);
+        static::assertSame(['fruit1', 'fruit2'], $keys);
+
+        // Key disappears after remove().
+        $this->adapter->remove('fruit1');
+        $keys = $this->adapter->getAllKeys();
+        static::assertNotContains('fruit1', $keys);
+        static::assertContains('fruit2', $keys);
+
+        // All keys gone after removeAll().
+        $this->adapter->removeAll();
+        static::assertSame([], $this->adapter->getAllKeys());
+    }
+
     /**
      * @before
      */

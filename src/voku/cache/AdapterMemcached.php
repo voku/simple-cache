@@ -88,6 +88,19 @@ class AdapterMemcached implements iAdapter
     /**
      * {@inheritdoc}
      */
+    public function getAllKeys(): array
+    {
+        $keys = $this->memcached->getAllKeys();
+        if ($keys === false) {
+            return [];
+        }
+
+        return $keys;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function set(string $key, $value): bool
     {
         // Make sure we are under the proper limit

@@ -20,6 +20,12 @@ use voku\cache\Exception\InvalidArgumentException;
 class Cache implements iCache
 {
     /**
+     * Reserved store key used to persist the keys registry inside the adapter.
+     * Users should not store cache items under this key.
+     */
+    private const KEYS_INDEX_KEY = '__simple_cache_keys_index__';
+
+    /**
      * @var array<string,mixed>
      */
     protected static $STATIC_CACHE = [];
@@ -369,6 +375,102 @@ class Cache implements iCache
     }
 
     /**
+     * Get the store key used to persist the keys registry in the adapter.
+     *
+     * @return string
+     */
+    private function getKeysIndexStoreKey(): string
+    {
+        return $this->calculateStoreKey(self::KEYS_INDEX_KEY);
+    }
+
+    /**
+     * Read all tracked raw (unprefixed) keys from the keys registry.
+     *
+     * @return string[]
+     */
+    private function getKeysFromIndex(): array
+    {
+        if (!$this->adapter instanceof iAdapter) {
+            return [];
+        }
+
+        $stored = $this->adapter->get($this->getKeysIndexStoreKey());
+        if ($stored === null || !\is_string($stored)) {
+            return [];
+        }
+
+        // Use PHP's native unserialize so the registry format is independent of
+        // whatever $this->serializer is configured to use.  This prevents
+        // cross-serializer corruption when a shared backend (static AdapterArray,
+        // APCu) is accessed by different Cache instances that use different
+        // serializers (e.g. SerializerDefault in ArrayCacheTest vs
+        // SerializerIgbinary in CacheChainTest).
+        $keys = @\unserialize($stored, ['allowed_classes' => false]);
+
+        return \is_array($keys) ? $keys : [];
+    }
+
+    /**
+     * Persist a list of raw keys to the keys registry in the adapter.
+     *
+     * @param string[] $keys
+     *
+     * @return void
+     */
+    private function saveKeysToIndex(array $keys): void
+    {
+        if (!$this->adapter instanceof iAdapter) {
+            return;
+        }
+
+        $indexKey = $this->getKeysIndexStoreKey();
+
+        if (empty($keys)) {
+            $this->adapter->remove($indexKey);
+
+            return;
+        }
+
+        // Always use PHP's native serialize so the registry format is independent
+        // of $this->serializer and can be safely read by any Cache instance that
+        // targets the same backend, regardless of its configured serializer.
+        $this->adapter->set($indexKey, \serialize(\array_values($keys)));
+    }
+
+    /**
+     * Add a raw key to the keys registry (no-op if already present).
+     *
+     * @param string $key
+     *
+     * @return void
+     */
+    private function addKeyToIndex(string $key): void
+    {
+        $keys = $this->getKeysFromIndex();
+        if (!\in_array($key, $keys, true)) {
+            $keys[] = $key;
+            $this->saveKeysToIndex($keys);
+        }
+    }
+
+    /**
+     * Remove a raw key from the keys registry.
+     *
+     * @param string $key
+     *
+     * @return void
+     */
+    private function removeKeyFromIndex(string $key): void
+    {
+        $keys = $this->getKeysFromIndex();
+        $filtered = \array_values(\array_diff($keys, [$key]));
+        if (\count($filtered) !== \count($keys)) {
+            $this->saveKeysToIndex($filtered);
+        }
+    }
+
+    /**
      * Check if cached-item exists.
      *
      * @param string $key
@@ -508,7 +610,77 @@ class Cache implements iCache
             );
         }
 
-        return $this->adapter->remove($storeKey);
+        $result = $this->adapter->remove($storeKey);
+
+        // Always clean the registry, even when the item was already gone (e.g. expired).
+        $this->removeKeyFromIndex($key);
+
+        return $result;
+    }
+
+    /**
+     * Remove all cached-items whose keys match a given regular expression.
+     *
+     * <p>The pattern is matched against the raw (unprefixed) key supplied to setItem().
+     * This method works with all adapters because it uses an in-adapter key registry
+     * maintained by setItem() / removeItem() / removeAll().</p>
+     *
+     * @param string $pattern A valid PHP regular expression (e.g. '/^imagecache_/').
+     *
+     * @return bool
+     *              <p>Returns true on success or when no tracked keys match the pattern.
+     *              Returns false only if a matched item that still exists could not be removed.</p>
+     */
+    public function removeItems(string $pattern): bool
+    {
+        if (!$this->adapter instanceof iAdapter) {
+            return false;
+        }
+
+        $rawKeys = $this->getKeysFromIndex();
+        if (empty($rawKeys)) {
+            return true;
+        }
+
+        $results = [];
+        $keysToRemove = [];
+
+        foreach ($rawKeys as $rawKey) {
+            if (\preg_match($pattern, $rawKey) !== 1) {
+                continue;
+            }
+
+            $storeKey = $this->calculateStoreKey($rawKey);
+
+            // Remove from static-cache
+            if (
+                !empty(self::$STATIC_CACHE)
+                &&
+                \array_key_exists($storeKey, self::$STATIC_CACHE)
+            ) {
+                unset(
+                    self::$STATIC_CACHE[$storeKey],
+                    self::$STATIC_CACHE_COUNTER[$storeKey],
+                    self::$STATIC_CACHE_EXPIRE[$storeKey]
+                );
+            }
+
+            $removed = $this->adapter->remove($storeKey);
+            // Treat an already-absent item (e.g. expired) as successfully removed.
+            if (!$removed && !$this->adapter->exists($storeKey)) {
+                $removed = true;
+            }
+            $results[] = $removed;
+            $keysToRemove[] = $rawKey;
+        }
+
+        // Prune matched keys from the registry regardless of removal outcome.
+        if (!empty($keysToRemove)) {
+            $remainingKeys = \array_values(\array_diff($rawKeys, $keysToRemove));
+            $this->saveKeysToIndex($remainingKeys);
+        }
+
+        return \in_array(false, $results, true) === false;
     }
 
     /**
@@ -549,10 +721,16 @@ class Cache implements iCache
             // always cache the TTL time, maybe we need this later ...
             self::$STATIC_CACHE_EXPIRE[$storeKey] = ($ttl ? (int) $ttl + \time() : 0);
 
-            return $this->adapter->setExpired($storeKey, $serialized, $ttl);
+            $result = $this->adapter->setExpired($storeKey, $serialized, $ttl);
+        } else {
+            $result = $this->adapter->set($storeKey, $serialized);
         }
 
-        return $this->adapter->set($storeKey, $serialized);
+        if ($result) {
+            $this->addKeyToIndex($key);
+        }
+
+        return $result;
     }
 
     /**
