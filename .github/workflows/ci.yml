@@ -105,7 +105,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          coverage: none
+          coverage: xdebug
           extensions: apcu, igbinary, memcache, memcached, opcache, redis
           tools: composer:v2
 
@@ -120,10 +120,17 @@ jobs:
 
       - name: Install analysis dependencies
         run: >
+          composer config --no-plugins allow-plugins.infection/extension-installer true &&
           composer require --dev --no-interaction --prefer-dist
-          phpstan/phpstan:^1.12
+          infection/infection:^0.32.7
+          phpstan/phpstan:^1.12.27
           "predis/predis:^1.1 || ^2.0 || ^3.0"
           "symfony/var-exporter:^5.4 || ^6.0 || ^7.0"
 
       - name: Run PHPStan
         run: php vendor/bin/phpstan analyse
+
+      - name: Run Infection
+        env:
+          XDEBUG_MODE: coverage
+        run: php vendor/bin/infection --show-mutations=0

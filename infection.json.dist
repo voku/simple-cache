@@ -1,0 +1,20 @@
+{
+  "$schema": "https://infection.github.io/schema.json",
+  "source": {
+    "directories": [
+      "src"
+    ]
+  },
+  "timeout": 10,
+  "threads": "max",
+  "phpUnit": {
+    "configDir": ".",
+    "customPath": "vendor/bin/phpunit"
+  },
+  "phpStan": {
+    "configDir": ".",
+    "customPath": "vendor/bin/phpstan"
+  },
+  "testFramework": "phpunit",
+  "staticAnalysisTool": "phpstan"
+}
