@@ -58,12 +58,13 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
         static::assertTrue($result);
     }
 
-    /**
-     * @depends testSet
-     */
     public function testKeyAfterSet()
     {
-        $item = $this->cache->getItem('some:test:key');
+        $key = 'some:test:key';
+
+        $this->cache->setItem($key, \uniqid(\time(), true), 10);
+
+        $item = $this->cache->getItem($key);
 
         static::assertNotNull($item);
     }
@@ -106,17 +107,19 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
     {
         $key = 'some:test:key';
 
+        $this->cache->setItem($key, \uniqid(\time(), true), 10);
+
         $result = $this->cache->removeItem($key);
 
         static::assertTrue($result);
     }
 
-    /**
-     * @depends testRemove
-     */
     public function testExists()
     {
         $key = 'some:test:key';
+
+        $this->cache->setItem($key, \uniqid(\time(), true), 10);
+        $this->cache->removeItem($key);
 
         $result = $this->cache->existsItem($key);
 
@@ -155,7 +158,6 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
             true
         );
 
-        // reset default prefix
-        $this->cache->setPrefix('');
+        $this->cache->setPrefix(static::class . ':' . $this->getName(false) . ':');
     }
 }
