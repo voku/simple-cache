@@ -97,6 +97,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
+    services:
+      memcached:
+        image: memcached:1.6-alpine
+        ports:
+          - 11211:11211
+      redis:
+        image: redis:8-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -117,6 +132,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php-8.3-composer-
             ${{ runner.os }}-composer-
+
+      - name: Wait for services
+        run: |
+          for port in 11211 6379; do
+            for attempt in {1..30}; do
+              if (echo > /dev/tcp/127.0.0.1/${port}) >/dev/null 2>&1; then
+                break
+              fi
+
+              if [ "${attempt}" -eq 30 ]; then
+                echo "Service on port ${port} did not become ready in time."
+                exit 1
+              fi
+
+              sleep 1
+            done
+          done
 
       - name: Install analysis dependencies
         run: >
