@@ -120,11 +120,14 @@ final class ArrayCacheTest extends \PHPUnit\Framework\TestCase
 
         assert($this->cache->getAdapter() instanceof AdapterArray);
         $values = $this->cache->getAdapter()->getStaticValues();
+        $expectedAo = new ArrayObject([], ArrayObject::ARRAY_AS_PROPS);
+        $expectedAo['prop'] = 'prop data';
+        $expectedAo['arr'] = 'array data';
 
         // User-set values are present with the expected serialized content.
         static::assertSame('N;', $values['foo_null']);
         static::assertSame('a:3:{i:0;i:3;i:1;i:2;i:2;i:1;}', $values['foo']);
-        static::assertSame('O:11:"ArrayObject":4:{i:0;i:2;i:1;a:2:{s:4:"prop";s:9:"prop data";s:3:"arr";s:10:"array data";}i:2;a:0:{}i:3;N;}', $values['ao']);
+        static::assertSame(\serialize($expectedAo), $values['ao']);
         static::assertSame('a:3:{i:0;i:3;i:1;i:2;i:2;i:1;}', $values['barfoo']);
 
         // The adapter also holds key-registry entries (one per prefix used so far).

@@ -51,7 +51,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
     public function testSet()
     {
         $key = 'some:test:key';
-        $value = \uniqid(\time(), true);
+        $value = \uniqid('', true);
 
         $result = $this->cache->setItem($key, $value, 10);
 
@@ -62,7 +62,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
     {
         $key = 'some:test:key';
 
-        $this->cache->setItem($key, \uniqid(\time(), true), 10);
+        $this->cache->setItem($key, \uniqid('', true), 10);
 
         $item = $this->cache->getItem($key);
 
@@ -72,7 +72,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
     public function testSetWithTtl()
     {
         $key = 'some:test:key';
-        $value = \uniqid(\time(), true);
+        $value = \uniqid('', true);
         $ttl = \random_int(20, 5000);
 
         $result = $this->cache->setItem($key, $value, $ttl);
@@ -83,7 +83,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
     public function testSetToDate()
     {
         $key = 'some:test:key';
-        $value = \uniqid(\time(), true);
+        $value = \uniqid('', true);
         $date = (new DateTime('now'))->add(new DateInterval('PT1H'));
 
         $result = $this->cache->setItemToDate($key, $value, $date);
@@ -96,7 +96,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\voku\cache\Exception\InvalidArgumentException::class);
 
         $key = 'some:test:key';
-        $value = \uniqid(\time(), true);
+        $value = \uniqid('', true);
         $date = new DateTime();
         $date->sub(new DateInterval('PT1H'));
 
@@ -107,7 +107,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
     {
         $key = 'some:test:key';
 
-        $this->cache->setItem($key, \uniqid(\time(), true), 10);
+        $this->cache->setItem($key, \uniqid('', true), 10);
 
         $result = $this->cache->removeItem($key);
 
@@ -118,7 +118,7 @@ final class CacheAutoInitOverwriteTest extends \PHPUnit\Framework\TestCase
     {
         $key = 'some:test:key';
 
-        $this->cache->setItem($key, \uniqid(\time(), true), 10);
+        $this->cache->setItem($key, \uniqid('', true), 10);
         $this->cache->removeItem($key);
 
         $result = $this->cache->existsItem($key);
